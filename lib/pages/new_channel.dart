@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:queschat/uicomponents/AppColors.dart';
+import 'package:queschat/constants/styles.dart';
 import 'package:queschat/uicomponents/appbars.dart';
 import 'package:queschat/uicomponents/custom_ui_widgets.dart';
 

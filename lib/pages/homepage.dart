@@ -7,7 +7,7 @@ import 'package:queschat/components/alert_grid.dart';
 import 'package:queschat/components/drawer.dart';
 import 'package:queschat/pages/ask_a_doubt.dart';
 import 'package:queschat/pages/post_a_MCQ.dart';
-import 'package:queschat/uicomponents/AppColors.dart';
+import 'package:queschat/constants/styles.dart';
 import 'package:queschat/uicomponents/appbars.dart';
 import 'package:queschat/uicomponents/custom_ui_widgets.dart';
 

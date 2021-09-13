@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:queschat/components/channel_suggestion_adapter.dart';
 import 'package:queschat/components/chat_list_adapter.dart';
-import 'package:queschat/uicomponents/AppColors.dart';
+import 'package:queschat/constants/styles.dart';
 
 class Channels extends StatefulWidget {
   @override

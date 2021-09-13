@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:queschat/components/drawer.dart';
+import 'package:queschat/constants/styles.dart';
 import 'package:queschat/pages/new_message.dart';
-import 'AppColors.dart';
 import 'custom_ui_widgets.dart';
 
 

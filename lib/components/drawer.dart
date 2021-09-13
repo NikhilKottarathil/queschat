@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:queschat/authentication/LoginPage.dart';
+import 'file:///C:/Users/WhiteBeast/StudioProjects/queschat/lib/authentication/screens/LoginPage.dart';
 import 'package:queschat/pages/create_group_stage_1.dart';
-import 'package:queschat/uicomponents/AppColors.dart';
+import 'package:queschat/constants/styles.dart';
 import 'package:queschat/uicomponents/custom_ui_widgets.dart';
 
 class CustomDrawer extends StatefulWidget {

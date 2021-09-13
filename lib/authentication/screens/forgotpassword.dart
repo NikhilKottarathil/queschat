@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:queschat/authentication/LoginPage.dart';
+import 'file:///C:/Users/WhiteBeast/StudioProjects/queschat/lib/authentication/screens/LoginPage.dart';
 import 'file:///C:/Users/WhiteBeast/StudioProjects/queschat/lib/uicomponents/custom_ui_widgets.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 

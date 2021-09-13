@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:queschat/components/channel_suggestion_adapter.dart';
 import 'package:queschat/pages/chats.dart';
 import 'package:queschat/pages/group_chat.dart';
-import 'package:queschat/uicomponents/AppColors.dart';
+import 'package:queschat/constants/styles.dart';
 
 class ChatAndChannelAdapter extends StatefulWidget {
   ChatAndChannelGS chatAndChannelGS;
@@ -68,7 +68,7 @@ class ChatListAdapter extends StatelessWidget {
                     // "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRuJdRZgCdojDsemBQqxOAg9UAGIYem6inQg&usqp=CAU"),
                   ),
                 ),
-              )),
+              ),),
           Expanded(
             flex: 4,
             child: Column(
@@ -101,7 +101,7 @@ class ChatListAdapter extends StatelessWidget {
                     child: Text(
                       chatListGS.messageCount,
                       style: TextStyle(color: Colors.white),
-                    )),
+                    ),),
               ],
             ),
           ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:queschat/pages/post_a_MCQ.dart';
-import 'package:queschat/uicomponents/AppColors.dart';
+import 'package:queschat/constants/styles.dart';
 
 class SearchUserAdapter extends StatefulWidget {
   SearchUserGS searchUserGS;

@@ -183,6 +183,7 @@ class _MediaPickerState extends State<MediaPicker> {
                 future: retrieveLostData(),
                 builder:
                     (BuildContext context, AsyncSnapshot<void> snapshot) {
+                  
                   switch (snapshot.connectionState) {
                     case ConnectionState.none:
                     case ConnectionState.waiting:

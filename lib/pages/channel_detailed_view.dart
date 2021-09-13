@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:queschat/pages/Courses.dart';
 import 'package:queschat/pages/ques_blog.dart';
-import 'package:queschat/uicomponents/AppColors.dart';
+import 'package:queschat/constants/styles.dart';
 import 'package:queschat/uicomponents/custom_ui_widgets.dart';
 
 import 'all_chats.dart';

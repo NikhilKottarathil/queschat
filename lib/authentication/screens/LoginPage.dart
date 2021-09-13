@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:queschat/authentication/forgotpassword.dart';
-import 'package:queschat/authentication/signup.dart';
-import 'package:queschat/uicomponents/AppColors.dart';
-import '../Trash.dart';
+import 'package:queschat/constants/styles.dart';
+import 'file:///C:/Users/WhiteBeast/StudioProjects/queschat/lib/authentication/screens/forgotpassword.dart';
+import 'file:///C:/Users/WhiteBeast/StudioProjects/queschat/lib/authentication/screens/signup.dart';
 import 'file:///C:/Users/WhiteBeast/StudioProjects/queschat/lib/uicomponents/custom_ui_widgets.dart';
 import 'package:queschat/pages/homepage.dart';
 

@@ -31,6 +31,10 @@ dependencies:
   pin_code_fields: ^7.0.0
   image_picker: ^0.7.2+1
   video_player: ^2.0.2
+  flutter_bloc: ^7.2.0
+  equatable: ^2.0.3
+  shared_preferences: ^2.0.5
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -65,15 +69,15 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: NunitoSans_Regular
+    - family: NunitoSans
       fonts:
         - asset: fonts/NunitoSans-Regular.ttf
-    - family: NunitoSans_SemiBold
-      fonts:
+          weight: 400
         - asset: fonts/NunitoSans-SemiBold.ttf
-    - family: NunitoSans_Bold
-      fonts:
+          weight: 500
         - asset: fonts/NunitoSans-Bold.ttf
+          weight: 700
+
   # fonts:
   #   - family: Schyler
   #     fonts:

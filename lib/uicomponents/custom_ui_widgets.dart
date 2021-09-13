@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:queschat/constants/styles.dart';
 import 'package:queschat/pages/create_group_stage_1.dart';
 
-import 'AppColors.dart';
 
 class CustomTextField extends StatefulWidget {
   TextEditingController textEditingController;

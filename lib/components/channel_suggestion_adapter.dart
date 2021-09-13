@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:queschat/pages/channel_detailed_view.dart';
-import 'package:queschat/uicomponents/AppColors.dart';
+import 'package:queschat/constants/styles.dart';
 
 class ChannelAdapter extends StatefulWidget {
   ChannelGS channelGS;
