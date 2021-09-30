@@ -24,7 +24,7 @@ class _NewMessageState extends State<NewMessage> {
     searchUserGSs.add(new SearchUserGS("search", "userName", "name",
         "https://i.pinimg.com/474x/98/4b/38/984b389f259826eb5fa38dc06bf915e8.jpg"));
     return Scaffold(
-      appBar: appBarWithBackButton(context, "New Message"),
+      appBar: appBarWithBackButton(context:context, titleString: "New Message"),
       body: Container(
         padding: EdgeInsets.all(15),
         child: Column(

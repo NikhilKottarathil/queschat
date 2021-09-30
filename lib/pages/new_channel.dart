@@ -13,7 +13,7 @@ class _NewChannelState extends State<NewChannel> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBarWithBackButton(context, "New Channel"),
+      appBar: appBarWithBackButton(context:context, titleString: "New Channel"),
       body: Container(
         padding: EdgeInsets.all(15),
         child: Column(

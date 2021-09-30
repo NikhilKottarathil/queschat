@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/authentication/auth_credentials.dart';
 import 'package:queschat/bloc/session_cubit.dart';
 
-enum AuthState { login, signUp, verifySignUp }
+enum AuthState { login, signUp, verifySignUp,forgotPassword }
 
 class AuthCubit extends Cubit<AuthState> {
   SessionCubit sessionCubit;
@@ -12,6 +12,7 @@ class AuthCubit extends Cubit<AuthState> {
   AuthCredentials authCredentials;
 
   void showLogin() => emit(AuthState.login);
+  void showForgotPassword() => emit(AuthState.forgotPassword);
 
   void showSignUp() => emit(AuthState.signUp);
 

@@ -8,7 +8,10 @@ class InitialFormStatus extends FormSubmissionStatus {
 
 class FormSubmitting extends FormSubmissionStatus {}
 
-class SubmissionSuccess extends FormSubmissionStatus {}
+class SubmissionSuccess extends FormSubmissionStatus {
+  String id;
+  SubmissionSuccess({this.id});
+}
 
 class SubmissionFailed extends FormSubmissionStatus {
   final Exception exception;

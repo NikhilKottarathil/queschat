@@ -8,8 +8,8 @@ class SignUpState {
     //
     if (userName.trim().length == 0) {
       return 'Please enter name';
-    } else if (userName.trim().length<6) {
-      return 'Username is too short';
+    } else if (userName.trim().length<4) {
+      return 'Username is too short!  at least 4 characters';
     } else {
       return null;
     }
@@ -22,7 +22,7 @@ class SignUpState {
     //
     if (phoneNumber.trim().length == 0) {
       return 'Please enter phone number';
-    } else if (phoneNumber.trim().length<10) {
+    } else if (phoneNumber.trim().length!=10) {
       return 'Enter a valid  phone number';
     } else {
       return null;

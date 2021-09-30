@@ -9,7 +9,6 @@ import 'package:queschat/pages/ask_a_doubt.dart';
 import 'package:queschat/pages/post_a_MCQ.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/uicomponents/appbars.dart';
-import 'package:queschat/uicomponents/custom_ui_widgets.dart';
 
 import 'messages.dart';
 import 'feedpage.dart';
@@ -49,7 +48,7 @@ class _HomePageState extends State<HomePage>
         statusBarIconBrightness: Brightness.light));
     return SafeArea(
       child: Scaffold(
-        appBar: appBar(context),
+        appBar: homeAppBar(context),
         drawer: CustomDrawer(),
         body: TabBarView(
           physics: NeverScrollableScrollPhysics(),

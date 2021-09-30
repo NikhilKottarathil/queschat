@@ -19,7 +19,7 @@ class _AlertGridState extends State<AlertGrid> {
     return InkWell(
 
       onTap: (){
-        widget.action;
+        widget.action();
 
       },
       child: Container(
@@ -50,10 +50,10 @@ class _AlertGridState extends State<AlertGrid> {
                 ),
               ],
             ),
-            IconButton(
-              // icon: Image.asset("image/ic_keyboard_backspace_24px"),
-                icon: new Icon(Icons.navigate_next,color: AppColors.PrimaryColor,size:MediaQuery.of(context).size.height*.04 ,),
-                onPressed: widget.action),
+            // IconButton(
+            //   // icon: Image.asset("image/ic_keyboard_backspace_24px"),
+                 new Icon(Icons.navigate_next,color: AppColors.PrimaryColor,size:MediaQuery.of(context).size.height*.04 ,),
+            //     onPressed: widget.action),
           ],
         ),
       ),

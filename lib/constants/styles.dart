@@ -6,8 +6,10 @@ class AppColors{
   static const PrimaryColor =  Color(0xff004C93);
   static const PrimaryColorLight =  Color(0xff0d64b5);
   static const SecondaryColorLight =  Color(0xff6694c0);
-  static const Tertiary =  Color(0xff6694c0);
+  static const Tertiary = Color(0xff6694c0);
+  static const PrimaryLightest =  Color(0xffBCE0FD);
   static const IconColor =  Color(0xff727C8E);
+  static const WhiteBlueShade =  Color(0xffF5FAFF);
 
   static const SecondaryLight =  Color(0xffF9FAFC);
   static const ShadowColor =  Color(0xffedeef0);
@@ -19,6 +21,7 @@ class AppColors{
   static const StatusBar =  Color(0xffF5F5F5);
 
   static const TextPrimary=  Color(0xff00264A);
+  static const TextPrimary2=  Color(0xff004C93);
   static const TextSecondary =  Color(0xff333333);
   static const TextTertiary=  Color(0xff82878A);
   static const TextError=  Colors.red;
@@ -27,6 +30,8 @@ class AppColors{
 
   static const White=  Color(0xFFFFFFFF);
 
+  static const Color DividerBase=const Color(0xFFF2F4F5);
+
 }
 
 class AppBorders {
@@ -34,7 +39,12 @@ class AppBorders {
   borderSide: BorderSide(
   color:Colors.transparent));
 }
+const  dividerDefault=const Divider(
+  thickness: 1,
+  color: AppColors.DividerBase,
+);
 class TextStyles{
+
 
 
   static const TextStyle tinyRegularTextPrimary=const TextStyle(fontSize:12,color: AppColors.TextPrimary,height:1.1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
@@ -49,9 +59,18 @@ class TextStyles{
   static const TextStyle mediumMediumTextPrimary=const TextStyle(fontSize:16,color: AppColors.TextPrimary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
   static const TextStyle mediumBoldTextPrimary=const TextStyle(fontSize:16,color: AppColors.TextPrimary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w700);
 
+  static const TextStyle xMediumRegularTextPrimary=const TextStyle(fontSize:20,color: AppColors.TextPrimary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle xMediumMediumTextPrimary=const TextStyle(fontSize:20,color: AppColors.TextPrimary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
+  static const TextStyle xMediumBoldTextPrimary=const TextStyle(fontSize:20,color: AppColors.TextPrimary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w700);
+
   static const TextStyle largeRegularTextPrimary=const TextStyle(fontSize:26,color: AppColors.TextPrimary,height:1.33,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
   static const TextStyle largeMediumTextPrimary=const TextStyle(fontSize:26,color: AppColors.TextPrimary,height:1.33,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
   static const TextStyle largeBoldTextPrimary=const TextStyle(fontSize:26,color: AppColors.TextPrimary,height:1.33,fontFamily: 'NunitoSans',fontWeight: FontWeight.w700);
+
+
+
+
+
 
   static const TextStyle tinyRegularTextSecondary=const TextStyle(fontSize:12,color: AppColors.TextSecondary,height:1.1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
   static const TextStyle tinyMediumTextSecondary=const TextStyle(fontSize:12,color: AppColors.TextSecondary,height:1.1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
@@ -65,9 +84,39 @@ class TextStyles{
   static const TextStyle mediumMediumTextSecondary=const TextStyle(fontSize:16,color: AppColors.TextSecondary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
   static const TextStyle mediumBoldTextSecondary=const TextStyle(fontSize:16,color: AppColors.TextSecondary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w700);
 
+ static const TextStyle xMediumRegularTextSecondary=const TextStyle(fontSize:20,color: AppColors.TextSecondary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle xMediumMediumTextSecondary=const TextStyle(fontSize:20,color: AppColors.TextSecondary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
+  static const TextStyle xMediumBoldTextSecondary=const TextStyle(fontSize:20,color: AppColors.TextSecondary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w700);
+
   static const TextStyle largeRegularTextSecondary=const TextStyle(fontSize:26,color: AppColors.TextSecondary,height:1.33,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
   static const TextStyle largeMediumTextSecondary=const TextStyle(fontSize:26,color: AppColors.TextSecondary,height:1.33,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
   static const TextStyle largeBoldTextSecondary=const TextStyle(fontSize:26,color: AppColors.TextSecondary,height:1.33,fontFamily: 'NunitoSans',fontWeight: FontWeight.w700);
+
+
+
+
+
+  static const TextStyle tinyRegularTextTertiary=const TextStyle(fontSize:12,color: AppColors.TextTertiary,height:1.1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle tinyMediumTextTertiary=const TextStyle(fontSize:12,color: AppColors.TextTertiary,height:1.1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
+  static const TextStyle tinyBoldTextTertiary=const TextStyle(fontSize:12,color: AppColors.TextTertiary,height:1.1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w700);
+
+  static const TextStyle smallRegularTextTertiary=const TextStyle(fontSize:14,color: AppColors.TextTertiary,height:1.43,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle smallMediumTextTertiary=const TextStyle(fontSize:14,color: AppColors.TextTertiary,height:1.43,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
+  static const TextStyle smallBoldTextTertiary=const TextStyle(fontSize:14,color: AppColors.TextTertiary,height:1.43,fontFamily: 'NunitoSans',fontWeight: FontWeight.w700);
+
+  static const TextStyle mediumRegularTextTertiary=const TextStyle(fontSize:16,color: AppColors.TextTertiary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle mediumMediumTextTertiary=const TextStyle(fontSize:16,color: AppColors.TextTertiary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
+  static const TextStyle mediumBoldTextTertiary=const TextStyle(fontSize:16,color: AppColors.TextTertiary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w700);
+
+  static const TextStyle xMediumRegularTextTertiary=const TextStyle(fontSize:20,color: AppColors.TextTertiary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle xMediumMediumTextTertiary=const TextStyle(fontSize:20,color: AppColors.TextTertiary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
+  static const TextStyle xMediumBoldTextTertiary=const TextStyle(fontSize:20,color: AppColors.TextTertiary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w700);
+
+  static const TextStyle largeRegularTextTertiary=const TextStyle(fontSize:26,color: AppColors.TextTertiary,height:1.33,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle largeMediumTextTertiary=const TextStyle(fontSize:26,color: AppColors.TextTertiary,height:1.33,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
+  static const TextStyle largeBoldTextTertiary=const TextStyle(fontSize:26,color: AppColors.TextTertiary,height:1.33,fontFamily: 'NunitoSans',fontWeight: FontWeight.w700);
+
+
 
 
 
@@ -84,9 +133,15 @@ class TextStyles{
   static const TextStyle mediumMediumTertiary=const TextStyle(fontSize:16,color: AppColors.Tertiary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
   static const TextStyle mediumBoldTertiary=const TextStyle(fontSize:16,color: AppColors.Tertiary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w700);
 
+  static const TextStyle xMediumRegularTertiary=const TextStyle(fontSize:20,color: AppColors.Tertiary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle xMediumMediumTertiary=const TextStyle(fontSize:20,color: AppColors.Tertiary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
+  static const TextStyle xMediumBoldTertiary=const TextStyle(fontSize:20,color: AppColors.Tertiary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w700);
+
   static const TextStyle largeRegularTertiary=const TextStyle(fontSize:26,color: AppColors.Tertiary,height:1.33,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
   static const TextStyle largeMediumTertiary=const TextStyle(fontSize:26,color: AppColors.Tertiary,height:1.33,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
   static const TextStyle largeBoldTertiary=const TextStyle(fontSize:26,color: AppColors.Tertiary,height:1.33,fontFamily: 'NunitoSans',fontWeight: FontWeight.w700);
+
+
 
 
 
@@ -102,9 +157,16 @@ class TextStyles{
   static const TextStyle mediumMediumWhite=const TextStyle(fontSize:16,color: AppColors.White,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
   static const TextStyle mediumBoldWhite=const TextStyle(fontSize:16,color: AppColors.White,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w700);
 
+ static const TextStyle xMediumRegularWhite=const TextStyle(fontSize:20,color: AppColors.White,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle xMediumMediumWhite=const TextStyle(fontSize:20,color: AppColors.White,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
+  static const TextStyle xMediumBoldWhite=const TextStyle(fontSize:20,color: AppColors.White,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w700);
+
   static const TextStyle largeRegularWhite=const TextStyle(fontSize:26,color: AppColors.White,height:1.33,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
   static const TextStyle largeMediumWhite=const TextStyle(fontSize:26,color: AppColors.White,height:1.33,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
   static const TextStyle largeBoldWhite=const TextStyle(fontSize:26,color: AppColors.White,height:1.33,fontFamily: 'NunitoSans',fontWeight: FontWeight.w700);
+
+
+
 
   static const TextStyle tinyRegularPrimaryColor=const TextStyle(fontSize:12,color: AppColors.PrimaryColor,height:1.1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
   static const TextStyle tinyMediumPrimaryColor=const TextStyle(fontSize:12,color: AppColors.PrimaryColor,height:1.1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
@@ -117,6 +179,10 @@ class TextStyles{
   static const TextStyle mediumRegularPrimaryColor=const TextStyle(fontSize:16,color: AppColors.PrimaryColor,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
   static const TextStyle mediumMediumPrimaryColor=const TextStyle(fontSize:16,color: AppColors.PrimaryColor,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
   static const TextStyle mediumBoldPrimaryColor=const TextStyle(fontSize:16,color: AppColors.PrimaryColor,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w700);
+
+ static const TextStyle xMediumRegularPrimaryColor=const TextStyle(fontSize:20,color: AppColors.PrimaryColor,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle xMediumMediumPrimaryColor=const TextStyle(fontSize:20,color: AppColors.PrimaryColor,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
+  static const TextStyle xMediumBoldPrimaryColor=const TextStyle(fontSize:20,color: AppColors.PrimaryColor,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w700);
 
   static const TextStyle largeRegularPrimaryColor=const TextStyle(fontSize:26,color: AppColors.PrimaryColor,height:1.33,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
   static const TextStyle largeMediumPrimaryColor=const TextStyle(fontSize:26,color: AppColors.PrimaryColor,height:1.33,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);

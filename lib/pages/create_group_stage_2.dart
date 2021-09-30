@@ -21,7 +21,7 @@ class _CreateGroupStage2State extends State<CreateGroupStage2> {
     searchUserGSs.add(new SearchUserGS("delete", "userName", "name",
         "https://i.pinimg.com/474x/98/4b/38/984b389f259826eb5fa38dc06bf915e8.jpg"));
     return Scaffold(
-      appBar: appBarWithBackButton(context, "New Group"),
+      appBar: appBarWithBackButton(context:context, titleString: "New Group"),
       body: Container(
         padding: EdgeInsets.all(15),
         child: Column(

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:queschat/components/drawer.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/pages/new_message.dart';
 import 'custom_ui_widgets.dart';
 
 
-Widget appBar(BuildContext context) {
+Widget homeAppBar(BuildContext context) {
   return AppBar(
     backgroundColor: Colors.white,
     elevation: 0,
@@ -34,19 +33,43 @@ Widget appBar(BuildContext context) {
 }
 
 
-Widget appBarWithBackButton(BuildContext context,String titleString) {
+Widget appBarWithBackButton({BuildContext context,String titleString,Function action,var tailActions}) {
   return AppBar(
     backgroundColor: Colors.white,
-    elevation: 0,
+    elevation: .5,
+    shadowColor: AppColors.ShadowColor,
     centerTitle: true,
+    actions:tailActions,
     iconTheme: IconThemeData(color: AppColors.IconColor),
     title: Text(titleString,style: TextStyle(fontSize: 20,color: AppColors.TextSecondary),),
     leading: IconButton(
       icon: Icon(Icons.arrow_back, color: AppColors.IconColor),
-      onPressed: () => Navigator.of(context).pop(),
+      onPressed:(){
+        action!=null?action():Navigator.of(context).pop();
+      },
     ),
   );
 }
+
+// for default leading button function
+// Widget appBarWithBackButton({BuildContext context,String titleString,Function action}) {
+//   return AppBar(
+//     backgroundColor: Colors.white,
+//     elevation: 1,
+//     centerTitle: true,
+//     iconTheme: IconThemeData(color: AppColors.IconColor),
+//     title: Text(titleString,style: TextStyle(fontSize: 20,color: AppColors.TextSecondary),),
+//     automaticallyImplyLeading: true,
+//
+//     leading:action!=null? IconButton(
+//       icon: Icon(Icons.arrow_back, color: AppColors.IconColor),
+//
+//       onPressed:(){
+//         action();
+//       },
+//     ):null,
+//   );
+// }
 
 
 Widget appBarForProfile(BuildContext context,String titleString) {

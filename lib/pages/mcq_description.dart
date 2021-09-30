@@ -12,7 +12,7 @@ class _MCQDescriptionState extends State<MCQDescription> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBarWithBackButton(context, "MCQ Description"),
+      appBar: appBarWithBackButton(context:context, titleString: "MCQ Description"),
       body: Container(
         // padding: EdgeInsets.all(10),
         margin: EdgeInsets.all(20),

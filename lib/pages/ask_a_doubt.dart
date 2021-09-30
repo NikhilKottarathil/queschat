@@ -19,7 +19,7 @@ class _AskADoubtState extends State<AskADoubt> {
   Widget build(BuildContext context) {
     double mHeight=MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: appBarWithBackButton(context,"Ask a Doubt"),
+      appBar: appBarWithBackButton(context:context,titleString:"Ask a Doubt"),
       body: Container(
         padding: EdgeInsets.only(top:20,left: 10,right: 10,bottom: 20),
         child: Column(

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/authentication/auth_cubit.dart';
 import 'package:queschat/authentication/auth_repo.dart';
@@ -7,10 +8,9 @@ import 'package:queschat/authentication/form_submitting_status.dart';
 import 'package:queschat/authentication/login/login_bloc.dart';
 import 'package:queschat/authentication/login/login_events.dart';
 import 'package:queschat/authentication/login/login_state.dart';
-import 'package:queschat/authentication/screens/forgotpassword.dart';
-import 'package:queschat/components/app_exit_alert.dart';
 import 'package:queschat/components/custom_progress_indicator.dart';
 import 'package:queschat/constants/styles.dart';
+import 'package:queschat/function/show_snack_bar.dart';
 import 'package:queschat/uicomponents/custom_button.dart';
 import 'package:queschat/uicomponents/custom_text_field.dart';
 
@@ -29,7 +29,7 @@ class LoginView extends StatelessWidget {
           listener: (context, state) {
             final formStatus = state.formStatus;
             if (formStatus is SubmissionFailed) {
-              _showSnackBar(context, formStatus.exception);
+              showSnackBar(context, formStatus.exception);
             }
           },
           child: Form(
@@ -82,6 +82,7 @@ class LoginView extends StatelessWidget {
                               builder: (context, state) {
                             return CustomTextField(
                                 hint: "Phone  Number",
+                                text: state.phoneNumber,
                                 validator: (value) {
                                   return state.phoneNumberValidationText;
                                 },
@@ -106,6 +107,7 @@ class LoginView extends StatelessWidget {
                                 validator: (value) {
                                   return state.passwordValidationText;
                                 },
+                                text: state.password,
                                 onChange: (value) {
                                   context.read<LoginBloc>().add(
                                         LoginPasswordChanged(password: value),
@@ -113,7 +115,7 @@ class LoginView extends StatelessWidget {
                                 },
                                 icon: new Icon(Icons.lock,
                                     color: AppColors.SecondaryColorLight),
-                                textInputType: TextInputType.number);
+                                textInputType: TextInputType.visiblePassword);
                           }),
                           SizedBox(
                             height: 10,
@@ -122,11 +124,7 @@ class LoginView extends StatelessWidget {
                             alignment: Alignment.centerRight,
                             child: InkWell(
                               onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            ForgotPassword()));
+                                context.read<AuthCubit>().showForgotPassword() ;
                               },
                               child: Text(
                                 "Forgot password?",
@@ -187,9 +185,5 @@ class LoginView extends StatelessWidget {
     );
   }
 
-  void _showSnackBar(BuildContext context, Exception exception) {
-    String message=exception.toString().substring(10);
-    final snackBar = SnackBar(content: Text(message));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
+
 }

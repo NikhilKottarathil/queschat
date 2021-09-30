@@ -26,8 +26,8 @@ class SessionCubit extends Cubit<SessionState> {
     emit(Authenticated(token: token));
   }
 
-  void signOut() {
-    authRepo.signOut();
+  void logOut() {
+    authRepo.logOut();
     emit(Unauthenticated());
   }
 }

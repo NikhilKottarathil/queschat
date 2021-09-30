@@ -4,13 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/authentication/auth_cubit.dart';
 import 'package:queschat/authentication/auth_repo.dart';
 import 'package:queschat/authentication/form_submitting_status.dart';
-import 'package:queschat/authentication/login/login_view.dart';
-import 'package:queschat/authentication/screens/forgotpassword.dart';
 import 'package:queschat/authentication/sign_up/sign_up_bloc.dart';
 import 'package:queschat/authentication/sign_up/sign_up_events.dart';
 import 'package:queschat/authentication/sign_up/sign_up_state.dart';
 import 'package:queschat/components/custom_progress_indicator.dart';
 import 'package:queschat/constants/styles.dart';
+import 'package:queschat/function/show_snack_bar.dart';
 import 'package:queschat/uicomponents/custom_button.dart';
 import 'package:queschat/uicomponents/custom_text_field.dart';
 
@@ -29,7 +28,7 @@ class SignUpView extends StatelessWidget {
           listener: (context, state) {
             final formStatus = state.formStatus;
             if (formStatus is SubmissionFailed) {
-              _showSnackBar(context, formStatus.exception);
+              showSnackBar(context, formStatus.exception);
             }
           },
           child: Form(
@@ -85,6 +84,7 @@ class SignUpView extends StatelessWidget {
                                   validator: (value) {
                                     return state.userNameValidationText;
                                   },
+                                  text: state.userName,
                                   onChange: (value) {
                                     context.read<SignUpBloc>().add(
                                       SignUpUsernameChanged(
@@ -106,6 +106,7 @@ class SignUpView extends StatelessWidget {
                                   validator: (value) {
                                     return state.phoneNumberValidationText;
                                   },
+                                  text: state.phoneNumber,
                                   onChange: (value) {
                                     context.read<SignUpBloc>().add(
                                           SignUpPhoneNumberChangeChanged(
@@ -127,6 +128,7 @@ class SignUpView extends StatelessWidget {
                                   validator: (value) {
                                     return state.passwordValidationText;
                                   },
+                                  text: state.password,
                                   onChange: (value) {
                                     context.read<SignUpBloc>().add(
                                           SignUpPasswordChanged(
@@ -135,7 +137,7 @@ class SignUpView extends StatelessWidget {
                                   },
                                   icon: new Icon(Icons.lock,
                                       color: AppColors.SecondaryColorLight),
-                                  textInputType: TextInputType.number);
+                                  textInputType: TextInputType.visiblePassword);
                             },
                           ),
                           SizedBox(
@@ -197,9 +199,4 @@ class SignUpView extends StatelessWidget {
     );
   }
 
-  void _showSnackBar(BuildContext context, Exception exception) {
-    String message=exception.toString().substring(10);
-    final snackBar = SnackBar(content: Text(message));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
 }

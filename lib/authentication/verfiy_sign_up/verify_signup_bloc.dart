@@ -23,8 +23,8 @@ class VerifySignUpBloc extends Bloc<VerifySignUpEvent, VerifySignUpState> {
         try {
           final token = await authRepo.signUp(
               username: authCubit.authCredentials.userName,
-              password: authCubit.authCredentials.userName,
-              phoneNumber: authCubit.authCredentials.password);
+              password: authCubit.authCredentials.password,
+              phoneNumber: authCubit.authCredentials.phoneNumber);
           yield state.copyWith(formStatus: SubmissionSuccess());
 
           final credentials = authCubit.authCredentials;

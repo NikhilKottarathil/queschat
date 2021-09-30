@@ -27,7 +27,7 @@ class _PostAMCQState extends State<PostAMCQ> {
       radioData.add(new RadioModel(false, "D"));
     }
     return Scaffold(
-      appBar: appBarWithBackButton(context, "Post a MCQ"),
+      appBar: appBarWithBackButton(context:context, titleString: "Post a MCQ"),
       body: SingleChildScrollView(
         child: Container(
           padding: EdgeInsets.all(15),

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/pages/create_group_stage_1.dart';
 
-
 class CustomTextField extends StatefulWidget {
   TextEditingController textEditingController;
   String hint;
@@ -37,7 +36,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         decoration: new InputDecoration(
           hintText: widget.hint,
           border: InputBorder.none,
-          hintStyle: TextStyle(color:AppColors.SecondaryColorLight),
+          hintStyle: TextStyle(color: AppColors.SecondaryColorLight),
           prefixIcon: widget.icon,
         ),
       ),
@@ -68,7 +67,8 @@ class _CustomButtonState extends State<CustomButton> {
             new RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
         child: Text(
           widget.text,
-          style: TextStyle(color: Colors.white,fontFamily: 'NunitoSans_SemiBold'),
+          style:
+              TextStyle(color: Colors.white, fontFamily: 'NunitoSans_SemiBold'),
         ),
       ),
     );
@@ -119,35 +119,37 @@ class _ActiveInactiveButtonState extends State<ActiveInactiveButton> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        widget.action();
-      },
-      child: Container(
-        decoration: widget.isActive
-            ? BoxDecoration(
-                borderRadius: BorderRadius.circular(30),
-                color: AppColors.SecondaryColorLight)
-            : null,
-        height: MediaQuery.of(context).size.height * .05,
-        child: Row(
-          children: <Widget>[
-            SizedBox(width: 15),
-            Container(
-              child: widget.icon,
-              width: MediaQuery.of(context).size.height * .025,
-            ),
-            SizedBox(width: 15),
-            Text(
-              widget.text,
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w400),
-            )
-          ],
-        ),
-      ),
-    );
+        splashColor: Colors.red,
+        onTap: () {
+          widget.action();
+        },
+        child: Container(
+          margin: EdgeInsets.only(bottom: 16),
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(),
+          // decoration: widget.isActive
+          //     ? BoxDecoration(
+          //     borderRadius: BorderRadius.circular(30),
+          //     color: AppColors.SecondaryColorLight)
+          //     : null,
+          child: Row(
+            children: <Widget>[
+              SizedBox(width: 15),
+              Container(
+                child: widget.icon,
+                width: MediaQuery.of(context).size.height * .025,
+              ),
+              SizedBox(width: 15),
+              Text(
+                widget.text,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w400),
+              )
+            ],
+          ),
+        ));
   }
 }
 
@@ -196,7 +198,8 @@ class FlatButtonWithIcon extends StatelessWidget {
   Icon icon;
   String text;
   Function action;
-  FlatButtonWithIcon(this.icon, this.text,this.action);
+
+  FlatButtonWithIcon(this.icon, this.text, this.action);
 
   @override
   Widget build(BuildContext context) {

@@ -4,7 +4,7 @@ class CustomProgressIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: CircularProgressIndicator(),
+      child: Center(child: CircularProgressIndicator()),
     );
   }
 }

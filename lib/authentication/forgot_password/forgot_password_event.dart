@@ -1,10 +1,11 @@
 abstract class ForgotPasswordEvent {}
 
+class ForgotOTPChanged extends ForgotPasswordEvent {
+  final String otp;
 
+  ForgotOTPChanged({this.otp});
+}
 
-
-
-class Button
 class ForgotPhoneNumberChanged extends ForgotPasswordEvent {
   final String phoneNumber;
 
@@ -14,4 +15,8 @@ class ForgotPasswordChanged extends ForgotPasswordEvent {
   final String password;
 
  ForgotPasswordChanged({this.password});
-}Submitted extends ForgotPasswordEvent {}
+}
+
+
+class ButtonSubmitted extends ForgotPasswordEvent {}
+class ReverseButtonSubmitted extends ForgotPasswordEvent {}
