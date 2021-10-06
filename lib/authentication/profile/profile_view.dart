@@ -6,11 +6,16 @@ import 'package:queschat/authentication/forgot_password/forgot_password_bloc.dar
 import 'package:queschat/authentication/forgot_password/forgot_password_view.dart';
 import 'package:queschat/authentication/profile/edit_profile/edit_profile_view.dart';
 import 'package:queschat/authentication/profile/edit_profile_options_view.dart';
+import 'package:queschat/authentication/profile/my_feeds.dart';
 import 'package:queschat/authentication/profile/profile_bloc.dart';
 import 'package:queschat/authentication/profile/profile_state.dart';
 import 'package:queschat/authentication/profile/profile_events.dart';
+import 'package:queschat/authentication/profile/saved_feeds.dart';
 import 'package:queschat/bloc/session_cubit.dart';
 import 'package:queschat/constants/styles.dart';
+import 'package:queschat/home/feeds/feeds_bloc.dart';
+import 'package:queschat/home/feeds/feeds_repo.dart';
+import 'package:queschat/home/feeds/feeds_view.dart';
 import 'package:queschat/uicomponents/appbars.dart';
 
 class ProfileView extends StatelessWidget {
@@ -39,6 +44,7 @@ class ProfileView extends StatelessWidget {
                         fontSize: 14))),
           ],
           action: () {
+            context.read<ProfileBloc>().add(FetchInitialFeeds());
             Navigator.of(context).pop();
           }),
       body: BlocBuilder<ProfileBloc, ProfileState>(
@@ -86,15 +92,19 @@ class ProfileView extends StatelessWidget {
                   ),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.only(
-                    left: 20, right: 20, top: 20.0, bottom: 20),
-                color: AppColors.White,
-                width: width,
-                child: Text(
-                  // state.name,
-                  'The end is the beginning, the beginning is th end',
-                  style: TextStyles.smallRegularTextSecondary,
+              Visibility(
+                visible: state.bio != null,
+                child: Container(
+                  padding: const EdgeInsets.only(
+                      left: 20, right: 20, top: 20.0, bottom: 20),
+                  color: AppColors.White,
+                  width: width,
+                  child: Text(
+                    // state.name,
+                    state.bio != null ? state.bio : '',
+                    style: TextStyles.smallRegularTextSecondary,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
               SizedBox(
@@ -122,12 +132,46 @@ class ProfileView extends StatelessWidget {
                             width: 22,
                           ),
                           Text(
+                            'My Feeds',
+                            style: TextStyles.smallMediumTextSecondary,
+                          ),
+                        ],
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => MyFeeds()
+                          ),
+                        );
+                      },
+                    ),
+                    dividerDefault,
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        primary: Colors.white,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.bookmark_outline_sharp,
+                            color: AppColors.IconColor,
+                          ),
+                          SizedBox(
+                            width: 22,
+                          ),
+                          Text(
                             'Saved Feeds',
                             style: TextStyles.smallMediumTextSecondary,
                           ),
                         ],
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (_) => SavedFeeds()
+                          ),
+                        );
+                      },
                     ),
                     dividerDefault,
                     TextButton(
@@ -173,7 +217,9 @@ class ProfileView extends StatelessWidget {
                       ),
                       onPressed: () {},
                     ),
-                    SizedBox(height: 5,),
+                    SizedBox(
+                      height: 5,
+                    ),
                   ],
                 ),
               ),

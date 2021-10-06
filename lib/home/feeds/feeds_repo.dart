@@ -1,28 +1,87 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:queschat/function/api_calls.dart';
+import 'package:queschat/home/feeds/quiz/quiz_mcq/quiz_mcq_state.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class FeedRepository {
-  Future<String> postMCQ(
+  Future<String> postMCQWithText(
       {String question,
+      List<File> questionImages,
       optionA,
       optionB,
       optionC,
       optionD,
-      correctOption}) async {
-    print('$question  $optionD $optionC $optionB $optionA $correctOption');
+      correctOption,
+      String feedLevel}) async {
+    print('correctOption $correctOption option A $optionA optionB $optionB');
+
     if (correctOption != null && correctOption != '') {
       try {
-        List options = [
-          {'option': optionA, 'Is_answer': correctOption == 'A' ? 1 : 0},
-          {'option': optionB, 'Is_answer': correctOption == 'B' ? 1 : 0},
-          {'option': optionC, 'Is_answer': correctOption == 'C' ? 1 : 0},
-          {'option': optionD, 'Is_answer': correctOption == 'D' ? 1 : 0},
-        ];
-        var myBody = {'name': question, 'options': options, 'feed_type': 'mcq'};
-
-        print('ttttttttt');
-        print(options.toString());
+        Map<String, String> myBody = {
+          'name': question,
+          'feed_type': 'mcq',
+          'option_a': optionA,
+          'option_b': optionB,
+          'option_c': optionC,
+          'option_d': optionD,
+          'option_type': 'text',
+          'answer': correctOption
+        };
         print(myBody);
-        var body = await postDataRequest(myBody: myBody, address: 'feed');
+
+        if (feedLevel != null) {
+          myBody.addAll({'feed_level': feedLevel});
+        }
+
+        print(myBody);
+        var body;
+
+        SharedPreferences sharedPreferences =
+            await SharedPreferences.getInstance();
+        String token = sharedPreferences.getString('token');
+        Map<String, String> headers = {};
+        headers['x-access-token'] = token;
+        print('in pbobst inage');
+        print(myBody);
+        try {
+          if (await checkInternetIsConnected()) {
+            print('net connectuin');
+
+            var request = http.MultipartRequest(
+                'POST', Uri.parse('https://api.queschat.com/api/feed'));
+            request.headers.addAll(headers);
+            request.fields.addAll(myBody);
+
+            List<http.MultipartFile> newList = [];
+            for (int i = 0; i < questionImages.length; i++) {
+              http.MultipartFile multipartFile = http.MultipartFile(
+                  'images',
+                  questionImages[i].readAsBytes().asStream(),
+                  questionImages[i].lengthSync(),
+                  filename: questionImages[i].path.split("/").last);
+              newList.add(multipartFile);
+            }
+            request.files.addAll(newList);
+
+            print('listing ok');
+            try {
+              http.Response response =
+                  await http.Response.fromStream(await request.send());
+              body = json.decode(response.body);
+            } catch (e) {
+              print('fgdf');
+              print(e);
+            }
+          } else {
+            body = {'message': 'noInternet'};
+          }
+        } catch (e) {
+          print(e);
+        }
+
         if (body['message'] != null) {
           if (body['message'] == 'Successfully Created') {
             return body['id'].toString();
@@ -42,15 +101,167 @@ class FeedRepository {
     }
   }
 
-  Future<String> postBlog({String heading, content, var media}) async {
+  Future<String> postMCQWithImage(
+      {String question,
+      List<File> questionImages,
+      correctOption,
+      File optionA,
+      optionB,
+      optionC,
+      optionD,
+      feedLevel}) async {
+    print(correctOption);
+    if (correctOption != null && correctOption != '') {
+      try {
+        Map<String, String> myBody = {
+          'name': question,
+          'feed_type': 'mcq',
+          'answer': correctOption,
+          'option_type': 'image',
+        };
+        print(myBody);
+        var body;
+        if (feedLevel != null) {
+          myBody.addAll({'feed_level': feedLevel});
+        }
+        print(myBody);
+
+        SharedPreferences sharedPreferences =
+            await SharedPreferences.getInstance();
+        String token = sharedPreferences.getString('token');
+        Map<String, String> headers = {};
+        headers['x-access-token'] = token;
+        print('in pbobst inage');
+        print(myBody);
+        try {
+          if (await checkInternetIsConnected()) {
+            print('net connectuin');
+
+            var request = http.MultipartRequest(
+                'POST', Uri.parse('https://api.queschat.com/api/feed'));
+            request.headers.addAll(headers);
+            request.fields.addAll(myBody);
+
+            List<http.MultipartFile> newList = [];
+            for (int i = 0; i < questionImages.length; i++) {
+              http.MultipartFile multipartFile = http.MultipartFile(
+                  'images',
+                  questionImages[i].readAsBytes().asStream(),
+                  questionImages[i].lengthSync(),
+                  filename: questionImages[i].path.split("/").last);
+              newList.add(multipartFile);
+            }
+
+            http.MultipartFile multipartFileOptionA = http.MultipartFile(
+                'option_a',
+                optionA.readAsBytes().asStream(),
+                optionA.lengthSync(),
+                filename: optionA.path.split("/").last);
+            newList.add(multipartFileOptionA);
+
+            http.MultipartFile multipartFileOptionB = http.MultipartFile(
+                'option_b',
+                optionB.readAsBytes().asStream(),
+                optionB.lengthSync(),
+                filename: optionB.path.split("/").last);
+            newList.add(multipartFileOptionB);
+            http.MultipartFile multipartFileOptionC = http.MultipartFile(
+                'option_c',
+                optionC.readAsBytes().asStream(),
+                optionC.lengthSync(),
+                filename: optionC.path.split("/").last);
+            newList.add(multipartFileOptionC);
+            http.MultipartFile multipartFileOptionD = http.MultipartFile(
+                'option_d',
+                optionD.readAsBytes().asStream(),
+                optionD.lengthSync(),
+                filename: optionD.path.split("/").last);
+            newList.add(multipartFileOptionD);
+
+            request.files.addAll(newList);
+
+            print('listing ok');
+            try {
+              http.Response response =
+                  await http.Response.fromStream(await request.send());
+              body = json.decode(response.body);
+            } catch (e) {
+              print('fgdf');
+              print(e);
+            }
+          } else {
+            body = {'message': 'noInternet'};
+          }
+        } catch (e) {
+          print(e);
+        }
+
+        if (body['message'] != null) {
+          if (body['message'] == 'Successfully Created') {
+            return body['id'].toString();
+          } else {
+            throw Exception('Please retry');
+          }
+        } else {
+          throw Exception('Please retry');
+        }
+      } catch (e) {
+        print('eeeeeeeeeeeeeeeeee');
+        print(e);
+        throw e;
+      }
+    } else {
+      throw Exception(['Please Select Answer']);
+    }
+  }
+
+  Future<String> postQuiz(
+      {String heading, content, var media, List<QuizMcqState> mcqList}) async {
     try {
-      Map<String,String> myBody = {
+      List<String> mcqIDs = [];
+      for (var state in mcqList) {
+        if (state.isImageOptions) {
+          mcqIDs.add(await postMCQWithImage(
+              question: state.question,
+              questionImages: state.questionImages,
+              optionA: state.optionAImage,
+              optionB: state.optionBImage,
+              optionC: state.optionCImage,
+              optionD: state.optionDImage,
+              feedLevel: '2',
+              correctOption: state.correctOption));
+        } else {
+          mcqIDs.add(await postMCQWithText(
+              question: state.question,
+              questionImages: state.questionImages,
+              optionA: state.optionA,
+              optionB: state.optionB,
+              optionC: state.optionC,
+              optionD: state.optionD,
+              feedLevel: '2',
+              correctOption: state.correctOption));
+        }
+      }
+
+      String mcqIDString = '';
+      mcqIDs.forEach((element) {
+        if (mcqIDString != '') {
+          mcqIDString = mcqIDString + ',';
+        }
+        mcqIDString = mcqIDString + element;
+      });
+      Map<String, String> myBody = {
         'name': heading,
         'description': content,
-        'feed_type': 'blog'
+        'mcq': mcqIDString,
+        'feed_type': 'quiz'
       };
 
-      var body = await postImageListDataRequest(myBody: myBody, address: 'feed',imageFiles:media,imageAddress: 'images' );
+      var body = await postImageListDataRequest(
+          myBody: myBody,
+          address: 'feed',
+          imageFiles: media,
+          imageAddress: 'images');
       print(body);
       if (body['message'] != null) {
         if (body['message'] == 'Successfully Created') {
@@ -68,16 +279,92 @@ class FeedRepository {
     }
   }
 
-  Future<List> getFeeds(int page, rowsPerPage) async {
+  Future<String> postBlog({String heading, content, var media}) async {
+    try {
+      Map<String, String> myBody = {
+        'name': heading,
+        'description': content,
+        'feed_type': 'blog'
+      };
+
+      var body = await postImageListDataRequest(
+          myBody: myBody,
+          address: 'feed',
+          imageFiles: media,
+          imageAddress: 'images');
+      print(body);
+      if (body['message'] != null) {
+        if (body['message'] == 'Successfully Created') {
+          return body['id'].toString();
+        } else {
+          throw Exception('Please retry');
+        }
+      } else {
+        throw Exception('Please retry');
+      }
+    } catch (e) {
+      print('eeeeeeeeeeeeeeeeee');
+      print(e);
+      throw e;
+    }
+  }
+
+  Future<void> editBlog({String heading, content, feedId}) async {
+    try {
+      Map<String, String> myBody = {
+        'name': heading,
+        'description': content,
+        'feed_type': 'blog'
+      };
+
+      var body =
+          await patchDataRequest(myBody: myBody, address: 'feed/$feedId');
+      print(body);
+      if (body['message'] != null) {
+        if (body['message'] == 'Successfully Updated') {
+        } else {
+          throw Exception('Please retry');
+        }
+      } else {
+        throw Exception('Please retry');
+      }
+    } catch (e) {
+      print('eeeeeeeeeeeeeeeeee');
+      print(e);
+      throw e;
+    }
+  }
+
+  Future<List> getFeeds(int page, rowsPerPage, parentPage) async {
     try {
       print('page $page rowsPerPage $rowsPerPage');
       // var body = await getDataRequest( address: 'feed/list');
-      var body = await getDataRequest(
-          address: 'feed/list?rows_per_page=$rowsPerPage&page=$page');
-      if (body['Feeds'] != null) {
-        return body['Feeds'];
-      } else {
-        throw Exception('Please retry');
+      var body;
+      if (parentPage == 'home') {
+        body = await getDataRequest(
+            address: 'feed/list?rows_per_page=$rowsPerPage&page=$page');
+        if (body['Feeds'] != null) {
+          return body['Feeds'];
+        } else {
+          throw Exception('Please retry');
+        }
+      } else if (parentPage == 'myFeeds') {
+        body = await getDataRequest(
+            address: 'feed/by_creator?rows_per_page=$rowsPerPage&page=$page');
+        if (body['Feeds'] != null) {
+          return body['Feeds'];
+        } else {
+          throw Exception('Please retry');
+        }
+      } else if (parentPage == 'savedFeeds') {
+        body = await getDataRequest(
+            address:
+                'saved_feed/by_creator?rows_per_page=$rowsPerPage&page=$page');
+        if (body['Saved Feeds'] != null) {
+          return body['Saved Feeds'];
+        } else {
+          throw Exception('Please retry');
+        }
       }
     } catch (e) {
       print(e);
@@ -99,12 +386,10 @@ class FeedRepository {
     }
   }
 
-
-
   Future<void> likeFeed({String feedId}) async {
     try {
       var myBody = {
-        'associated_id': 'Feed-'+feedId,
+        'associated_id': 'Feed-' + feedId,
         'connection_type': 'like',
       };
 
@@ -123,12 +408,13 @@ class FeedRepository {
       throw e;
     }
   }
-  Future<void> answerMcq({String feedId,String answer}) async {
+
+  Future<void> answerMcq({String feedId, String answer}) async {
     try {
       var myBody = {
-        'associated_id': 'Feed-'+feedId,
+        'associated_id': 'Feed-' + feedId,
         'connection_type': 'answer',
-        'name':answer
+        'name': answer
       };
 
       print(myBody);
@@ -146,11 +432,63 @@ class FeedRepository {
       throw e;
     }
   }
+
   Future<void> unLikeFeed({String connectionId}) async {
     try {
-
-
       var body = await deleteDataRequest(address: 'connection/$connectionId');
+      if (body['message'] != null) {
+        if (body['message'] == 'Successfully Deleted') {
+        } else {
+          throw Exception('Please retry');
+        }
+      } else {
+        throw Exception('Please retry');
+      }
+    } catch (e) {
+      print(e);
+      throw e;
+    }
+  }
+
+  Future<void> deleteFeed({String feedId}) async {
+    try {
+      var body = await deleteDataRequest(address: 'feed/$feedId');
+      if (body['message'] != null) {
+        if (body['message'] == 'Successfully Deleted') {
+        } else {
+          throw Exception('Please retry');
+        }
+      } else {
+        throw Exception('Please retry');
+      }
+    } catch (e) {
+      print(e);
+      throw e;
+    }
+  }
+
+  Future<String> saveFeed({String feedId}) async {
+    try {
+      var myBody = {'feed_id': feedId};
+      var body = await postDataRequest(address: 'saved_feed', myBody: myBody);
+      if (body['message'] != null) {
+        if (body['message'] == 'Successfully Created') {
+          return body['id'].toString();
+        } else {
+          throw Exception('Please retry');
+        }
+      } else {
+        throw Exception('Please retry');
+      }
+    } catch (e) {
+      print(e);
+      throw e;
+    }
+  }
+
+  Future<void> deleteFromSaved({String savedId}) async {
+    try {
+      var body = await deleteDataRequest(address: 'saved_feed/$savedId');
       if (body['message'] != null) {
         if (body['message'] == 'Successfully Deleted') {
         } else {

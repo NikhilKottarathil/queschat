@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:queschat/authentication/form_submitting_status.dart';
 
 class PostMcqState {
@@ -5,6 +7,9 @@ class PostMcqState {
   FormSubmissionStatus formSubmissionStatus;
 
   String question;
+  List<File> questionImages;
+  bool isImageOptions;
+
   String get questionValidationText {
     if (question.trim().length == 0) {
       return 'Please enter question';
@@ -52,15 +57,22 @@ class PostMcqState {
       return null;
     }
   }
+  File  optionAImage,optionBImage,optionCImage,optionDImage;
 
   PostMcqState({
     this.question = '',
+    this.questionImages,
     this.optionA = '',
     this.optionB = '',
     this.optionC = '',
     this.optionD = '',
     this.correctOption='',
-    this.formSubmissionStatus
+    this.formSubmissionStatus,
+    this.optionAImage,
+    this.optionBImage,
+    this.optionCImage,
+    this.optionDImage,
+    this.isImageOptions=false,
   });
 
   PostMcqState copyWith({
@@ -71,13 +83,23 @@ class PostMcqState {
     String optionD,
     String correctOption,
     FormSubmissionStatus formSubmissionStatus,
+    File  optionAImage,optionBImage,optionCImage,optionDImage,
+    List<File> questionImages,
+    bool isImageOptions,
+
   }) {
     return PostMcqState(
       question: question ?? this.question,
+      questionImages: questionImages ?? this.questionImages,
+      isImageOptions: isImageOptions ?? this.isImageOptions,
       optionA: optionA ?? this.optionA,
       optionB: optionB ?? this.optionB,
       optionC: optionC ?? this.optionC,
       optionD: optionD ?? this.optionD,
+      optionAImage: optionAImage ?? this.optionAImage,
+      optionBImage: optionBImage ?? this.optionBImage,
+      optionCImage: optionCImage ?? this.optionCImage,
+      optionDImage: optionDImage ?? this.optionDImage,
       correctOption: correctOption ?? this.correctOption,
       formSubmissionStatus: formSubmissionStatus ?? this.formSubmissionStatus,
     );

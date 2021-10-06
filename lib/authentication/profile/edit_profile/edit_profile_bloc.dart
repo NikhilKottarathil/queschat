@@ -18,6 +18,7 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
   setUserDetails(){
     state.userName=profileBloc.state.name;
     state.phoneNumber=profileBloc.state.phoneNumber;
+    state.bio=profileBloc.state.bio;
 
   }
 
@@ -29,11 +30,14 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
     else if (event is EditProfilePhoneNumberChangeChanged) {
       yield state.copyWith(phoneNumber: event.phoneNumber);
 
+    } else if (event is EditProfileBioChangeChanged) {
+      yield state.copyWith(bio: event.bio);
+
     }  else if (event is EditProfileSubmitted) {
       yield state.copyWith(formStatus: FormSubmitting());
 
       try {
-        await authRepo.editProfile(userName:state.userName,phoneNumber:state.phoneNumber);
+        await authRepo.editProfile(userName:state.userName,phoneNumber:state.phoneNumber,bio: state.bio);
         profileBloc.add(ProfileEdited());
         yield state.copyWith(formStatus: SubmissionSuccess());
       } catch (e) {

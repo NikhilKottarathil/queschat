@@ -25,6 +25,18 @@ class LikeAndUnLikeFeed extends FeedEvent {
   int feedIndex;
 
   LikeAndUnLikeFeed({this.feedIndex});
+}class EditedAFeed extends FeedEvent {
+  String feedId;
+
+  EditedAFeed({this.feedId});
+}class DeleteFeed extends FeedEvent {
+  int feedIndex;
+
+  DeleteFeed({this.feedIndex});
+}class SaveAndUnSaveFeed extends FeedEvent {
+  int feedIndex;
+
+  SaveAndUnSaveFeed({this.feedIndex});
 }
 class CommentFeed extends FeedEvent {
   int feedIndex;
@@ -32,3 +44,6 @@ class CommentFeed extends FeedEvent {
 
   CommentFeed({this.feedIndex, this.option});
 }
+
+
+

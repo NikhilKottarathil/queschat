@@ -11,6 +11,11 @@ class EditProfilePhoneNumberChangeChanged extends EditProfileEvent {
 
   EditProfilePhoneNumberChangeChanged({this.phoneNumber});
 }
+class EditProfileBioChangeChanged extends EditProfileEvent {
+  final String bio;
+
+  EditProfileBioChangeChanged({this.bio});
+}
 
 
 

@@ -5,8 +5,6 @@ import 'package:queschat/constants/styles.dart';
 import 'package:queschat/uicomponents/appbars.dart';
 import 'package:queschat/uicomponents/custom_ui_widgets.dart';
 
-import '../Trash.dart';
-
 class AskADoubt extends StatefulWidget {
   @override
   _AskADoubtState createState() => _AskADoubtState();

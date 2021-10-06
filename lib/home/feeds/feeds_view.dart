@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:queschat/authentication/app_data.dart';
-import 'package:queschat/authentication/forgot_password/forgot_password_status.dart';
 import 'package:queschat/components/custom_progress_indicator.dart';
+import 'package:queschat/function/show_snack_bar.dart';
 import 'package:queschat/home/feeds/feed_adpater.dart';
-
 import 'package:queschat/home/feeds/feeds_bloc.dart';
 import 'package:queschat/home/feeds/feeds_event.dart';
 import 'package:queschat/home/feeds/feeds_state.dart';
@@ -43,6 +41,10 @@ class _FeedsViewState extends State<FeedsView> {
                   duration: const Duration(milliseconds: 400),
                   curve: Curves.fastOutSlowIn);
             });
+          }
+          Exception e= state.actionErrorMessage;
+          if(e!=null  &&e.toString().length!=0){
+            showSnackBar(context, e);
           }
         },
         child: BlocBuilder<FeedsBloc, FeedsState>(builder: (context, state) {

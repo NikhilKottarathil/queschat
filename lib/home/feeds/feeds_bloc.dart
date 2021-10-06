@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/constants/strings_and_urls.dart';
-import 'package:queschat/function/api_calls.dart';
 import 'package:queschat/function/time_conversions.dart';
 import 'package:queschat/home/feeds/feeds_event.dart';
 import 'package:queschat/home/feeds/feeds_repo.dart';
@@ -12,13 +11,15 @@ import 'package:queschat/home/feeds/feeds_status.dart';
 import 'package:queschat/models/blog_nodel.dart';
 import 'package:queschat/models/feed_model.dart';
 import 'package:queschat/models/mcq_model.dart';
+import 'package:queschat/models/quiz_model.dart';
 
 class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
   FeedRepository feedRepository;
+  String parentPage;
 
-
-  FeedsBloc({@required this.feedRepository})
+  FeedsBloc({@required this.feedRepository, @required this.parentPage})
       : super(FeedsState(feedModelList: [], feedIds: [])) {
+    state.parentPage = parentPage;
     getInitialFeeds();
   }
 
@@ -26,19 +27,23 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
     state.feedModelList.clear();
     state.feedIds.clear();
     state.page = 1;
-    var feeds = await feedRepository.getFeeds(state.page, 3);
-    convertFeeds(feeds);
+    var feeds = await feedRepository.getFeeds(state.page, 10, parentPage);
     print('inital $feeds');
+
+    convertFeeds(feeds);
   }
 
   getMoreFeeds() async {
     state.page = state.page + 1;
-    var feeds = await feedRepository.getFeeds(state.page, 3);
-    convertFeeds(feeds);
+    var feeds = await feedRepository.getFeeds(state.page, 10, parentPage);
     print('norw $feeds');
+
+    convertFeeds(feeds);
   }
 
-  insertFeedToTop(String id) async {
+  insertFeedToTop(
+    String id,
+  ) async {
     var element = await feedRepository.getSingleFeedDetails(id);
     var contentModel = await getContentModel(element);
 
@@ -46,8 +51,12 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
         0,
         FeedModel(
             userName: element['user'],
+            userId: element['user_id'].toString(),
             id: element['id'].toString(),
             feedType: element['feed_type'],
+            savedId: element['saved_feed_id'] != null
+                ? element['saved_feed_id'].toString()
+                : null,
             commentCount: element['comment_count'] != null
                 ? element['comment_count']
                 : '0',
@@ -65,16 +74,47 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
     emit(state);
   }
 
+  updateSingleFeedData(
+    String id,
+  ) async {
+    var element = await feedRepository.getSingleFeedDetails(id);
+    var contentModel = await getContentModel(element);
+
+    state.feedModelList[state.feedIds.indexOf(id)] = FeedModel(
+        userName: element['user'],
+        userId: element['user_id'].toString(),
+        id: element['id'].toString(),
+        feedType: element['feed_type'],
+        savedId: element['saved_feed_id'] != null
+            ? element['saved_feed_id'].toString()
+            : null,
+        commentCount:
+            element['comment_count'] != null ? element['comment_count'] : '0',
+        likeCount: element['like_count'] != null ? element['like_count'] : '0',
+        profilePicUrl: element['profile_pic'] != null
+            ? 'https://api.queschat.com/' + element['profile_pic']
+            : Urls().personUrl,
+        uploadedTime: getTimeDifferenceFromNowString(element['create_date']),
+        contentModel: contentModel);
+    emit(state);
+  }
+
   convertFeeds(var feeds) async {
     try {
+      print('conver feed');
       feeds.forEach((element) async {
         if (!state.feedIds.contains(element['id'])) {
           var contentModel = await getContentModel(element);
 
           state.feedModelList.add(FeedModel(
               userName: element['user'],
+              userId: element['user_id'].toString(),
+
               id: element['id'].toString(),
               feedType: element['feed_type'],
+              savedId: element['saved_feed_id'] != null
+                  ? element['saved_feed_id'].toString()
+                  : null,
               commentCount: element['comment_count'] != null
                   ? element['comment_count'].toString()
                   : '0',
@@ -107,69 +147,49 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
 
   Future getContentModel(var element) async {
     if (element['feed_type'] == 'mcq') {
-      String optionA, optionB, optionC, optionD, correctAnswer;
-
-      final List optionStrings = ['A', 'B', 'C', 'D'];
-      var options = element['options'];
-      var selectedAnswer;
-
       try {
-        for (int i = 0; i <= 3; i++) {
-          String randomItem = getRandomElement(optionStrings);
-
-          if (randomItem == 'A') {
-            optionA = options[i]['option'];
-            if (options[i]['Is_answer'] == 1) {
-              correctAnswer = 'A';
-            }
-            if(element['my_answer']['name']==options[i]['option']){
-              selectedAnswer='A';
-            }
-          }
-          if (randomItem == 'B') {
-            optionB = options[i]['option'];
-            if (options[i]['Is_answer'] == 1) {
-              correctAnswer = 'B';
-            }
-            if(element['my_answer']['name']==options[i]['option']){
-              selectedAnswer='B';
-            }
-          }
-          if (randomItem == 'C') {
-            optionC = options[i]['option'];
-            if (options[i]['Is_answer'] == 1) {
-              correctAnswer = 'C';
-            }
-            if(element['my_answer']['name']==options[i]['option']){
-              selectedAnswer='C';
-            }
-          }
-          if (randomItem == 'D') {
-            optionD = options[i]['option'];
-            if (options[i]['Is_answer'] == 1) {
-              correctAnswer = 'D';
-            }
-            if(element['my_answer']['name']==options[i]['option']){
-              selectedAnswer='D';
-            }
-          }
-          optionStrings.remove(randomItem);
+        String optionA, optionB, optionC, optionD, correctAnswer;
+        var selectedAnswer;
+        var myAnswer = element['my_answer'] != null
+            ? element['my_answer']['name'] != null
+                ? element['my_answer']['name']
+                : null
+            : null;
+        correctAnswer = element['answer'];
+        optionA = element['option_a'];
+        optionB = element['option_b'];
+        optionC = element['option_c'];
+        optionD = element['option_d'];
+        if(myAnswer==optionA){
+          selectedAnswer='A';
         }
+        if(myAnswer==optionB){
+          selectedAnswer='B';
+        }
+        if(myAnswer==optionC){
+          selectedAnswer='C';
 
+        }
+        if(myAnswer==optionD){
+          selectedAnswer='D';
+        }
+        List<String> media = [];
+        element['media'].forEach((value) {
+          media.add('https://api.queschat.com/' + value['url']);
+        });
         MCQModel mcqModel = MCQModel(
             question: element['name'],
             optionA: optionA,
             optionB: optionB,
+            optionType: element['option_type'],
             selectedAnswer: selectedAnswer,
             optionC: optionC,
+            media: media,
             optionD: optionD,
             correctAnswer: correctAnswer);
 
         return mcqModel;
-      } catch (e) {
-        print('option error');
-        print(e);
-      }
+      } catch (e) {}
     } else if (element['feed_type'] == 'blog') {
       List<String> media = [];
       element['media'].forEach((value) {
@@ -178,6 +198,25 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
       BlogModel blogModel = BlogModel(
           content: element['description'],
           images: media,
+          heading: element['name']);
+      return blogModel;
+    } else if (element['feed_type'] == 'quiz') {
+      List<String> media = [];
+      element['media'].forEach((value) {
+        media.add('https://api.queschat.com/' + value['url']);
+      });
+      List<String> mcqList = [];
+      String mcq= element['mcq'].toString();
+      if (mcq != null) {
+
+        mcqList=mcq.split(',');
+      }
+      print('mcqList$mcqList');
+      QuizModel blogModel = QuizModel(
+          content: element['description'],
+          images: media,
+          mcqIDs:mcqList,
+          noOfQuestions: mcqList.length.toString(),
           heading: element['name']);
       return blogModel;
     }
@@ -228,6 +267,43 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
             event.option;
         yield state.copyWith();
       } catch (e) {}
+    } else if (event is DeleteFeed) {
+      try {
+        await feedRepository.deleteFeed(
+          feedId: state.feedModelList[event.feedIndex].id,
+        );
+        state.feedModelList.removeAt(event.feedIndex);
+        yield state.copyWith();
+      } catch (e) {
+        yield state.copyWith(actionErrorMessage: e);
+        Exception e1 = Exception(['']);
+        yield state.copyWith(actionErrorMessage: e1);
+      }
+    } else if (event is SaveAndUnSaveFeed) {
+      try {
+        if (state.feedModelList[event.feedIndex].savedId == null) {
+          var savedId = await feedRepository.saveFeed(
+              feedId: state.feedModelList[event.feedIndex].id);
+          state.feedModelList[event.feedIndex].savedId = savedId;
+          yield state.copyWith();
+        } else {
+          await feedRepository.deleteFromSaved(
+              savedId: state.feedModelList[event.feedIndex].savedId);
+          state.feedModelList[event.feedIndex].savedId = null;
+          if (parentPage == 'savedFeeds') {
+            state.feedModelList.removeAt(event.feedIndex);
+          }
+          yield state.copyWith();
+        }
+        yield state.copyWith();
+      } catch (e) {
+        yield state.copyWith(actionErrorMessage: e);
+        Exception e1 = Exception(['']);
+        yield state.copyWith(actionErrorMessage: e1);
+      }
+    } else if (event is EditedAFeed) {
+      await updateSingleFeedData(event.feedId);
+      yield state.copyWith();
     }
   }
 }

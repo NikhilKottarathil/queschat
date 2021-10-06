@@ -16,6 +16,7 @@ class AuthRepository {
       dynamic myBody = {
         'token': token,
       };
+      print(token);
       var body = await postDataRequest(address: 'check/token', myBody: myBody);
       if (body['message'] == 'Token Valid') {
         AppData appData=AppData();
@@ -156,9 +157,13 @@ class AuthRepository {
     }
   }
 
-  Future<void> editProfile({String userName, phoneNumber}) async {
+  Future<void> editProfile({String userName, phoneNumber,bio}) async {
     try {
-      dynamic myBody = {'name': userName, 'mobile': phoneNumber};
+      var myBody = {'name': userName, 'mobile': phoneNumber};
+      if(bio!=null && bio.toString().trim().length!=0){
+        dynamic bioBody={'about_me':bio};
+        myBody.addAll(bioBody);
+      }
       print(myBody);
       var body =
           await patchDataRequest(address: 'user/profile', myBody: myBody);

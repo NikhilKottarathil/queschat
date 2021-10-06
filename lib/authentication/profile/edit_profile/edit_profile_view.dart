@@ -15,6 +15,7 @@ import 'package:queschat/function/show_snack_bar.dart';
 import 'package:queschat/uicomponents/appbars.dart';
 import 'package:queschat/uicomponents/custom_button.dart';
 import 'package:queschat/uicomponents/custom_text_field.dart';
+import 'package:queschat/uicomponents/custom_text_field_2.dart';
 
 class EditProfileView extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
@@ -58,16 +59,16 @@ class EditProfileView extends StatelessWidget {
                           SizedBox(
                             height: 100,
                           ),
-                          Text(
-                            'Edit Profile',
-                            style: TextStyles.largeRegularTertiary,
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
+                          // Text(
+                          //   'Edit Profile',
+                          //   style: TextStyles.largeRegularTertiary,
+                          // ),
+                          // SizedBox(
+                          //   height: 20,
+                          // ),
                           BlocBuilder<EditProfileBloc, EditProfileState>(
                             builder: (context, state) {
-                              return CustomTextField(
+                              return CustomTextField3(
                                   hint: "UserName",
                                   validator: (value) {
                                     return state.userNameValidationText;
@@ -79,17 +80,17 @@ class EditProfileView extends StatelessWidget {
                                               username: value),
                                         );
                                   },
-                                  icon: new Icon(Icons.person,
-                                      color: AppColors.SecondaryColorLight),
+
                                   textInputType: TextInputType.text);
                             },
                           ),
+                          dividerDefault,
                           SizedBox(
                             height: 20,
                           ),
                           BlocBuilder<EditProfileBloc, EditProfileState>(
                             builder: (context, state) {
-                              return CustomTextField(
+                              return CustomTextField3(
                                   hint: "Phone  Number",
                                   validator: (value) {
                                     return state.phoneNumberValidationText;
@@ -101,14 +102,37 @@ class EditProfileView extends StatelessWidget {
                                               phoneNumber: value),
                                         );
                                   },
-                                  icon: new Icon(Icons.phone_android,
-                                      color: AppColors.SecondaryColorLight),
+
                                   textInputType: TextInputType.number);
                             },
                           ),
+                          dividerDefault,
+
                           SizedBox(
                             height: 20,
                           ),
+                          BlocBuilder<EditProfileBloc, EditProfileState>(
+                            builder: (context, state) {
+                              return CustomTextField3(
+                                  hint: "About  me",
+                                  validator: (value) {
+                                    return null;
+                                  },
+                                  text: state.bio,
+                                  onChange: (value) {
+                                    context.read<EditProfileBloc>().add(
+                                      EditProfileBioChangeChanged(
+                                          bio: value),
+                                    );
+                                  },
+
+                                  textInputType: TextInputType.text);
+                            },
+                          ),
+                          dividerDefault,
+
+                          SizedBox(height: 20,),
+
                           BlocBuilder<EditProfileBloc, EditProfileState>(
                             builder: (context, state) {
                               return state.formStatus is FormSubmitting

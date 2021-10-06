@@ -56,16 +56,15 @@ patchDataRequest({address, myBody}) async {
 
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   String token = sharedPreferences.getString('token');
-  Map<String, String> headers = {};
+  Map<String, String> headers = {"Content-Type": "application/json"};
   headers['x-access-token'] = token;
 
   if (await checkInternetIsConnected()) {
     String url = "https://api.queschat.com/api/$address";
-    dynamic response = await http.Client().patch(
-      Uri.parse(url),
-      headers: headers,
-      body: myBody,
-    );
+    dynamic response = await http.Client().patch(Uri.parse(url),
+        headers: headers,
+        body: json.encode(myBody),
+        encoding: Encoding.getByName("utf-8"));
     print(response.body);
     var body = json.decode(response.body);
 
@@ -163,10 +162,17 @@ postImageListDataRequest(
       }
       request.files.addAll(newList);
 
-      http.Response response =
-          await http.Response.fromStream(await request.send());
-      var body = json.decode(response.body);
-      return body;
+      print('listing ok');
+      try {
+        http.Response response =
+            await http.Response.fromStream(await request.send());
+        var body = json.decode(response.body);
+
+        return body;
+      } catch (e) {
+        print('fgdf');
+        print(e);
+      }
     } else {
       var data = {'message': 'noInternet'};
       return data;

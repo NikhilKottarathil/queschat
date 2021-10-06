@@ -27,133 +27,138 @@ class PostBlogView extends StatelessWidget {
   List<RadioModel> radioData = new List<RadioModel>();
   final _formKey = GlobalKey<FormState>();
 
-  FeedRepository feedRepo;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar:
-          appBarWithBackButton(context: context, titleString: "Post A Blog"),
-      body: BlocListener<PostBlogBloc, PostBlogState>(
-        listener: (context, state) {
-          final formStatus = state.formSubmissionStatus;
-          if (formStatus is SubmissionFailed) {
-            showSnackBar(context, formStatus.exception);
-          }
-          if (formStatus is SubmissionSuccess) {
-            context.read<FeedsBloc>().add(UserAddedNewFeed(id: formStatus.id));
-            context.read<PostBlogBloc>().add(ClearAllFields());
+    return WillPopScope(
+      onWillPop: (){
+        context.read<PostBlogBloc>().add(ClearAllFields());
+        return null;
+      },
+      child: Scaffold(
+        appBar:
+            appBarWithBackButton(context: context, titleString: "Post A Blog"),
+        body: BlocListener<PostBlogBloc, PostBlogState>(
+          listener: (context, state) {
+            final formStatus = state.formSubmissionStatus;
+            if (formStatus is SubmissionFailed) {
+              showSnackBar(context, formStatus.exception);
+            }
+            if (formStatus is SubmissionSuccess) {
+              context.read<FeedsBloc>().add(UserAddedNewFeed(id: formStatus.id));
+              context.read<PostBlogBloc>().add(ClearAllFields());
 
-            Navigator.pop(context);
-            Navigator.pop(context);
-          }
-        },
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return Stack(
-              children: [
-                SingleChildScrollView(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                        minWidth: constraints.maxWidth,
-                        minHeight: constraints.maxHeight),
-                    child: IntrinsicHeight(
-                      child: Padding(
-                        padding: EdgeInsets.all(20),
-                        child: Form(
-                          key: _formKey,
-                          child: Column(
-                            children: [
-                              BlocBuilder<PostBlogBloc, PostBlogState>(
-                                builder: (context, state) {
-                                  return TextFieldWithBoxBorder(
-                                    hint: 'Enter blog title',
-                                    text: state.heading,
-                                    heading: 'Title',
-                                    height: 150,
-                                    textInputType: TextInputType.multiline,
-                                    validator: (value) {
-                                      return state.headingValidationText;
-                                    },
-                                    onChange: (value) {
-                                      context.read<PostBlogBloc>().add(
-                                            HeadingChanged(heading: value),
-                                          );
-                                    },
-                                  );
-                                },
-                              ),
-                              BlocBuilder<PostBlogBloc, PostBlogState>(
-                                builder: (context, state) {
-                                  return TextFieldWithBoxBorder(
-                                    hint: 'Enter your blog',
-                                    text: state.content,
-                                    heading: 'blog',
-                                    height: 300,
-                                    textInputType: TextInputType.multiline,
-                                    validator: (value) {
-                                      return state.contentAValidationText;
-                                    },
-                                    onChange: (value) {
-                                      context.read<PostBlogBloc>().add(
-                                            ContentChanged(content: value),
-                                          );
-                                    },
-                                  );
-                                },
-                              ),
-                              BlocBuilder<PostBlogBloc, PostBlogState>(
-                                builder: (context, state) {
-                                  return Visibility(
-                                    visible: state.media.length > 0,
-                                    child: MultiFileViewer(media: state.media),
-                                  );
-                                },
-                              ),
-                              CustomButtonWithIcon(
-                                icon: Icons.camera,
-                                text: "Add an Image",
-                                action: () async {
-                                  context
-                                      .read<PostBlogBloc>()
-                                      .add(SelectMedia(context: context));
-                                },
-                              ),
-                              SizedBox(
-                                height: 100,
-                              ),
-                            ],
+              Navigator.pop(context);
+              Navigator.pop(context);
+            }
+          },
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return Stack(
+                children: [
+                  SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                          minWidth: constraints.maxWidth,
+                          minHeight: constraints.maxHeight),
+                      child: IntrinsicHeight(
+                        child: Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              children: [
+                                BlocBuilder<PostBlogBloc, PostBlogState>(
+                                  builder: (context, state) {
+                                    return TextFieldWithBoxBorder(
+                                      hint: 'Enter blog title',
+                                      text: state.heading,
+                                      heading: 'Title',
+                                      height: 150,
+                                      textInputType: TextInputType.multiline,
+                                      validator: (value) {
+                                        return state.headingValidationText;
+                                      },
+                                      onChange: (value) {
+                                        context.read<PostBlogBloc>().add(
+                                              HeadingChanged(heading: value),
+                                            );
+                                      },
+                                    );
+                                  },
+                                ),
+                                BlocBuilder<PostBlogBloc, PostBlogState>(
+                                  builder: (context, state) {
+                                    return TextFieldWithBoxBorder(
+                                      hint: 'Enter your blog',
+                                      text: state.content,
+                                      heading: 'blog',
+                                      height: 300,
+                                      textInputType: TextInputType.multiline,
+                                      validator: (value) {
+                                        return state.contentAValidationText;
+                                      },
+                                      onChange: (value) {
+                                        context.read<PostBlogBloc>().add(
+                                              ContentChanged(content: value),
+                                            );
+                                      },
+                                    );
+                                  },
+                                ),
+                                BlocBuilder<PostBlogBloc, PostBlogState>(
+                                  builder: (context, state) {
+                                    return Visibility(
+                                      visible: state.media.length > 0,
+                                      child: MultiFileViewer(media: state.media),
+                                    );
+                                  },
+                                ),
+                                CustomButtonWithIcon(
+                                  icon: Icons.camera,
+                                  text: "Attach Media",
+                                  action: () async {
+                                    context
+                                        .read<PostBlogBloc>()
+                                        .add(SelectMedia(context: context));
+                                  },
+                                ),
+                                SizedBox(
+                                  height: 100,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
-                    child: BlocBuilder<PostBlogBloc, PostBlogState>(
-                      builder: (context, state) {
-                        return state.formSubmissionStatus is FormSubmitting
-                            ? CustomProgressIndicator()
-                            : CustomButton(
-                                text: "NEXT",
-                                action: () async {
-                                  if (_formKey.currentState.validate()) {
-                                    context
-                                        .read<PostBlogBloc>()
-                                        .add(PostBlogSubmitted());
-                                  }
-                                },
-                              );
-                      },
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                      child: BlocBuilder<PostBlogBloc, PostBlogState>(
+                        builder: (context, state) {
+                          return state.formSubmissionStatus is FormSubmitting
+                              ? CustomProgressIndicator()
+                              : CustomButton(
+                                  text: "NEXT",
+                                  action: () async {
+                                    if (_formKey.currentState.validate()) {
+                                      context
+                                          .read<PostBlogBloc>()
+                                          .add(PostBlogSubmitted());
+                                    }
+                                  },
+                                );
+                        },
+                      ),
                     ),
-                  ),
-                )
-              ],
-            );
-          },
+                  )
+                ],
+              );
+            },
+          ),
         ),
       ),
     );

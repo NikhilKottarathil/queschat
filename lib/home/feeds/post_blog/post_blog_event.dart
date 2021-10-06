@@ -19,5 +19,6 @@ class ContentChanged extends PostBlogEvent {
 
 
 class PostBlogSubmitted extends PostBlogEvent {}
+class EditBlogSubmitted extends PostBlogEvent {}
 class ClearAllFields extends PostBlogEvent {}
 

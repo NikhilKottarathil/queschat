@@ -59,12 +59,14 @@ class OptionTextField extends StatefulWidget {
   var onChange;
   var text;
   String optionKey;
+  String errorText;
 
 
   OptionTextField({Key key,
     this.hint,
     this.validator,
     this.text,
+    this.errorText,
     this.onChange,
     this.optionKey,
     this.textInputType})
@@ -127,6 +129,7 @@ class _OptionTextFieldState extends State<OptionTextField> {
           hintText: widget.hint,
 
           hintStyle: TextStyles.smallRegularTextTertiary,
+          errorText: widget.errorText==''?null:widget.errorText,
           errorStyle: TextStyle(
               fontSize: 12,
               color: AppColors.TextError,

@@ -7,12 +7,16 @@ class FeedsState {
   int page;
   List<String> feedIds=[];
   bool isLoading;
+  String parentPage;
+  Exception actionErrorMessage;
 
   FeedsState({
     this.feedModelList,
     this.pageScrollStatus=const InitialStatus(),
     this.feedIds,
     this.page=1,
+    this.parentPage,
+    this.actionErrorMessage,
     this.isLoading=false
   });
 
@@ -20,6 +24,8 @@ class FeedsState {
     var feedModelList,
     var feedIds,
     bool isLoading,
+    String parentPage,
+    Exception actionErrorMessage,
     PageScrollStatus pageScrollStatus,
     int page,
   }) {
@@ -29,6 +35,8 @@ class FeedsState {
       pageScrollStatus: pageScrollStatus ?? this.pageScrollStatus,
       isLoading: isLoading ?? this.isLoading,
       page: page ?? this.page,
+      parentPage: parentPage ?? this.parentPage,
+      actionErrorMessage: actionErrorMessage ?? this.actionErrorMessage,
     );
   }
 }

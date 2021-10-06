@@ -9,6 +9,8 @@ import 'package:queschat/home/feeds/feeds_view.dart';
 import 'package:queschat/home/feeds/post_a_mcq/post_mcq_bloc.dart';
 import 'package:queschat/home/feeds/post_blog/post_blog_bloc.dart';
 import 'package:queschat/home/feeds/post_blog/post_blog_view.dart';
+import 'package:queschat/home/feeds/quiz/create_quiz_view.dart';
+import 'package:queschat/home/feeds/quiz/post_quiz_bloc.dart';
 import 'package:queschat/home/home_bloc.dart';
 import 'package:queschat/home/home_events.dart';
 import 'package:queschat/home/home_state.dart';
@@ -167,6 +169,22 @@ void showDialog(BuildContext buildContext) {
                                     value: buildContext.read<FeedsBloc>(),
                                   ),
                                 ], child: PostAMCQView(),)
+                              ),);
+
+                        }), AlertGrid(
+                        heading: "Post A Quiz",
+                        description: "Challenge your fellow beings",
+                        action: () {
+                          Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => MultiBlocProvider(providers: [
+                                  BlocProvider.value(
+                                    value: buildContext.read<PostQuizBloc>(),
+                                  ),
+                                  BlocProvider.value(
+                                    value: buildContext.read<FeedsBloc>(),
+                                  ),
+                                ], child: CreateQuizView(),)
                               ),);
 
                         }),

@@ -8,6 +8,7 @@ import 'package:queschat/authentication/profile/profile_events.dart';
 import 'package:queschat/authentication/profile/profile_state.dart';
 import 'package:queschat/authentication/profile/profile_view.dart';
 import 'package:queschat/bloc/session_cubit.dart';
+import 'package:queschat/home/feeds/feeds_bloc.dart';
 import 'package:queschat/pages/create_group_stage_1.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/uicomponents/custom_ui_widgets.dart';
@@ -42,6 +43,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 ProfileBloc(
                   authRepo: context.read<AuthRepository>(),
                   authCubit: context.read<AuthCubit>(),
+                  feedsBloc: context.read<FeedsBloc>(),
                 ),
             child: ClipRRect(
               borderRadius: BorderRadius.only(

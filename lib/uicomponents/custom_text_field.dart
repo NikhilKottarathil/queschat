@@ -153,6 +153,7 @@ class TextFieldWithBoxBorder extends StatefulWidget {
   Icon icon;
   TextInputType textInputType;
   var validator;
+  var errorText;
   var onChange;
   var text;
 
@@ -163,6 +164,7 @@ class TextFieldWithBoxBorder extends StatefulWidget {
       this.validator,
       this.text,
       this.heading,
+        this.errorText,
       this.height,
       this.onChange,
       this.textInputType})
@@ -181,6 +183,8 @@ class _TextFieldWithBoxBorderState extends State<TextFieldWithBoxBorder> {
     super.initState();
     if (widget.text != null) {
       controller.text = widget.text;
+    }else{
+      controller.text='';
     }
   }
 
@@ -192,10 +196,10 @@ class _TextFieldWithBoxBorderState extends State<TextFieldWithBoxBorder> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            widget.heading,
+          widget.heading!=null?Text(
+            widget.heading!=null?widget.heading:'',
             style: TextStyle(color: AppColors.TextFourth, fontSize: 18),
-          ),
+          ):Container(),
           Expanded(
             child: Container(
               margin: EdgeInsets.only(top: 10, bottom: 10),
@@ -207,7 +211,6 @@ class _TextFieldWithBoxBorderState extends State<TextFieldWithBoxBorder> {
                 keyboardType: widget.textInputType,
                 style: TextStyles.smallRegularTextSecondary,
 
-                validator: widget.validator,
                 obscureText:
                     widget.textInputType == TextInputType.visiblePassword
                         ? true
@@ -222,7 +225,10 @@ class _TextFieldWithBoxBorderState extends State<TextFieldWithBoxBorder> {
                         : true,
                 onChanged: widget.onChange,
                 maxLines: null,
+                validator: widget.validator,
                 decoration: new InputDecoration(
+
+                  errorText: widget.errorText,
                   prefixIcon: widget.icon,
                   contentPadding: EdgeInsets.only(top: 17, bottom: 17,left: 17,right: 17),
                   hintText: widget.hint,

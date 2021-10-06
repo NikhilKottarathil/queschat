@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/authentication/form_submitting_status.dart';
 import 'package:queschat/components/custom_progress_indicator.dart';
 import 'package:queschat/components/custom_radio_button.dart';
+import 'package:queschat/components/multi_file_viewer.dart';
 import 'package:queschat/components/option_text_field.dart';
+import 'package:queschat/constants/styles.dart';
 import 'package:queschat/function/show_snack_bar.dart';
 import 'package:queschat/home/feeds/feeds_bloc.dart';
 import 'package:queschat/home/feeds/feeds_event.dart';
@@ -21,40 +23,49 @@ class PostAMCQView extends StatefulWidget {
   _PostAMCQViewState createState() => _PostAMCQViewState();
 }
 
-class _PostAMCQViewState extends State<PostAMCQView> {
+class _PostAMCQViewState extends State<PostAMCQView>
+    with SingleTickerProviderStateMixin {
   List<RadioModel> radioData = new List<RadioModel>();
   final _formKey = GlobalKey<FormState>();
 
   FeedRepository feedRepo;
+  TabController tabController;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    tabController = TabController(length: 2, vsync: this, initialIndex: 0);
+  }
+
   @override
   Widget build(BuildContext context) {
-    feedRepo=new FeedRepository();
+    feedRepo = new FeedRepository();
     if (radioData.isEmpty) {
-      radioData.add(new RadioModel(isSelected:false,text: "A"));
-      radioData.add(new RadioModel(isSelected:false,text: "B"));
-      radioData.add(new RadioModel(isSelected:false,text: "C"));
-      radioData.add(new RadioModel(isSelected:false,text: "D"));
+      radioData.add(new RadioModel(isSelected: false, text: "A"));
+      radioData.add(new RadioModel(isSelected: false, text: "B"));
+      radioData.add(new RadioModel(isSelected: false, text: "C"));
+      radioData.add(new RadioModel(isSelected: false, text: "D"));
     }
     // create: (context) => PostMcqBloc(feedRepo: feedRepo),
 
     return Scaffold(
-      appBar:
-          appBarWithBackButton(context: context, titleString: "Post a MCQ"),
-      body: BlocListener<PostMcqBloc,PostMcqState>(
+      appBar: appBarWithBackButton(context: context, titleString: "Post a MCQ"),
+      body: BlocListener<PostMcqBloc, PostMcqState>(
         listener: (context, state) {
           final formStatus = state.formSubmissionStatus;
           if (formStatus is SubmissionFailed) {
             showSnackBar(context, formStatus.exception);
           }
           if (formStatus is SubmissionSuccess) {
-
             context.read<FeedsBloc>().add(UserAddedNewFeed(id: formStatus.id));
             context.read<PostMcqBloc>().add(ClearAllFields());
 
             Navigator.pop(context);
             Navigator.pop(context);
           }
-        },          child: LayoutBuilder(
+        },
+        child: LayoutBuilder(
           builder: (context, constraints) {
             return Stack(
               children: [
@@ -72,9 +83,11 @@ class _PostAMCQViewState extends State<PostAMCQView> {
                             children: [
                               BlocBuilder<PostMcqBloc, PostMcqState>(
                                 builder: (context, state) {
-                                  return CustomTextField2(
+                                  return TextFieldWithBoxBorder(
                                     hint: 'Enter your question here',
                                     text: state.question,
+                                    height: 150,
+                                    heading: 'Enter your Question',
                                     textInputType: TextInputType.multiline,
                                     validator: (value) {
                                       return state.questionValidationText;
@@ -87,78 +100,380 @@ class _PostAMCQViewState extends State<PostAMCQView> {
                                   );
                                 },
                               ),
+                              BlocBuilder<PostMcqBloc, PostMcqState>(
+                                builder: (context, state) {
+                                  return state.questionImages.length > 0
+                                      ? MultiFileViewer(
+                                          media: state.questionImages)
+                                      : Container();
+                                },
+                              ),
+                              CustomButtonWithIcon(
+                                icon: Icons.camera,
+                                text: "Add an Image",
+                                action: () async {
+                                  context.read<PostMcqBloc>().add(
+                                      SelectQuestionImages(context: context));
+                                },
+                              ),
                               SizedBox(
                                 height: 20,
                               ),
-                              BlocBuilder<PostMcqBloc, PostMcqState>(
-                                builder: (context, state) {
-                                  return OptionTextField(
-                                    hint: 'Enter here',
-                                    optionKey: "A",
-                                    text: state.optionA,
-                                    textInputType: TextInputType.multiline,
-                                    validator: (value) {
-                                      return state.optionAValidationText;
+                              Container(
+                                margin: EdgeInsets.only(top: 30),
+                                decoration: BoxDecoration(
+                                  color: AppColors.ShadowColor,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                padding: EdgeInsets.all(2),
+                                child: new TabBar(
+                                    indicatorColor: Colors.grey,
+                                    labelStyle: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600),
+                                    indicator: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(10),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: AppColors.ShadowColor,
+                                          )
+                                        ]),
+                                    onTap: (index) {
+                                      context
+                                          .read<PostMcqBloc>()
+                                          .add(ChooseOptionType());
                                     },
-                                    onChange: (value) {
-                                      context.read<PostMcqBloc>().add(
-                                            OptionAChanged(optionA: value),
-                                          );
-                                    },
-                                  );
-                                },
+                                    controller: tabController,
+                                    labelColor: AppColors.PrimaryColor,
+                                    unselectedLabelColor:
+                                        AppColors.TextTertiary,
+                                    tabs: <Tab>[
+                                      new Tab(text: "Text"),
+                                      new Tab(text: "Image"),
+                                    ]),
                               ),
                               BlocBuilder<PostMcqBloc, PostMcqState>(
-                                builder: (context, state) {
-                                  return OptionTextField(
-                                    hint: 'Enter here',
-                                    optionKey: "B",
-                                    text: state.optionB,
-                                    validator: (value) {
-                                      return state.optionBValidationText;
-                                    },
-                                    onChange: (value) {
-                                      context.read<PostMcqBloc>().add(
-                                            OptionBChanged(optionB: value),
-                                          );
-                                    },
-                                  );
-                                },
-                              ),
-                              BlocBuilder<PostMcqBloc, PostMcqState>(
-                                builder: (context, state) {
-                                  return OptionTextField(
-                                    hint: 'Enter here',
-                                    optionKey: "C",
-                                    text: state.optionC,
-                                    validator: (value) {
-                                      return state.optionCValidationText;
-                                    },
-                                    onChange: (value) {
-                                      context.read<PostMcqBloc>().add(
-                                            OptionCChanged(optionC: value),
-                                          );
-                                    },
-                                  );
-                                },
-                              ),
-                              BlocBuilder<PostMcqBloc, PostMcqState>(
-                                builder: (context, state) {
-                                  return OptionTextField(
-                                    hint: 'Enter here',
-                                    optionKey: "D",
-                                    text: state.optionD,
-                                    validator: (value) {
-                                      return state.optionDValidationText;
-                                    },
-                                    onChange: (value) {
-                                      context.read<PostMcqBloc>().add(
-                                            OptionDChanged(optionD: value),
-                                          );
-                                    },
-                                  );
-                                },
-                              ),
+                                  builder: (context, state) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(
+                                      bottom: 14, top: 14),
+                                  child: Column(
+                                    children: [
+                                      Visibility(
+                                        visible: !state.isImageOptions,
+                                        child: Column(
+                                          children: [
+                                            OptionTextField(
+                                              hint: 'Enter here',
+                                              optionKey: "A",
+                                              text: state.optionA,
+                                              textInputType:
+                                                  TextInputType.multiline,
+                                              validator: (value) {
+                                                return state
+                                                    .optionAValidationText;
+                                              },
+                                              onChange: (value) {
+                                                context.read<PostMcqBloc>().add(
+                                                      OptionAChanged(
+                                                          optionA: value),
+                                                    );
+                                              },
+                                            ),
+                                            OptionTextField(
+                                              hint: 'Enter here',
+                                              optionKey: "B",
+                                              text: state.optionB,
+                                              validator: (value) {
+                                                return state
+                                                    .optionBValidationText;
+                                              },
+                                              onChange: (value) {
+                                                context.read<PostMcqBloc>().add(
+                                                      OptionBChanged(
+                                                          optionB: value),
+                                                    );
+                                              },
+                                            ),
+                                            OptionTextField(
+                                              hint: 'Enter here',
+                                              optionKey: "C",
+                                              text: state.optionC,
+                                              validator: (value) {
+                                                return state
+                                                    .optionCValidationText;
+                                              },
+                                              onChange: (value) {
+                                                context.read<PostMcqBloc>().add(
+                                                      OptionCChanged(
+                                                          optionC: value),
+                                                    );
+                                              },
+                                            ),
+                                            OptionTextField(
+                                              hint: 'Enter here',
+                                              optionKey: "D",
+                                              text: state.optionD,
+                                              validator: (value) {
+                                                return state
+                                                    .optionDValidationText;
+                                              },
+                                              onChange: (value) {
+                                                context.read<PostMcqBloc>().add(
+                                                      OptionDChanged(
+                                                          optionD: value),
+                                                    );
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Visibility(
+                                          visible: state.isImageOptions,
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        context
+                                                            .read<PostMcqBloc>()
+                                                            .add(
+                                                                SelectOptionAImage(
+                                                                    context));
+                                                      },
+                                                      child: Container(
+                                                        padding:
+                                                            EdgeInsets.all(5),
+                                                        height: 100,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color:
+                                                              AppColors.White,
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              color: Colors.grey
+                                                                  .shade200,
+                                                              offset: Offset(
+                                                                  0.5, 0.5),
+                                                              spreadRadius: 1,
+                                                              blurRadius: 2,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                          child: Row(
+                                                            children: [
+                                                              Text(
+                                                                'A :',
+                                                                style: TextStyles
+                                                                    .smallRegularTextSecondary,
+                                                              ),
+                                                              Expanded(
+                                                                child: Center(
+                                                                  child: state.optionAImage ==
+                                                                      null
+                                                                      ? Icon(Icons
+                                                                      .add_photo_alternate_outlined)
+                                                                      : Image.file(
+                                                                    state
+                                                                        .optionAImage,
+                                                                    fit: BoxFit
+                                                                        .scaleDown,
+                                                                  ),                                                                ),
+                                                              ),
+                                                            ],
+                                                          )
+
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 14,
+                                                  ),
+                                                  Expanded(
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        context
+                                                            .read<PostMcqBloc>()
+                                                            .add(
+                                                                SelectOptionBImage(
+                                                                    context));
+                                                      },
+                                                      child: Container(
+                                                          height: 100,
+                                                          padding:
+                                                              EdgeInsets.all(5),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color:
+                                                                AppColors.White,
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                color: Colors
+                                                                    .grey
+                                                                    .shade200,
+                                                                offset: Offset(
+                                                                    0.5, 0.5),
+                                                                spreadRadius: 1,
+                                                                blurRadius: 2,
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          child: Row(
+                                                            children: [
+                                                              Text(
+                                                                'B :',
+                                                                style: TextStyles
+                                                                    .smallRegularTextSecondary,
+                                                              ),
+                                                              Expanded(
+                                                                child: Center(
+                                                                  child: state.optionBImage ==
+                                                                          null
+                                                                      ? Icon(Icons
+                                                                          .add_photo_alternate_outlined)
+                                                                      : Image
+                                                                          .file(
+                                                                          state
+                                                                              .optionBImage,
+                                                                          fit: BoxFit
+                                                                              .scaleDown,
+                                                                        ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          )),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(
+                                                height: 14,
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        context
+                                                            .read<PostMcqBloc>()
+                                                            .add(
+                                                                SelectOptionCImage(
+                                                                    context));
+                                                      },
+                                                      child: Container(
+                                                        height: 100,
+                                                        padding:
+                                                            EdgeInsets.all(5),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color:
+                                                              AppColors.White,
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              color: Colors.grey
+                                                                  .shade200,
+                                                              offset: Offset(
+                                                                  0.5, 0.5),
+                                                              spreadRadius: 1,
+                                                              blurRadius: 2,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        child: Row(
+                                                          children: [
+                                                            Text(
+                                                              'C :',
+                                                              style: TextStyles
+                                                                  .smallRegularTextSecondary,
+                                                            ),
+                                                            Expanded(
+                                                              child: Center(
+                                                                child: state.optionCImage ==
+                                                                        null
+                                                                    ? Icon(Icons
+                                                                        .add_photo_alternate_outlined)
+                                                                    : Image
+                                                                        .file(
+                                                                        state
+                                                                            .optionCImage,
+                                                                        fit: BoxFit
+                                                                            .scaleDown,
+                                                                      ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 14,
+                                                  ),
+                                                  Expanded(
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        context
+                                                            .read<PostMcqBloc>()
+                                                            .add(
+                                                                SelectOptionDImage(
+                                                                    context));
+                                                      },
+                                                      child: Container(
+                                                        height: 100,
+                                                        padding:
+                                                            EdgeInsets.all(5),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color:
+                                                              AppColors.White,
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              color: Colors.grey
+                                                                  .shade200,
+                                                              offset: Offset(
+                                                                  0.5, 0.5),
+                                                              spreadRadius: 1,
+                                                              blurRadius: 2,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        child: Row(
+                                                          children: [
+                                                            Text(
+                                                              'D :',
+                                                              style: TextStyles
+                                                                  .smallRegularTextSecondary,
+                                                            ),
+                                                            Expanded(
+                                                              child: Center(
+                                                                  child: state.optionDImage ==
+                                                                          null
+                                                                      ? Icon(Icons
+                                                                          .add_photo_alternate_outlined)
+                                                                      : Image
+                                                                          .file(
+                                                                          state
+                                                                              .optionDImage,
+                                                                          fit: BoxFit
+                                                                              .scaleDown,
+                                                                        )),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
+                                            ],
+                                          ))
+                                    ],
+                                  ),
+                                );
+                              }),
                               Row(
                                 children: [
                                   Text("Select Correct Answer : \t"),
@@ -204,9 +519,9 @@ class _PostAMCQViewState extends State<PostAMCQView> {
                                   ),
                                 ],
                               ),
-
-                              SizedBox(height: 100,)
-
+                              SizedBox(
+                                height: 100,
+                              )
                             ],
                           ),
                         ),
@@ -225,12 +540,26 @@ class _PostAMCQViewState extends State<PostAMCQView> {
                             : CustomButton(
                                 text: "NEXT",
                                 action: () async {
-                                  if (_formKey.currentState.validate()) {
+                                  if(!state.isImageOptions){
                                     context
                                         .read<PostMcqBloc>()
                                         .add(PostMcqSubmitted());
-
+                                  }else{
+                                    if(state.question==null || state.question==''){
+                                      _formKey.currentState.validate();
+                                    }else{
+                                      if(state.optionAImage !=null && state.optionBImage !=null &&state.optionCImage !=null && state.optionDImage !=null){
+                                        context
+                                            .read<PostMcqBloc>()
+                                            .add(PostMcqSubmitted());
+                                      }else{
+                                        Exception e=Exception(['Please Select Images for Option']);
+                                        showSnackBar(context, e);
+                                      }
+                                    }
                                   }
+
+
                                 },
                               );
                       },

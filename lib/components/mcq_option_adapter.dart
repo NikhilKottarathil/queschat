@@ -63,3 +63,47 @@ class MCQOptionAdapter extends StatelessWidget {
     );
   }
 }
+
+class MCQOptionImagedAdapter extends StatelessWidget {
+  bool isSelected;
+  bool isAnswerCorrect;
+  String optionKey;
+  String option;
+  Function function;
+
+  MCQOptionImagedAdapter(
+      {this.isSelected,
+      this.optionKey,
+      this.function,
+      this.isAnswerCorrect,
+      this.option});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        function();
+      },
+      child: Container(
+        padding: const EdgeInsets.all(5.0),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(
+              width: 2,
+              color: isAnswerCorrect != null
+                  ? isAnswerCorrect
+                      ? AppColors.GreenPrimary
+                      : AppColors.RedPrimary
+                  : isSelected
+                      ? AppColors.IconColor
+                      : AppColors.BorderColor,
+            )),
+        child: Image.network(
+          'https://api.queschat.com/' + option,
+          fit: BoxFit.scaleDown,
+        ),
+      ),
+    );
+  }
+}
