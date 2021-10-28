@@ -15,36 +15,42 @@ class AuthNavigator extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthCubit, AuthState>(
       builder: (context, state) {
-        return Navigator(
-            key: _navigationKey,
-            pages: [
-              // Show login
-              if (state == AuthState.login) MaterialPage(child: LoginView()),
-              if (state == AuthState.forgotPassword)
-                MaterialPage(
-                    child: BlocProvider(
-                        create: (context) => ForgotPasswordBloc(
-                              authRepo: context.read<AuthRepository>(),
-                              authCubit: context.read<AuthCubit>(),
-                            ),
-                        child: ForgotPasswordView())),
+        return WillPopScope(
+          onWillPop: ()async{
+            print('auth will');
+            return false;
+          },
+          child: Navigator(
+              key: _navigationKey,
+              pages: [
+                // Show login
+                if (state == AuthState.login) MaterialPage(child: LoginView()),
+                if (state == AuthState.forgotPassword)
+                  MaterialPage(
+                      child: BlocProvider(
+                          create: (context) => ForgotPasswordBloc(
+                                authRepo: context.read<AuthRepository>(),
+                                authCubit: context.read<AuthCubit>(),
+                              ),
+                          child: ForgotPasswordView())),
 
-              // Allow push animation
-              if (state == AuthState.signUp ||
-                  state == AuthState.verifySignUp) ...[
-                // Show Sign
+                // Allow push animation
+                if (state == AuthState.signUp ||
+                    state == AuthState.verifySignUp) ...[
+                  // Show Sign
 
-                MaterialPage(child: SignUpView()),
-                // Show confirm sign up
-                if (state == AuthState.verifySignUp)
-                  MaterialPage(child: VerifySignUpView())
-              ]
-            ],
-            onPopPage: (route, result) {
-              print(result);
-              print(route);
-              return route.didPop(result);
-            });
+                  MaterialPage(child: SignUpView()),
+                  // Show confirm sign up
+                  if (state == AuthState.verifySignUp)
+                    MaterialPage(child: VerifySignUpView())
+                ]
+              ],
+              onPopPage: (route, result) {
+                print(result);
+                print(route);
+                return route.didPop(result);
+              }),
+        );
       },
     );
   }

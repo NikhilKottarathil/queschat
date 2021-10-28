@@ -15,7 +15,7 @@ import 'package:queschat/function/show_snack_bar.dart';
 import 'package:queschat/uicomponents/appbars.dart';
 import 'package:queschat/uicomponents/custom_button.dart';
 import 'package:queschat/uicomponents/custom_text_field.dart';
-import 'package:queschat/uicomponents/custom_text_field_2.dart';
+import 'package:queschat/uicomponents/custom_text_field_3.dart';
 
 class EditProfileView extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
