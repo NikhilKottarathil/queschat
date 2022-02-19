@@ -3,11 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/authentication/form_submitting_status.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/function/show_snack_bar.dart';
-import 'package:queschat/home/feeds/quiz/quiz_play/mcq_adapter.dart';
+import 'package:queschat/function/time_conversions.dart';
 import 'package:queschat/home/feeds/quiz/quiz_play/quiz_play_bloc.dart';
-import 'package:queschat/home/feeds/quiz/quiz_play/quiz_play_event.dart';
 import 'package:queschat/home/feeds/quiz/quiz_play/quiz_play_state.dart';
-
 import 'package:queschat/uicomponents/appbars.dart';
 import 'package:queschat/uicomponents/custom_button.dart';
 
@@ -33,7 +31,6 @@ class QuizResultView extends StatelessWidget {
               showSnackBar(context, formStatus.exception);
             }
             if (formStatus is SubmissionSuccess) {
-              Navigator.pop(context);
             }
           },
           child: BlocBuilder<QuizPlayBloc, QuizPlayState>(
@@ -44,7 +41,7 @@ class QuizResultView extends StatelessWidget {
 
               child: Column(
                 children: [
-                  Image.asset('images/trophy.png'),
+                  Flexible(child: Image.asset('images/trophy.png',fit: BoxFit.contain,)),
                   SizedBox(height: 20,),
                   Text('Congratulations',style: TextStyles.largeBoldPrimaryColor,),
                   SizedBox(height: 35,),
@@ -99,11 +96,33 @@ class QuizResultView extends StatelessWidget {
 
                     ],
                   ),
+                  SizedBox(height: 35,),
+                  Column(
+                    children: [
+                      Text((state.correctMCQ*int.parse(context.read<QuizPlayBloc>().point)).toString(),
+                          style: TextStyle(
+                              fontSize: 48,
+                              color: AppColors.GreenPrimary,
+                              height: 1.33,
+                              fontFamily: 'NunitoSans',
+                              fontWeight: FontWeight.w700)),
+                      Text(
+                        'Total Score',
+                        style: TextStyles.largeRegularTextTertiary,
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 35,),
+                  Text(
+                    'Completed Time : ${getDurationTime((context.read<QuizPlayBloc>().totalDuration-state.duration).toString())}',
+                    style: TextStyles.xMediumRegularTextFourth,
+                  ),
                   Spacer(),
                   CustomButton(
-                    text: 'Next',
+                    text: 'Leader Board',
                     action: () {
                       Navigator.of(context).pop();
+                      Navigator.pushReplacementNamed(context, '/leaderBoard',arguments: {'quizId':context.read<QuizPlayBloc>().quizId});
                     },
                   )
                 ],

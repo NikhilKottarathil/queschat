@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:queschat/authentication/auth_cubit.dart';
-import 'package:queschat/authentication/auth_repo.dart';
+import 'package:queschat/repository/auth_repo.dart';
 import 'package:queschat/authentication/forgot_password/forgot_password_event.dart';
 import 'package:queschat/authentication/forgot_password/forgot_password_state.dart';
 import 'package:queschat/authentication/forgot_password/forgot_password_status.dart';
@@ -8,9 +7,8 @@ import 'package:queschat/authentication/forgot_password/forgot_password_status.d
 class ForgotPasswordBloc
     extends Bloc<ForgotPasswordEvent, ForgotPasswordState> {
   final AuthRepository authRepo;
-  final AuthCubit authCubit;
 
-  ForgotPasswordBloc({this.authRepo, this.authCubit})
+  ForgotPasswordBloc({this.authRepo})
       : super(ForgotPasswordState());
 
   @override
@@ -61,14 +59,14 @@ class ForgotPasswordBloc
           yield state.copyWith(formStatus: OTPSubmittedSuccessfully());
         }
       } else if (state.formStatus is NewPasswordSubmittedSuccessfully) {
-        authCubit.showLogin();
+        // authCubit.showLogin();
       }
     } else if (event is ReverseButtonSubmitted) {
       if (state.formStatus is InitialStatus ||
           state.formStatus is MobileNumberSubmitting ||
           state.formStatus is MobileNumberSubmitFailed ||
           state.formStatus is NewPasswordSubmittedSuccessfully) {
-        authCubit.showLogin();
+        // authCubit.showLogin();
       } else if (state.formStatus is MobileNumberSubmittedSuccessfully ||
           state.formStatus is OTPSubmitting ||
           state.formStatus is OTPSubmitFailed) {

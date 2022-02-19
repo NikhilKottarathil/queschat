@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/authentication/form_submitting_status.dart';
@@ -9,13 +8,17 @@ import 'package:queschat/home/feeds/feeds_repo.dart';
 import 'package:queschat/home/feeds/quiz/post_quiz_event.dart';
 import 'package:queschat/home/feeds/quiz/post_quiz_state.dart';
 import 'package:queschat/home/feeds/quiz/quiz_mcq/quiz_mcq_state.dart';
+import 'package:queschat/home/message/message_room/message_room_cubit.dart';
+import 'package:queschat/models/message_model.dart';
 
 class PostQuizBloc extends Bloc<PostQuizEvent, PostQuizState> {
   final FeedRepository feedRepo;
+  MessageRoomCubit messageRoomCubit;
+  String parentPage;
 
 
-  PostQuizBloc({@required this.feedRepo})
-      : super(PostQuizState(mcqList: [],images: []));
+  PostQuizBloc({@required this.feedRepo,this.messageRoomCubit,this.parentPage})
+      : super(PostQuizState(mcqList: [],images: [],duration: Duration(minutes: 5).inMilliseconds,point: '1'));
 
 
   @override
@@ -24,6 +27,10 @@ class PostQuizBloc extends Bloc<PostQuizEvent, PostQuizState> {
       yield state.copyWith(heading: event.heading);
     } else if (event is ContentChanged) {
       yield state.copyWith(content: event.content);
+    }else if (event is DurationChanged) {
+      yield state.copyWith(duration: event.value);
+    }else if (event is PointChanged) {
+      yield state.copyWith(point: event.value);
     }else if (event is SelectMedia) {
       try {
         File  file;
@@ -73,7 +80,10 @@ class PostQuizBloc extends Bloc<PostQuizEvent, PostQuizState> {
       state.mcqList[state.currentIndex]=event.quizMcqState;
 
       try{
-        String id=await feedRepo.postQuiz(media: state.images,content: state.content,heading: state.heading,mcqList: state.mcqList);
+        String id=await feedRepo.postQuiz(media: state.images,content: state.content,heading: state.heading,point: state.point,duration: state.duration,mcqList: state.mcqList);
+        if(messageRoomCubit!=null){
+          messageRoomCubit.sendMessage(messageType: MessageType.feed,feedId: id);
+        }
         yield state.copyWith(formSubmissionStatus: SubmissionSuccess(id:id));
 
       }catch(e){

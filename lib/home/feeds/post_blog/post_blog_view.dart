@@ -1,18 +1,13 @@
-import 'dart:io';
-
-import 'package:carousel_slider/carousel_controller.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:queschat/authentication/form_submitting_status.dart';
 import 'package:queschat/components/custom_progress_indicator.dart';
-import 'package:queschat/components/multi_file_viewer.dart';
+import 'package:queschat/components/multi_file_view.dart';
+import 'package:queschat/components/text_editor.dart';
+import 'package:queschat/constants/styles.dart';
 import 'package:queschat/function/show_snack_bar.dart';
-import 'package:queschat/home/feeds/feeds_bloc.dart';
-import 'package:queschat/home/feeds/feeds_event.dart';
-import 'package:queschat/home/feeds/feeds_repo.dart';
 import 'package:queschat/home/feeds/post_blog/post_blog_bloc.dart';
 import 'package:queschat/home/feeds/post_blog/post_blog_event.dart';
 import 'package:queschat/home/feeds/post_blog/post_blog_state.dart';
@@ -21,17 +16,14 @@ import 'package:queschat/uicomponents/appbars.dart';
 import 'package:queschat/uicomponents/custom_text_field.dart';
 import 'package:queschat/uicomponents/custom_ui_widgets.dart';
 
-
-
 class PostBlogView extends StatelessWidget {
   List<RadioModel> radioData = new List<RadioModel>();
   final _formKey = GlobalKey<FormState>();
 
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: (){
+      onWillPop: () {
         context.read<PostBlogBloc>().add(ClearAllFields());
         return null;
       },
@@ -45,7 +37,7 @@ class PostBlogView extends StatelessWidget {
               showSnackBar(context, formStatus.exception);
             }
             if (formStatus is SubmissionSuccess) {
-              context.read<FeedsBloc>().add(UserAddedNewFeed(id: formStatus.id));
+              // context.read<FeedsBloc>().add(UserAddedNewFeed(id: formStatus.id));
               context.read<PostBlogBloc>().add(ClearAllFields());
 
               Navigator.pop(context);
@@ -68,61 +60,45 @@ class PostBlogView extends StatelessWidget {
                             key: _formKey,
                             child: Column(
                               children: [
-                                BlocBuilder<PostBlogBloc, PostBlogState>(
-                                  builder: (context, state) {
-                                    return TextFieldWithBoxBorder(
-                                      hint: 'Enter blog title',
-                                      text: state.heading,
-                                      heading: 'Title',
-                                      height: 150,
-                                      textInputType: TextInputType.multiline,
-                                      validator: (value) {
-                                        return state.headingValidationText;
+                                Flexible(
+                                  child: Container(
+                                    padding: EdgeInsets.all(4),
+                                    color: AppColors.ShadowColor,
+                                    constraints: BoxConstraints(
+                                        minHeight: 500,
+                                        minWidth: double.infinity),
+                                    child: BlocBuilder<PostBlogBloc,
+                                        PostBlogState>(
+                                      builder: (context, state) {
+                                        return TextEditor(
+                                          controller: context
+                                              .read<PostBlogBloc>()
+                                              .controller,
+                                        );
                                       },
-                                      onChange: (value) {
-                                        context.read<PostBlogBloc>().add(
-                                              HeadingChanged(heading: value),
-                                            );
-                                      },
-                                    );
-                                  },
+                                    ),
+                                  ),
                                 ),
-                                BlocBuilder<PostBlogBloc, PostBlogState>(
-                                  builder: (context, state) {
-                                    return TextFieldWithBoxBorder(
-                                      hint: 'Enter your blog',
-                                      text: state.content,
-                                      heading: 'blog',
-                                      height: 300,
-                                      textInputType: TextInputType.multiline,
-                                      validator: (value) {
-                                        return state.contentAValidationText;
-                                      },
-                                      onChange: (value) {
-                                        context.read<PostBlogBloc>().add(
-                                              ContentChanged(content: value),
-                                            );
-                                      },
-                                    );
-                                  },
+                                SizedBox(
+                                  height: 10,
                                 ),
-                                BlocBuilder<PostBlogBloc, PostBlogState>(
-                                  builder: (context, state) {
-                                    return Visibility(
-                                      visible: state.media.length > 0,
-                                      child: MultiFileViewer(media: state.media),
-                                    );
-                                  },
-                                ),
-                                CustomButtonWithIcon(
-                                  icon: Icons.camera,
-                                  text: "Attach Media",
-                                  action: () async {
-                                    context
-                                        .read<PostBlogBloc>()
-                                        .add(SelectMedia(context: context));
-                                  },
-                                ),
+                                // BlocBuilder<PostBlogBloc, PostBlogState>(
+                                //   builder: (context, state) {
+                                //     return Visibility(
+                                //       visible: state.media.length > 0,
+                                //       child: MultiFileView(media: state.media),
+                                //     );
+                                //   },
+                                // ),
+                                // CustomButtonWithIcon(
+                                //   icon: Icons.camera,
+                                //   text: "Attach Media",
+                                //   action: () async {
+                                //     context
+                                //         .read<PostBlogBloc>()
+                                //         .add(SelectMedia(context: context));
+                                //   },
+                                // ),
                                 SizedBox(
                                   height: 100,
                                 ),
@@ -144,11 +120,42 @@ class PostBlogView extends StatelessWidget {
                               : CustomButton(
                                   text: "NEXT",
                                   action: () async {
-                                    if (_formKey.currentState.validate()) {
-                                      context
-                                          .read<PostBlogBloc>()
-                                          .add(PostBlogSubmitted());
+                                    print(context
+                                        .read<PostBlogBloc>()
+                                        .controller
+                                        .document
+                                        .isEmpty());
+                                    // if (_formKey.currentState.validate()) {
+                                    if (context
+                                        .read<PostBlogBloc>()
+                                        .controller
+                                        .document
+                                        .isEmpty()) {
+                                      showSnackBar(context,
+                                          Exception('Enter your blog post'));
                                     }
+                                    // else if (context
+                                    //         .read<PostBlogBloc>()
+                                    //         .controller
+                                    //         .getPlainText()
+                                    //         .length <
+                                    //     100) {
+                                    //   showSnackBar(context,
+                                    //       Exception('Blog is too short'));
+                                    // }
+                                    else {
+                                      if (context.read<PostBlogBloc>().feedId !=
+                                          null) {
+                                        context
+                                            .read<PostBlogBloc>()
+                                            .add(EditBlogSubmitted());
+                                      } else {
+                                        context
+                                            .read<PostBlogBloc>()
+                                            .add(PostBlogSubmitted());
+                                      }
+                                    }
+                                    //
                                   },
                                 );
                         },

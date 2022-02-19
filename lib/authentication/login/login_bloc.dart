@@ -1,17 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:queschat/authentication/auth_credentials.dart';
-import 'package:queschat/authentication/auth_cubit.dart';
-import 'package:queschat/authentication/auth_repo.dart';
+import 'package:queschat/authentication/app_data.dart';
+import 'package:queschat/repository/auth_repo.dart';
 import 'package:queschat/authentication/form_submitting_status.dart';
 import 'package:queschat/authentication/login/login_events.dart';
 import 'package:queschat/authentication/login/login_state.dart';
 
-
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final AuthRepository authRepo;
-  final AuthCubit authCubit;
 
-  LoginBloc({this.authRepo,this.authCubit}) : super(LoginState());
+  LoginBloc({this.authRepo}) : super(LoginState());
 
   @override
   Stream<LoginState> mapEventToState(LoginEvent event) async* {
@@ -28,10 +26,21 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       yield state.copyWith(formStatus: FormSubmitting());
 
       try {
-        final token= await authRepo.login(phoneNumber:state.phoneNumber,password: state.password );
+        final authCredentials = await authRepo.login(
+            phoneNumber: state.phoneNumber, password: state.password);
+
+        print(authCredentials.firebaseToken);
+        FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+        // await firebaseAuth.signInWithCustomToken(authCredentials.firebaseToken);
+
+        await authRepo.updateFirebaseDeviceToken();
+
+        AppData appData = AppData();
+        await appData.setUserDetails();
+
         yield state.copyWith(formStatus: SubmissionSuccess());
-        authCubit.showSession(new AuthCredentials(token: token));
       } catch (e) {
+        print(e);
         yield state.copyWith(formStatus: SubmissionFailed(e));
         yield state.copyWith(formStatus: InitialFormStatus());
       }

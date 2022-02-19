@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "299745524219",
+    "project_id": "queschat-65fff",
+    "storage_bucket": "queschat-65fff.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:299745524219:android:361523df33a6ddf140b35e",
+        "android_client_info": {
+          "package_name": "com.hamrut.queschat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "299745524219-cuio0547qo8k3q2eng2p03hl7vl2o5qr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hamrut.queschat",
+            "certificate_hash": "ed9bfa032e206b6f35574847878aed864cd7b559"
+          }
+        },
+        {
+          "client_id": "299745524219-1vplbp2om7n53qok59o8oe4dq4unt9jj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjojcxgtAoHjiUT-VQ4Jho7LqVpgMV9HQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "299745524219-1vplbp2om7n53qok59o8oe4dq4unt9jj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:equatable/equatable.dart';
 import 'package:queschat/authentication/form_submitting_status.dart';
 
 class QuizMcqState  {

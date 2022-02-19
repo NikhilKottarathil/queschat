@@ -3,7 +3,10 @@ class AuthCredentials {
   final String phoneNumber;
   final String password;
    String token;
-  final String verifyOTP;
+  String generatedOTP;
+  String verificationId;
+  String firebaseToken;
+  int resendToken;
 
-  AuthCredentials({this.userName, this.phoneNumber, this.password, this.token,this.verifyOTP});
+  AuthCredentials({this.userName, this.phoneNumber, this.password, this.token,this.firebaseToken,this.resendToken,this.verificationId,this.generatedOTP});
 }

@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:http/http.dart' as http;
+import 'package:queschat/constants/strings_and_urls.dart';
 import 'package:queschat/function/api_calls.dart';
+import 'package:queschat/home/feeds/quiz/leader_board/leader_board_model.dart';
 import 'package:queschat/home/feeds/quiz/quiz_mcq/quiz_mcq_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 
 class FeedRepository {
   Future<String> postMCQWithText(
@@ -216,7 +218,12 @@ class FeedRepository {
   }
 
   Future<String> postQuiz(
-      {String heading, content, var media, List<QuizMcqState> mcqList}) async {
+      {String heading,
+      content,
+      point,
+      int duration,
+      var media,
+      List<QuizMcqState> mcqList}) async {
     try {
       List<String> mcqIDs = [];
       for (var state in mcqList) {
@@ -252,6 +259,8 @@ class FeedRepository {
       });
       Map<String, String> myBody = {
         'name': heading,
+        'quiz_time': duration.toString(),
+        'quiz_point': point,
         'description': content,
         'mcq': mcqIDString,
         'feed_type': 'quiz'
@@ -282,7 +291,6 @@ class FeedRepository {
   Future<String> postBlog({String heading, content, var media}) async {
     try {
       Map<String, String> myBody = {
-        'name': heading,
         'description': content,
         'feed_type': 'blog'
       };
@@ -312,11 +320,12 @@ class FeedRepository {
   Future<void> editBlog({String heading, content, feedId}) async {
     try {
       Map<String, String> myBody = {
-        'name': heading,
         'description': content,
         'feed_type': 'blog'
       };
-
+      if (heading != null) {
+        myBody.addAll({'name': heading});
+      }
       var body =
           await patchDataRequest(myBody: myBody, address: 'feed/$feedId');
       print(body);
@@ -342,7 +351,8 @@ class FeedRepository {
       var body;
       if (parentPage == 'home') {
         body = await getDataRequest(
-            address: 'feed/list?rows_per_page=$rowsPerPage&page=$page');
+            address:
+                'feed/list?rows_per_page=$rowsPerPage&page=$page&feed_type=blog');
         if (body['Feeds'] != null) {
           return body['Feeds'];
         } else {
@@ -378,7 +388,11 @@ class FeedRepository {
       if (body['Feed'] != null) {
         return body['Feed'];
       } else {
-        throw Exception('Please retry');
+        if (body['message'] == null) {
+          throw Exception('Please retry');
+        } else {
+          throw Exception(body['message']);
+        }
       }
     } catch (e) {
       print(e);
@@ -426,6 +440,81 @@ class FeedRepository {
         }
       } else {
         throw Exception('Please retry');
+      }
+    } catch (e) {
+      print(e);
+      throw e;
+    }
+  }
+
+  Future<void> answerQuizMcq({
+    String quizId,
+    mcqId,
+    point,
+    answerStatus,
+    answer,
+    int completionTime,
+  }) async {
+    try {
+      var myBody = {
+        'quiz_id': quizId,
+        'mcq_id': mcqId,
+        'name': answer,
+        'answer_status': answerStatus,
+        'completion_time': completionTime.toString(),
+        'point': point,
+      };
+
+      print(myBody);
+      var body = await postDataRequest(myBody: myBody, address: 'leader_board');
+      if (body['message'] != null) {
+        if (body['message'] == 'Successfully Created') {
+        } else {
+          throw Exception('Please retry');
+        }
+      } else {
+        throw Exception('Please retry');
+      }
+    } catch (e) {
+      print(e);
+      throw e;
+    }
+  }
+
+  Future<List<LeaderBoardModel>> getLeaderBoardData({String quizId}) async {
+    try {
+      var body = await getDataRequest(address: 'leader_board/$quizId');
+      if (body['leader_board'] != null) {
+        List<LeaderBoardModel> models = [];
+        body['leader_board'].forEach((element) {
+          models.add(LeaderBoardModel(
+            userId: element['user_id'].toString(),
+            profilePic:
+                element['profile_pic'] != null ? Urls().serverAddress+element['profile_pic'] : null,
+            userName:
+                element['user_name'] != null ? element['user_name'] : null,
+            completedTime: element['completion_time'] != null
+                ? element['completion_time']
+                : 0,
+            wrongAnswers:
+                element['wrong_answer'] != null ? element['wrong_answer'] : 0,
+            correctAnswers: element['correct_answer'] != null
+                ? element['correct_answer']
+                : 0,
+            score: element['score'] != null ? element['score'] : 0,
+            totalAttended: element['correct_answer'] != null &&
+                    element['wrong_answer'] != null
+                ? element['correct_answer'] + element['wrong_answer']
+                : 0,
+          ));
+        });
+        return models;
+      } else {
+        if (body['message'] != null) {
+          throw Exception([body['message']]);
+        } else {
+          throw AppExceptions().somethingWentWrong;
+        }
       }
     } catch (e) {
       print(e);

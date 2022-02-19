@@ -3,12 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/authentication/form_submitting_status.dart';
 import 'package:queschat/components/custom_progress_indicator.dart';
 import 'package:queschat/components/custom_radio_button.dart';
-import 'package:queschat/components/multi_file_viewer.dart';
+import 'package:queschat/components/multi_file_view.dart';
 import 'package:queschat/components/option_text_field.dart';
+import 'package:queschat/components/text_editor.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/function/show_snack_bar.dart';
-import 'package:queschat/home/feeds/feeds_bloc.dart';
-import 'package:queschat/home/feeds/feeds_event.dart';
 import 'package:queschat/home/feeds/feeds_repo.dart';
 import 'package:queschat/home/feeds/post_a_mcq/post_mcq_bloc.dart';
 import 'package:queschat/home/feeds/post_a_mcq/post_mcq_event.dart';
@@ -30,7 +29,6 @@ class _PostAMCQViewState extends State<PostAMCQView>
 
   FeedRepository feedRepo;
   TabController tabController;
-
   @override
   void initState() {
     // TODO: implement initState
@@ -50,7 +48,7 @@ class _PostAMCQViewState extends State<PostAMCQView>
     // create: (context) => PostMcqBloc(feedRepo: feedRepo),
 
     return Scaffold(
-      appBar: appBarWithBackButton(context: context, titleString: "Post a MCQ"),
+      appBar: appBarWithBackButton(context: context, titleString: "Post a POLL"),
       body: BlocListener<PostMcqBloc, PostMcqState>(
         listener: (context, state) {
           final formStatus = state.formSubmissionStatus;
@@ -58,7 +56,7 @@ class _PostAMCQViewState extends State<PostAMCQView>
             showSnackBar(context, formStatus.exception);
           }
           if (formStatus is SubmissionSuccess) {
-            context.read<FeedsBloc>().add(UserAddedNewFeed(id: formStatus.id));
+            // context.read<FeedsBloc>().add(UserAddedNewFeed(id: formStatus.id));
             context.read<PostMcqBloc>().add(ClearAllFields());
 
             Navigator.pop(context);
@@ -80,6 +78,7 @@ class _PostAMCQViewState extends State<PostAMCQView>
                         child: Form(
                           key: _formKey,
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               BlocBuilder<PostMcqBloc, PostMcqState>(
                                 builder: (context, state) {
@@ -88,6 +87,7 @@ class _PostAMCQViewState extends State<PostAMCQView>
                                     text: state.question,
                                     height: 150,
                                     heading: 'Enter your Question',
+
                                     textInputType: TextInputType.multiline,
                                     validator: (value) {
                                       return state.questionValidationText;
@@ -103,7 +103,7 @@ class _PostAMCQViewState extends State<PostAMCQView>
                               BlocBuilder<PostMcqBloc, PostMcqState>(
                                 builder: (context, state) {
                                   return state.questionImages.length > 0
-                                      ? MultiFileViewer(
+                                      ? MultiFileView(
                                           media: state.questionImages)
                                       : Container();
                                 },
@@ -117,10 +117,12 @@ class _PostAMCQViewState extends State<PostAMCQView>
                                 },
                               ),
                               SizedBox(
-                                height: 20,
+                                height: 24,
                               ),
+
+                              // Text('Choose Option',style: TextStyles.mediumMediumTextSecondary,),
                               Container(
-                                margin: EdgeInsets.only(top: 30),
+                                margin: EdgeInsets.only(top: 10),
                                 decoration: BoxDecoration(
                                   color: AppColors.ShadowColor,
                                   borderRadius: BorderRadius.circular(10),
@@ -538,7 +540,7 @@ class _PostAMCQViewState extends State<PostAMCQView>
                         return state.formSubmissionStatus is FormSubmitting
                             ? CustomProgressIndicator()
                             : CustomButton(
-                                text: "NEXT",
+                                text: "POST",
                                 action: () async {
                                   if(!state.isImageOptions){
                                     context

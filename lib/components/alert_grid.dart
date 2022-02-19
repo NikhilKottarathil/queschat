@@ -43,7 +43,7 @@ class _AlertGridState extends State<AlertGrid> {
                       fontSize: 20,
                     ),
                     textAlign: TextAlign.start),
-                Text(
+               if(widget.description!=null) Text(
                   widget.description,
                   style: TextStyle(fontSize: 15),
                   textAlign: TextAlign.start,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/components/mcq_option_adapter.dart';
-import 'package:queschat/components/multi_file_viewer_url.dart';
+import 'package:queschat/components/multi_file_view_url.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/home/feeds/quiz/quiz_play/quiz_play_bloc.dart';
 import 'package:queschat/home/feeds/quiz/quiz_play/quiz_play_event.dart';
@@ -51,7 +51,7 @@ class MCQAdapter extends StatelessWidget {
               child: Center(
                 child: SizedBox(
                   height: 300,
-                  child: MultiFileViewerUrl(
+                  child: MultiFileViewUrl(
                     mediaUrl: mcqModel.media,
                   ),
                 ),
@@ -77,6 +77,7 @@ class MCQAdapter extends StatelessWidget {
                         ? mcqModel.correctAnswer == 'A'
                         : null
                         : null,
+                    answeredPercentage: mcqModel.optionAPercentage,
                     optionKey: 'A',
                   ),
                   SizedBox(
@@ -98,6 +99,8 @@ class MCQAdapter extends StatelessWidget {
                         ? mcqModel.correctAnswer == 'B'
                         : null
                         : null,
+                    answeredPercentage: mcqModel.optionBPercentage,
+
                     optionKey: 'B',
                   ),
                   SizedBox(
@@ -119,6 +122,8 @@ class MCQAdapter extends StatelessWidget {
                         ? mcqModel.correctAnswer == 'C'
                         : null
                         : null,
+                    answeredPercentage: mcqModel.optionCPercentage,
+
                     optionKey: 'C',
                   ),
                   SizedBox(
@@ -140,6 +145,8 @@ class MCQAdapter extends StatelessWidget {
                         ? mcqModel.correctAnswer == 'D'
                         : null
                         : null,
+                    answeredPercentage: mcqModel.optionDPercentage,
+
                     optionKey: 'D',
                   ),
                 ],

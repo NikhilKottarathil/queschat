@@ -1,8 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:queschat/authentication/auth_cubit.dart';
-import 'package:queschat/authentication/auth_repo.dart';
+import 'package:queschat/repository/auth_repo.dart';
 import 'package:queschat/authentication/forgot_password/forgot_password_bloc.dart';
 import 'package:queschat/authentication/forgot_password/forgot_password_event.dart';
 import 'package:queschat/authentication/forgot_password/forgot_password_state.dart';
@@ -20,12 +19,23 @@ class ForgotPasswordView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:
-          appBarWithBackButton(context: context, titleString: 'Reset Password',action: (){
-            context
-                .read<ForgotPasswordBloc>()
-                .add(ReverseButtonSubmitted());
+      appBar: appBarWithBackButton(
+          context: context,
+          titleString: 'Reset Password',
+          action: () {
+            ForgotPasswordStatus formStatus =
+                context.read<ForgotPasswordBloc>().state.formStatus;
 
+            if (formStatus is InitialStatus ||
+                formStatus is MobileNumberSubmitting ||
+                formStatus is MobileNumberSubmitFailed ||
+                formStatus is NewPasswordSubmittedSuccessfully) {
+              Navigator.of(context).pop();
+            } else {
+              print('reverse buttn submit');
+
+              context.read<ForgotPasswordBloc>().add(ReverseButtonSubmitted());
+            }
           }),
       body: BlocListener<ForgotPasswordBloc, ForgotPasswordState>(
         listener: (context, state) {
@@ -62,16 +72,14 @@ class ForgotPasswordView extends StatelessWidget {
                             return state.formStatus is InitialStatus ||
                                     state.formStatus
                                         is MobileNumberSubmitting ||
-                                    state.formStatus
-                                        is MobileNumberSubmitFailed
+                                    state.formStatus is MobileNumberSubmitFailed
                                 ? Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Enter mobile number',
-                                        style:
-                                            TextStyles.largeRegularTertiary,
+                                        style: TextStyles.largeRegularTertiary,
                                       ),
                                       SizedBox(
                                         height: 30,
@@ -82,7 +90,7 @@ class ForgotPasswordView extends StatelessWidget {
                                             return state
                                                 .phoneNumberValidationText;
                                           },
-                                          text:state.phoneNumber,
+                                          text: state.phoneNumber,
                                           onChange: (value) {
                                             context
                                                 .read<ForgotPasswordBloc>()
@@ -107,13 +115,12 @@ class ForgotPasswordView extends StatelessWidget {
                                     state.formStatus is OTPSubmitting ||
                                     state.formStatus is OTPSubmitFailed
                                 ? Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Verify OTP',
-                                        style:
-                                            TextStyles.largeRegularTertiary,
+                                        style: TextStyles.largeRegularTertiary,
                                       ),
                                       SizedBox(
                                         height: 30,
@@ -123,20 +130,18 @@ class ForgotPasswordView extends StatelessWidget {
                                           validator: (value) {
                                             return state.otpValidationText;
                                           },
-                                          text:state.otp,
+                                          text: state.otp,
                                           onChange: (value) {
                                             context
                                                 .read<ForgotPasswordBloc>()
                                                 .add(
-                                                  ForgotOTPChanged(
-                                                      otp: value),
+                                                  ForgotOTPChanged(otp: value),
                                                 );
                                           },
                                           icon: new Icon(Icons.phone_android,
                                               color: AppColors
                                                   .SecondaryColorLight),
-                                          textInputType:
-                                              TextInputType.number),
+                                          textInputType: TextInputType.number),
                                     ],
                                   )
                                 : Container();
@@ -146,18 +151,15 @@ class ForgotPasswordView extends StatelessWidget {
                           builder: (context, state) {
                             return state.formStatus
                                         is OTPSubmittedSuccessfully ||
-                                    state.formStatus
-                                        is NewPasswordSubmitting ||
-                                    state.formStatus
-                                        is NewPasswordSubmitFailed
+                                    state.formStatus is NewPasswordSubmitting ||
+                                    state.formStatus is NewPasswordSubmitFailed
                                 ? Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Enter New Password',
-                                        style:
-                                            TextStyles.largeRegularTertiary,
+                                        style: TextStyles.largeRegularTertiary,
                                       ),
                                       SizedBox(
                                         height: 30,
@@ -165,10 +167,9 @@ class ForgotPasswordView extends StatelessWidget {
                                       CustomTextField(
                                           hint: "Password",
                                           validator: (value) {
-                                            return state
-                                                .passwordValidationText;
+                                            return state.passwordValidationText;
                                           },
-                                          text:state.password,
+                                          text: state.password,
                                           onChange: (value) {
                                             context
                                                 .read<ForgotPasswordBloc>()
@@ -200,8 +201,7 @@ class ForgotPasswordView extends StatelessWidget {
                         ),
                         BlocBuilder<ForgotPasswordBloc, ForgotPasswordState>(
                           builder: (context, state) {
-                            return state.formStatus
-                                        is NewPasswordSubmitting ||
+                            return state.formStatus is NewPasswordSubmitting ||
                                     state.formStatus
                                         is MobileNumberSubmitting ||
                                     state.formStatus is OTPSubmitting
@@ -212,13 +212,20 @@ class ForgotPasswordView extends StatelessWidget {
                                         : state.formStatus
                                                 is MobileNumberSubmittedSuccessfully
                                             ? 'Verify'
-                                            :  state.formStatus
-                                    is OTPSubmittedSuccessfully?'Reset Password':'Login',
+                                            : state.formStatus
+                                                    is OTPSubmittedSuccessfully
+                                                ? 'Reset Password'
+                                                : 'Login',
                                     action: () {
-                                      if (_formKey.currentState.validate()) {
-                                      context
-                                          .read<ForgotPasswordBloc>()
-                                          .add(ButtonSubmitted());
+                                      if (state.formStatus
+                                          is NewPasswordSubmittedSuccessfully) {
+                                        Navigator.of(context).pop();
+                                      } else {
+                                        if (_formKey.currentState.validate()) {
+                                          context
+                                              .read<ForgotPasswordBloc>()
+                                              .add(ButtonSubmitted());
+                                        }
                                       }
                                     },
                                   );
@@ -235,5 +242,4 @@ class ForgotPasswordView extends StatelessWidget {
       ),
     );
   }
-
 }

@@ -1,12 +1,13 @@
-import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/authentication/app_data.dart';
-import 'package:queschat/components/custom_radio_button.dart';
 import 'package:queschat/components/mcq_option_adapter.dart';
-import 'package:queschat/components/multi_file_viewer_url.dart';
+import 'package:queschat/components/multi_file_view_url.dart';
+import 'package:queschat/components/text_edit_viewer.dart';
 import 'package:queschat/constants/styles.dart';
+import 'package:queschat/firebase_dynamic_link.dart';
+import 'package:queschat/function/time_conversions.dart';
 import 'package:queschat/home/feeds/comment/comment_bloc.dart';
 import 'package:queschat/home/feeds/comment/comment_view.dart';
 import 'package:queschat/home/feeds/comment/connection_repo.dart';
@@ -14,223 +15,264 @@ import 'package:queschat/home/feeds/feeds_bloc.dart';
 import 'package:queschat/home/feeds/feeds_event.dart';
 import 'package:queschat/home/feeds/feeds_repo.dart';
 import 'package:queschat/home/feeds/feeds_state.dart';
-import 'package:queschat/home/feeds/post_a_mcq/post_mcq_bloc.dart';
-import 'package:queschat/home/feeds/post_a_mcq/post_mcq_view.dart';
 import 'package:queschat/home/feeds/post_blog/edit_blog_view.dart';
 import 'package:queschat/home/feeds/post_blog/post_blog_bloc.dart';
+import 'package:queschat/home/feeds/post_blog/post_blog_view.dart';
 import 'package:queschat/home/feeds/quiz/quiz_play/quiz_play_bloc.dart';
 import 'package:queschat/home/feeds/quiz/quiz_play/quiz_play_view.dart';
 import 'package:queschat/home/report_a_content/report_view.dart';
 import 'package:queschat/models/blog_nodel.dart';
-import 'package:queschat/models/feed_model.dart';
 import 'package:queschat/models/mcq_model.dart';
 import 'package:queschat/models/quiz_model.dart';
+import 'package:queschat/router/app_router.dart';
 import 'package:queschat/uicomponents/custom_button.dart';
 
 class FeedAdapter extends StatelessWidget {
   int index;
 
-  FeedAdapter(this.index);
+  String parentPage;
+
+  FeedAdapter(this.index, this.parentPage);
 
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
-    return BlocBuilder<FeedsBloc, FeedsState>(builder: (context, state) {
-      var feedModel = state.feedModelList[index];
-      return Container(
-        decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [BoxShadow(color: Colors.grey.shade200, blurRadius: 2)],
-            borderRadius: BorderRadius.circular(10)),
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.only(top: 5, bottom: 5, right: 5, left: 14),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        height: 40,
-                        width: 40,
-                        margin: EdgeInsets.only(right: 10),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: NetworkImage(
-                                feedModel.profilePicUrl.toString()),
-                          ),
+    return BlocBuilder<FeedsBloc, FeedsState>(buildWhen: (prevState, state) {
+      return state.feedModelList.isNotEmpty;
+    }, builder: (context, state) {
+      if (state.feedModelList.isNotEmpty) {
+        var feedModel = state.feedModelList[index];
+        return GestureDetector(
+          onTap: () {
+            if (parentPage != 'singleView') {
+              Navigator.pushNamed(context, '/feedSingleView', arguments: {
+                'parentPage': 'feedAdapter',
+                'feedId': feedModel.id
+              });
+            }
+          },
+          child: Container(
+            decoration: BoxDecoration(
+                color: AppColors.White,
+                boxShadow: [
+                  BoxShadow(
+                      color: AppColors.ShadowColor,
+                      offset: Offset(0, 3),
+                      blurRadius: 6)
+                ],
+                borderRadius: BorderRadius.circular(10)),
+            child: Column(
+              children: [
+                parentPage != 'messageRoom'
+                    ? Container(
+                        padding: EdgeInsets.only(
+                            top: 5, bottom: 5, right: 5, left: 14),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  height: 40,
+                                  width: 40,
+                                  margin: EdgeInsets.only(right: 10),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image: NetworkImage(
+                                          feedModel.profilePicUrl.toString()),
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  feedModel.userName.toString(),
+                                  style: TextStyles.mediumMediumTextSecondary,
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.access_time_rounded,
+                                  color: AppColors.IconColor,
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Text(
+                                  feedModel.uploadedTime,
+                                  style: TextStyle(
+                                      color: AppColors.IconColor, fontSize: 14),
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                IconButton(
+                                    iconSize: 24,
+                                    padding: EdgeInsets.zero,
+                                    constraints: BoxConstraints(),
+                                    icon: Image.asset(
+                                        'images/three_dot_vertical.png',
+                                        color: AppColors.TextTertiary),
+                                    onPressed: () {
+                                      if (feedModel.userId ==
+                                          AppData().userId) {
+                                        print(feedModel.id);
+                                        print(AppData().userId);
+                                        if (feedModel.feedType == 'blog') {
+                                          showOptionAlert(
+                                              context, index, feedModel.id);
+                                        } else {
+                                          showConfirmDeleteAlert(
+                                              context, index, feedModel.id);
+                                        }
+                                      } else {
+                                        showReportAlert(
+                                            buildContext: context,
+                                            reportedModel: 'Feed',
+                                            reportedModelId: feedModel.id);
+                                        print(
+                                            'Wrong  feed in my Feeds or id not matching');
+                                      }
+                                    }),
+                              ],
+                            )
+                          ],
                         ),
-                      ),
-                      Text(
-                        feedModel.userName,
-                        style: TextStyles.mediumMediumTextSecondary,
-                      ),
-                    ],
-                  ),
-                  Row(
+                      )
+                    : Container(),
+                Padding(
+                  padding: EdgeInsets.all(4),
+                  child: feedModel.feedType == 'mcq'
+                      ? MCQFeed(index)
+                      : feedModel.feedType == 'blog'
+                          ? BlogFeed(index)
+                          : feedModel.feedType == 'quiz'
+                              ? QuizFeed(index)
+                              : Container(
+                                  height: height * .5,
+                                  color: Colors.grey.shade100,
+                                ),
+                ),
+                Container(
+                  height: height * .05,
+                  child: Row(
                     children: [
-                      Icon(
-                        Icons.access_time_rounded,
-                        color: AppColors.IconColor,
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
+                      IconButton(
+                          icon: Icon(Icons.favorite,
+                              color: feedModel.isLiked
+                                  ? AppColors.RedPrimary
+                                  : AppColors.IconColor),
+                          splashRadius: 20,
+                          padding: EdgeInsets.only(left: 14, right: 5),
+                          constraints: BoxConstraints(),
+                          onPressed: () {
+                            context
+                                .read<FeedsBloc>()
+                                .add(LikeAndUnLikeFeed(feedIndex: index));
+                          }),
                       Text(
-                        feedModel.uploadedTime,
+                        feedModel.likeCount,
                         style:
                             TextStyle(color: AppColors.IconColor, fontSize: 14),
                       ),
                       SizedBox(
-                        width: 10,
+                        width: 20,
                       ),
                       IconButton(
-                          iconSize: 24,
-                          padding: EdgeInsets.zero,
+                          splashRadius: 20,
+                          icon: Icon(Icons.insert_comment_sharp,
+                              color: AppColors.IconColor),
+                          padding: EdgeInsets.only(right: 5),
                           constraints: BoxConstraints(),
-                          icon: Image.asset('images/three_dot_vertical.png',
-                              color: AppColors.TextTertiary),
                           onPressed: () {
-                            if (feedModel.userId == AppData().userId) {
-                              print(feedModel.id);
-                              print(AppData().userId);
-                              if (feedModel.feedType == 'blog') {
-                                showOptionAlert(context, index);
-                              } else {
-                                showConfirmDeleteAlert(context, index);
-                              }
-                            } else {
-                              showReportAlert(
-                                  buildContext: context,
-                                  reportedModel: 'Feed',
-                                  reportedModelId: feedModel.id);
-                              print(
-                                  'Wrong  feed in my Feeds or id not matching');
-                            }
-                          }),
-                    ],
-                  )
-                ],
-              ),
-            ),
-            feedModel.feedType == 'mcq'
-                ? MCQFeed(index)
-                : feedModel.feedType == 'blog'
-                    ? BlogFeed(index)
-                    : feedModel.feedType == 'quiz'
-                        ? QuizFeed(index)
-                        : Container(
-                            height: height * .5,
-                            color: Colors.grey.shade100,
-                          ),
-            Container(
-              height: height * .05,
-              child: Row(
-                children: [
-                  IconButton(
-                      icon: Icon(Icons.favorite,
-                          color: feedModel.isLiked
-                              ? AppColors.RedPrimary
-                              : AppColors.IconColor),
-                      splashRadius: 20,
-                      padding: EdgeInsets.only(left: 14, right: 5),
-                      constraints: BoxConstraints(),
-                      onPressed: () {
-                        context
-                            .read<FeedsBloc>()
-                            .add(LikeAndUnLikeFeed(feedIndex: index));
-                      }),
-                  Text(
-                    feedModel.likeCount,
-                    style: TextStyle(color: AppColors.IconColor, fontSize: 14),
-                  ),
-                  SizedBox(
-                    width: 20,
-                  ),
-                  IconButton(
-                      splashRadius: 20,
-                      icon: Icon(Icons.insert_comment_sharp,
-                          color: AppColors.IconColor),
-                      padding: EdgeInsets.only(right: 5),
-                      constraints: BoxConstraints(),
-                      onPressed: () {
-                        ConnectionRepository connectionRepository =
-                            ConnectionRepository();
+                            ConnectionRepository connectionRepository =
+                                ConnectionRepository();
 
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => MultiBlocProvider(
-                              providers: [
-                                BlocProvider(
-                                  create: (context) => CommentBloc(
-                                      connectionRepository:
-                                          connectionRepository,
-                                      feedId: feedModel.id),
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => MultiBlocProvider(
+                                  providers: [
+                                    BlocProvider(
+                                      create: (context) => CommentBloc(
+                                          connectionRepository:
+                                              connectionRepository,
+                                          feedId: feedModel.id),
+                                    ),
+                                    BlocProvider.value(
+                                        value: context.read<FeedsBloc>()),
+                                  ],
+                                  child: CommentView(
+                                    index: index,
+                                    feedId: feedModel.id,
+                                  ),
                                 ),
-                                BlocProvider.value(
-                                    value: context.read<FeedsBloc>()),
-                              ],
-                              // create: (context)=>CommentBloc(connectionRepository: connectionRepository,feedId: feedModel.id),
-                              child: CommentView(
-                                index: index,
-                                feedId: feedModel.id,
                               ),
+                            );
+                          }),
+                      Text(
+                        feedModel.commentCount,
+                        style:
+                            TextStyle(color: AppColors.IconColor, fontSize: 14),
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      IconButton(
+                        splashRadius: 20,
+                        icon: Icon(
+                            feedModel.savedId == null
+                                ? Icons.bookmark_outline_sharp
+                                : Icons.bookmark,
+                            color: AppColors.IconColor),
+                        padding: EdgeInsets.only(left: 0, right: 5),
+                        constraints: BoxConstraints(),
+                        onPressed: () {
+                          context
+                              .read<FeedsBloc>()
+                              .add(SaveAndUnSaveFeed(feedIndex: index));
+                        },
+                      ),
+                      Spacer(),
+                      GestureDetector(
+                        onTap: () {
+                          generateFeedDynamicLink(id: feedModel.id);
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              "SHARE",
+                              style: TextStyle(
+                                  color: AppColors.IconColor, fontSize: 14),
                             ),
-                          ),
-                        );
-                      }),
-                  Text(
-                    feedModel.commentCount,
-                    style: TextStyle(color: AppColors.IconColor, fontSize: 14),
-                  ),
-                  SizedBox(
-                    width: 20,
-                  ),
-                  IconButton(
-                    splashRadius: 20,
-                    icon: Icon(
-                        feedModel.savedId == null
-                            ? Icons.bookmark_outline_sharp
-                            : Icons.bookmark,
-                        color: AppColors.IconColor),
-                    padding: EdgeInsets.only(left: 0, right: 5),
-                    constraints: BoxConstraints(),
-                    onPressed: () {
-                      context
-                          .read<FeedsBloc>()
-                          .add(SaveAndUnSaveFeed(feedIndex: index));
-                    },
-                  ),
-                  Expanded(
-                      child: Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          "SHARE",
-                          style: TextStyle(
-                              color: AppColors.IconColor, fontSize: 14),
+                            IconButton(
+                                icon: Icon(Icons.screen_share_sharp,
+                                    color: AppColors.IconColor),
+                                onPressed: null),
+                          ],
                         ),
-                        IconButton(
-                            icon: Icon(Icons.screen_share_sharp,
-                                color: AppColors.IconColor),
-                            onPressed: null),
-                      ],
-                    ),
-                  )),
-                ],
-              ),
-            )
-          ],
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      }
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 10,vertical: parentPage=='singleView'?50:5),
+        child: Text(
+          'The post is removed',
+          style: TextStyles.smallMediumTextTertiary,
         ),
       );
     });
   }
 
-  void showOptionAlert(BuildContext buildContext, int index) {
+  void showOptionAlert(BuildContext buildContext, int index, String feedId) {
     showModalBottomSheet(
         context: buildContext,
         isScrollControlled: true,
@@ -257,7 +299,7 @@ class FeedAdapter extends StatelessWidget {
                     TextButton(
                       onPressed: () {
                         Navigator.pop(context);
-                        showConfirmDeleteAlert(buildContext, index);
+                        showConfirmDeleteAlert(buildContext, index, feedId);
                       },
                       child: Text(
                         'Delete',
@@ -304,7 +346,7 @@ class FeedAdapter extends StatelessWidget {
                                         value: buildContext.read<FeedsBloc>(),
                                       ),
                                     ],
-                                    child: EditBlogView(),
+                                    child: PostBlogView(),
                                   )),
                         );
                       },
@@ -319,7 +361,7 @@ class FeedAdapter extends StatelessWidget {
                       child: TextButton(
                         onPressed: () {
                           Navigator.pop(context);
-                          showConfirmDeleteAlert(buildContext, index);
+                          showConfirmDeleteAlert(buildContext, index, feedId);
                         },
                         child: Text(
                           'Cancel',
@@ -336,7 +378,8 @@ class FeedAdapter extends StatelessWidget {
         });
   }
 
-  void showConfirmDeleteAlert(BuildContext buildContext, int index) {
+  void showConfirmDeleteAlert(
+      BuildContext buildContext, int index, String feedId) {
     showModalBottomSheet(
         context: buildContext,
         isScrollControlled: true,
@@ -359,9 +402,16 @@ class FeedAdapter extends StatelessWidget {
                   children: [
                     CustomButton(
                       action: () {
-                        buildContext
-                            .read<FeedsBloc>()
-                            .add(DeleteFeed(feedIndex: index));
+                        if (homeFeedBloc.state.feedIds.contains(feedId)) {
+                          homeFeedBloc.add(DeleteFeed(feedId: feedId));
+                        }
+                        if (savedFeedBloc.state.feedIds.contains(feedId)) {
+                          savedFeedBloc.add(DeleteFeed(feedId: feedId));
+                        }
+                        if (myFeedsBloc.state.feedIds.contains(feedId)) {
+                          myFeedsBloc.add(DeleteFeed(feedId: feedId));
+                        }
+
                         Navigator.pop(context);
                       },
                       text: 'Delete',
@@ -412,11 +462,17 @@ class MCQFeed extends StatelessWidget {
     return BlocBuilder<FeedsBloc, FeedsState>(builder: (context, state) {
       MCQModel mcqModel = state.feedModelList[index].contentModel;
 
-      print(mcqModel.selectedAnswer);
-      print(mcqModel.correctAnswer);
+      // print(mcqModel.selectedAnswer);
+      // print(mcqModel.correctAnswer);
       print(mcqModel.optionA);
       return Container(
-        color: Colors.grey.shade100,
+        color: Colors.transparent,
+        // decoration: BoxDecoration(
+        //   color: AppColors.White,
+        //   boxShadow: [
+        //     BoxShadow(color: AppColors.ShadowColor,offset: Offset(0,3),blurRadius: 6)
+        //   ]
+        // ),
         child: Column(
           children: [
             Padding(
@@ -436,7 +492,6 @@ class MCQFeed extends StatelessWidget {
                     mcqModel.question,
                     style: TextStyles.mediumRegularTextSecondary,
                   )),
-
                 ],
               ),
             ),
@@ -445,7 +500,7 @@ class MCQFeed extends StatelessWidget {
               child: Center(
                 child: SizedBox(
                   height: 300,
-                  child: MultiFileViewerUrl(
+                  child: MultiFileViewUrl(
                     mediaUrl: mcqModel.media,
                   ),
                 ),
@@ -457,6 +512,7 @@ class MCQFeed extends StatelessWidget {
                 children: [
                   MCQOptionAdapter(
                     isSelected: false,
+                    answeredPercentage: mcqModel.optionAPercentage,
                     function: () {
                       if (mcqModel.selectedAnswer == null)
                         context.read<FeedsBloc>().add(McqAnswered(
@@ -493,6 +549,7 @@ class MCQFeed extends StatelessWidget {
                             : null
                         : null,
                     optionKey: 'B',
+                    answeredPercentage: mcqModel.optionBPercentage,
                   ),
                   SizedBox(
                     height: 6,
@@ -514,6 +571,7 @@ class MCQFeed extends StatelessWidget {
                             : null
                         : null,
                     optionKey: 'C',
+                    answeredPercentage: mcqModel.optionCPercentage,
                   ),
                   SizedBox(
                     height: 6,
@@ -535,6 +593,7 @@ class MCQFeed extends StatelessWidget {
                             : null
                         : null,
                     optionKey: 'D',
+                    answeredPercentage: mcqModel.optionDPercentage,
                   ),
                 ],
               ),
@@ -566,6 +625,7 @@ class MCQFeed extends StatelessWidget {
                             ? mcqModel.correctAnswer == 'A'
                             : null
                         : null,
+                    answeredPercentage: mcqModel.optionAPercentage,
                     optionKey: 'A',
                   ),
                   MCQOptionImagedAdapter(
@@ -584,6 +644,7 @@ class MCQFeed extends StatelessWidget {
                             ? mcqModel.correctAnswer == 'B'
                             : null
                         : null,
+                    answeredPercentage: mcqModel.optionBPercentage,
                     optionKey: 'B',
                   ),
                   MCQOptionImagedAdapter(
@@ -602,6 +663,7 @@ class MCQFeed extends StatelessWidget {
                             ? mcqModel.correctAnswer == 'C'
                             : null
                         : null,
+                    answeredPercentage: mcqModel.optionCPercentage,
                     optionKey: 'C',
                   ),
                   MCQOptionImagedAdapter(
@@ -620,11 +682,15 @@ class MCQFeed extends StatelessWidget {
                             ? mcqModel.correctAnswer == 'D'
                             : null
                         : null,
+                    answeredPercentage: mcqModel.optionDPercentage,
                     optionKey: 'D',
                   ),
                 ],
               ),
             ),
+            SizedBox(
+              height: 8,
+            )
           ],
         ),
       );
@@ -664,9 +730,22 @@ class QuizFeed extends StatelessWidget {
                     style: TextStyles.smallRegularTextSecondary,
                   ),
                   SizedBox(
-                    width: 5,
+                    height: 8,
                   ),
-
+                  Text(
+                    'Total time : ${getDurationTime(quizModel.duration.toString())}',
+                    style: TextStyles.smallRegularTextSecondary,
+                  ),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  Text(
+                    'Point for one question : ${quizModel.point}',
+                    style: TextStyles.smallRegularTextSecondary,
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
                 ],
               ),
             ),
@@ -675,7 +754,7 @@ class QuizFeed extends StatelessWidget {
               child: Center(
                 child: SizedBox(
                   height: 300,
-                  child: MultiFileViewerUrl(
+                  child: MultiFileViewUrl(
                     mediaUrl: quizModel.images,
                   ),
                 ),
@@ -699,20 +778,31 @@ class QuizFeed extends StatelessWidget {
                     child: RaisedButton(
                       color: AppColors.GreenSecondary,
                       onPressed: () {
-                        FeedRepository feedRepository=FeedRepository();
-                        Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => BlocProvider(
-                            create: (context)=>QuizPlayBloc(feedRepository:feedRepository ,mcqIDs: quizModel.mcqIDs),
-                            child: QuizPlayView(),
-                          ),
-                        ));
+                        if(quizModel.isQuizAttended){
+                          Navigator.pushNamed(context, '/leaderBoard',arguments: {'quizId':state.feedModelList[index].id});
+
+                        }else {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) =>
+                                BlocProvider(
+                                  create: (context) =>
+                                      QuizPlayBloc(
+                                          quizId: state.feedModelList[index].id,
+                                          totalDuration: quizModel.duration,
+                                          point: quizModel.point,
+                                          feedRepository: feedRepository,
+                                          mcqIDs: quizModel.mcqIDs),
+                                  child: QuizPlayView(),
+                                ),
+                          ));
+                        }
                       },
                       shape: new RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: EdgeInsets.all(14),
                         child: Text(
-                          'START QUIZ',
+                          quizModel.isQuizAttended?'LEADER BOARD':'START QUIZ',
                           style: TextStyles.smallMediumWhite,
                         ),
                       ),
@@ -753,7 +843,7 @@ class BlogFeed extends StatelessWidget {
               child: Center(
                 child: SizedBox(
                   height: 300,
-                  child: MultiFileViewerUrl(
+                  child: MultiFileViewUrl(
                     mediaUrl: blogModel.images,
                   ),
                 ),
@@ -764,15 +854,18 @@ class BlogFeed extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    blogModel.heading,
-                    style: TextStyles.xMediumMediumTextSecondary,
+                  // Text(
+                  //   blogModel.heading,
+                  //   style: TextStyles.xMediumMediumTextSecondary,
+                  // ),
+                  // SizedBox(height: 8),
+                  TextEditorView(
+                    incomingJSONText: blogModel.content,
                   ),
-                  SizedBox(height: 8),
-                  Text(
-                    blogModel.content,
-                    style: TextStyles.smallRegularTextSecondary,
-                  ),
+                  // Text(
+                  //   blogModel.content,
+                  //   style: TextStyles.smallRegularTextSecondary,
+                  // ),
                   SizedBox(
                     width: 5,
                   ),

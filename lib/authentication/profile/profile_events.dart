@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 abstract class ProfileEvent {}
 
 class ProfileEdited extends ProfileEvent {}
+class UpdateData extends ProfileEvent {}
 class FetchInitialFeeds  extends ProfileEvent {}
 
 class ChangeProfilePicture extends ProfileEvent {

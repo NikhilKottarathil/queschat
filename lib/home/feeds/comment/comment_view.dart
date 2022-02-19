@@ -4,7 +4,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/authentication/app_data.dart';
 import 'package:queschat/components/custom_progress_indicator.dart';
-import 'package:queschat/home/feeds/feed_adpater.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/home/feeds/comment/comment_adapter.dart';
 import 'package:queschat/home/feeds/comment/comment_bloc.dart';

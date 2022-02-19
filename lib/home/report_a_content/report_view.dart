@@ -31,9 +31,9 @@ void showReportAlert(
                 Navigator.of(context).pop();
               }
             },            child: BlocBuilder<ReportBloc, ReportState>(
-                builder: (buildContext, state) {
+                builder: (context, state) {
               return SizedBox(
-                height: MediaQuery.of(buildContext).size.height - 30,
+                height: MediaQuery.of(context).size.height - 30,
                 child: Scaffold(
                   appBar: appBarWithBackButton(
                       titleString: 'Report', context: context),
@@ -45,7 +45,7 @@ void showReportAlert(
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Text(
-                            'Why are you reporting this',
+                            'Why are you reporting this ${reportedModel=='user'?'User':''}',
                             style: TextStyles.mediumBoldTextSecondary,
                           ),
                         ),
@@ -80,7 +80,7 @@ void showReportAlert(
                         child: state.formSubmissionStatus is FormSubmitting
                         ? CustomProgressIndicator():CustomButton(
                           action: () {
-                            buildContext
+                            context
                                 .read<ReportBloc>()
                                 .add(ReportSubmitted(reportedModelId: reportedModelId,reportedModel: reportedModel));
                           },

@@ -1,45 +1,101 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:queschat/app_navigator.dart';
-import 'package:queschat/authentication/auth_navigator.dart';
-import 'package:queschat/authentication/auth_repo.dart';
+import 'package:queschat/awsome_notifications.dart';
+import 'package:queschat/components/app_exit_alert.dart';
+import 'package:queschat/components/custom_progress_indicator.dart';
 import 'package:queschat/constants/styles.dart';
+import 'package:queschat/router/app_router.dart';
 
-import 'authentication/auth_cubit.dart';
-import 'bloc/session_cubit.dart';
+
+
+final AppRouter appRouter = AppRouter();
+
 
 void main() async {
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: const Color(0xFF144169),
-      statusBarIconBrightness: Brightness.light));
-  runApp(
-    new MaterialApp(
-      title: "Queschat",
-      debugShowCheckedModeBanner: false,
+  WidgetsFlutterBinding.ensureInitialized();
 
-      theme: ThemeData(
-          fontFamily: 'NunitoSans_Regular',
-          appBarTheme: AppBarTheme(
-            systemOverlayStyle: SystemUiOverlayStyle(
-              statusBarColor: AppColors.PrimaryColorLight,
-              statusBarIconBrightness:Brightness.light,
-              statusBarBrightness: Brightness.light,
-            )
-          ),
-          scaffoldBackgroundColor: Color(0xFFFAFAFA)),
-      home: RepositoryProvider(
-        create: (context) => AuthRepository(),
-        child: BlocProvider(
-          create: (context) =>
-              SessionCubit(authRepo: context.read<AuthRepository>()),
-          child:AppNavigator(),
-        ),
-      ),
-    ),
-  );
+  await Firebase.initializeApp();
+
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  // await flutterLocalNotificationsPlugin
+  //     .resolvePlatformSpecificImplementation<
+  //         AndroidFlutterLocalNotificationsPlugin>()
+  //     ?.createNotificationChannel(androidNotificationChannel);
+  runApp(MyApp());
 }
-// BlocProvider(
-// create: (context) => AuthCubit( sessionCubit: context.read<SessionCubit>()),
-// child: AuthNavigator(),
-// )
+
+class MyApp extends StatefulWidget {
+  static final navigatorKey = new GlobalKey<NavigatorState>();
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    initializeNotifications(context);
+  }
+
+  Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarColor: AppColors.PrimaryColor,
+        statusBarIconBrightness: Brightness.light));
+
+    return WillPopScope(
+      onWillPop: () {
+        return appExitAlert(context);
+      },
+      child: MaterialApp(
+        title: "Queschat",
+        debugShowCheckedModeBanner: false,
+        navigatorKey: MyApp.navigatorKey,
+
+        theme: ThemeData(
+            fontFamily: 'NunitoSans',
+            appBarTheme: AppBarTheme(
+                systemOverlayStyle: SystemUiOverlayStyle(
+                  statusBarColor: AppColors.PrimaryColorLight,
+                  statusBarIconBrightness: Brightness.light,
+                  statusBarBrightness: Brightness.light,
+                )),
+            scaffoldBackgroundColor: AppColors.White),
+        onGenerateRoute: appRouter.onGenerateRoute,
+      ),
+    );
+
+    // return FutureBuilder(
+    //   future: Firebase.initializeApp(),
+    //   builder: (context, snapshot) {
+    //     if (snapshot.hasError) {
+    //       return const MaterialApp(
+    //         debugShowCheckedModeBanner: false,
+    //         home: Scaffold(
+    //           backgroundColor: Colors.grey,
+    //           body: Center(child: Text("Error")),
+    //         ),
+    //       );
+    //     }
+    //     if (snapshot.connectionState == ConnectionState.done) {
+    //     }
+    //     return MaterialApp(
+    //       debugShowCheckedModeBanner: false,
+    //       home: Scaffold(
+    //         body: CustomProgressIndicator(),
+    //       ),
+    //     );
+    //   },
+    // );
+  }
+}
+
+

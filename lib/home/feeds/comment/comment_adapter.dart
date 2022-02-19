@@ -1,8 +1,5 @@
-import 'package:carousel_slider/carousel_options.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/home/feeds/comment/comment_bloc.dart';
 import 'package:queschat/home/feeds/comment/comment_event.dart';

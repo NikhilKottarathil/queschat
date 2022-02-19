@@ -8,6 +8,13 @@ class McqAnswered extends QuizPlayEvent {
   McqAnswered({this.feedIndex, this.option,this.answer});
 }
 class ShowPreviousMCQ extends QuizPlayEvent {}
+class TimerChanged extends QuizPlayEvent {
+  int duration;
+
+  TimerChanged({this.duration});
+}
 
 class ShowNextMCQ extends QuizPlayEvent {}
-class Finish extends QuizPlayEvent {}
+class Finished extends QuizPlayEvent {
+
+}

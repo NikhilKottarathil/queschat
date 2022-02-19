@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/authentication/form_submitting_status.dart';
+import 'package:queschat/components/timer_card.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/function/show_snack_bar.dart';
 import 'package:queschat/home/feeds/quiz/quiz_play/mcq_adapter.dart';
@@ -8,10 +9,14 @@ import 'package:queschat/home/feeds/quiz/quiz_play/quiz_play_bloc.dart';
 import 'package:queschat/home/feeds/quiz/quiz_play/quiz_play_event.dart';
 import 'package:queschat/home/feeds/quiz/quiz_play/quiz_play_state.dart';
 import 'package:queschat/home/feeds/quiz/quiz_play/quiz_result_view.dart';
-
 import 'package:queschat/uicomponents/appbars.dart';
 
-class QuizPlayView extends StatelessWidget {
+class QuizPlayView extends StatefulWidget {
+  @override
+  State<QuizPlayView> createState() => _QuizPlayViewState();
+}
+
+class _QuizPlayViewState extends State<QuizPlayView> {
   final PageController controller = PageController(initialPage: 0);
 
   @override
@@ -25,6 +30,16 @@ class QuizPlayView extends StatelessWidget {
         appBar: appBarWithBackButton(
             context: context,
             titleString: "Play Quiz",
+            isCenterTitle: false,
+            tailActions: [
+              BlocBuilder<QuizPlayBloc, QuizPlayState>(
+                builder: (context,state) {
+                  print('state.duration ${state.duration}');
+                  // return buildTimerWidget(Duration(minutes: 10));
+                  return buildTimerWidget(Duration(milliseconds: state.duration));
+                }
+              ),
+            ],
             action: () {
               Navigator.of(context).pop();
             }),
@@ -35,7 +50,18 @@ class QuizPlayView extends StatelessWidget {
               showSnackBar(context, formStatus.exception);
             }
             if (formStatus is SubmissionSuccess) {
-              Navigator.pop(context);
+              if(this.mounted) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                      builder: (_) =>
+                          MultiBlocProvider(providers: [
+                            BlocProvider.value(
+                              value: context.read<QuizPlayBloc>(),
+                            ),
+
+                          ], child: QuizResultView(),)
+                  ),);
+              }
             }
           },
           child: BlocBuilder<QuizPlayBloc, QuizPlayState>(
@@ -92,15 +118,8 @@ class QuizPlayView extends StatelessWidget {
                           InkWell(
                               onTap: () async {
                                 if(state.currentIndex==state.mcqIds.length-1){
-                                  Navigator.of(context).pushReplacement(
-                                    MaterialPageRoute(
-                                        builder: (_) => MultiBlocProvider(providers: [
-                                          BlocProvider.value(
-                                            value: context.read<QuizPlayBloc>(),
-                                          ),
+                                  context.read<QuizPlayBloc>().add(Finished());
 
-                                        ], child: QuizResultView(),)
-                                    ),);
 
                                 }else{
                                   context.read<QuizPlayBloc>().add(ShowNextMCQ());

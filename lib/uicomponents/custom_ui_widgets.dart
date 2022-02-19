@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:queschat/constants/styles.dart';
-import 'package:queschat/pages/create_group_stage_1.dart';
 
 class CustomTextField extends StatefulWidget {
   TextEditingController textEditingController;
@@ -49,8 +48,9 @@ class CustomButton extends StatefulWidget {
   _CustomButtonState createState() => _CustomButtonState();
   String text;
   Function action;
+  bool isActive;
 
-  CustomButton({Key key, this.text, this.action}) : super(key: key);
+  CustomButton({Key key, this.text, this.action,this.isActive=true}) : super(key: key);
 }
 
 class _CustomButtonState extends State<CustomButton> {
@@ -61,8 +61,12 @@ class _CustomButtonState extends State<CustomButton> {
       height: MediaQuery.of(context).size.height * .07,
       width: MediaQuery.of(context).size.width,
       child: RaisedButton(
-        color: Colors.lightBlue.shade900,
-        onPressed: widget.action,
+        color: widget.isActive?AppColors.PrimaryColor:AppColors.TextFourth,
+        onPressed: (){
+          if(widget.isActive){
+            widget.action();
+          }
+        },
         shape:
             new RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
         child: Text(

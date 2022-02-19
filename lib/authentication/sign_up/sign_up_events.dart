@@ -6,10 +6,10 @@ class SignUpUsernameChanged extends SignUpEvent {
   SignUpUsernameChanged({this.username});
 }
 
-class SignUpPhoneNumberChangeChanged extends SignUpEvent {
+class SignUpPhoneNumberChanged extends SignUpEvent {
   final String phoneNumber;
 
-  SignUpPhoneNumberChangeChanged({this.phoneNumber});
+  SignUpPhoneNumberChanged({this.phoneNumber});
 }
 class SignUpPasswordChanged extends SignUpEvent {
   final String password;

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:queschat/authentication/form_submitting_status.dart';
 
 class PostBlogState {
@@ -32,7 +33,7 @@ class PostBlogState {
     this.mediaUrls,
     this.heading = '',
     this.content = '',
-    this.formSubmissionStatus
+    this.formSubmissionStatus,
   });
 
   PostBlogState copyWith({

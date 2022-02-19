@@ -3,8 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/authentication/form_submitting_status.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/function/show_snack_bar.dart';
-import 'package:queschat/home/feeds/feeds_bloc.dart';
-import 'package:queschat/home/feeds/feeds_event.dart';
 import 'package:queschat/home/feeds/quiz/post_quiz_bloc.dart';
 import 'package:queschat/home/feeds/quiz/post_quiz_event.dart';
 import 'package:queschat/home/feeds/quiz/post_quiz_state.dart';
@@ -12,7 +10,6 @@ import 'package:queschat/home/feeds/quiz/quiz_mcq/quiz_mcq_bloc.dart';
 import 'package:queschat/home/feeds/quiz/quiz_mcq/quiz_mcq_event.dart';
 import 'package:queschat/home/feeds/quiz/quiz_mcq/quiz_mcq_state.dart';
 import 'package:queschat/home/feeds/quiz/quiz_mcq/quiz_mcq_view.dart';
-import 'package:queschat/models/radio_model.dart';
 import 'package:queschat/uicomponents/appbars.dart';
 import 'package:queschat/uicomponents/custom_button.dart';
 
@@ -53,7 +50,7 @@ class AddMCQsView extends StatelessWidget {
                 showSnackBar(context, formStatus.exception);
               }
               if (formStatus is SubmissionSuccess) {
-                context.read<FeedsBloc>().add(UserAddedNewFeed(id: formStatus.id));
+                // context.read<FeedsBloc>().add(UserAddedNewFeed(id: formStatus.id));
                 context.read<PostQuizBloc>().add(ClearAllFields());
 
                 Navigator.pop(context);

@@ -6,12 +6,16 @@ import 'package:queschat/function/select_image.dart';
 import 'package:queschat/home/feeds/feeds_repo.dart';
 import 'package:queschat/home/feeds/post_a_mcq/post_mcq_event.dart';
 import 'package:queschat/home/feeds/post_a_mcq/post_mcq_state.dart';
+import 'package:queschat/home/message/message_room/message_room_cubit.dart';
+import 'package:queschat/models/message_model.dart';
 
 
 class PostMcqBloc extends Bloc< PostMcqEvent, PostMcqState> {
   final FeedRepository feedRepo;
+  MessageRoomCubit messageRoomCubit;
+  String parentPage;
 
-  PostMcqBloc({this.feedRepo}) : super(PostMcqState(questionImages: []));
+  PostMcqBloc({this.feedRepo,this.messageRoomCubit,this.parentPage}) : super(PostMcqState(questionImages: []));
 
   @override
   Stream<PostMcqState> mapEventToState(PostMcqEvent event) async* {
@@ -101,6 +105,9 @@ class PostMcqBloc extends Bloc< PostMcqEvent, PostMcqState> {
               optionC: state.optionCImage,
               optionD: state.optionDImage,
               correctOption: state.correctOption);
+          if(messageRoomCubit!=null){
+            messageRoomCubit.sendMessage(messageType: MessageType.feed,feedId: id);
+          }
           yield state.copyWith(formSubmissionStatus: SubmissionSuccess(id: id));
         }else {
           String id = await feedRepo.postMCQWithText(question: state.question,
@@ -110,6 +117,9 @@ class PostMcqBloc extends Bloc< PostMcqEvent, PostMcqState> {
               optionC: state.optionC,
               optionD: state.optionD,
               correctOption: state.correctOption);
+          if(messageRoomCubit!=null){
+            messageRoomCubit.sendMessage(messageType: MessageType.feed,feedId: id);
+          }
           yield state.copyWith(formSubmissionStatus: SubmissionSuccess(id: id));
 
         }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:queschat/constants/strings_and_urls.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 postDataRequest({address, myBody}) async {
@@ -13,16 +14,23 @@ postDataRequest({address, myBody}) async {
 
   if (await checkInternetIsConnected()) {
     String url = "https://api.queschat.com/api/$address";
-    dynamic response = await http.post(Uri.parse(url),
+    var response = await http.post(Uri.parse(url),
         headers: headers,
         body: json.encode(myBody),
         encoding: Encoding.getByName("utf-8"));
-    var body = json.decode(response.body);
-    print(body);
 
-    return body;
+    print(response.statusCode);
+
+
+    if(response.statusCode==502) {
+      throw AppExceptions().badGateWay;
+    }else{
+      var body = json.decode(response.body);
+      print(body);
+      return body;
+    }
   } else {
-    var data = {'message': 'noInternet'};
+    var data = {'message': 'No Internet'};
     return data;
   }
 }
@@ -48,6 +56,7 @@ getDataRequest({address}) async {
   } else {
     var data = {'message': 'noInternet'};
     return data;
+
   }
 }
 
@@ -58,7 +67,7 @@ patchDataRequest({address, myBody}) async {
   String token = sharedPreferences.getString('token');
   Map<String, String> headers = {"Content-Type": "application/json"};
   headers['x-access-token'] = token;
-
+print("token $token");
   if (await checkInternetIsConnected()) {
     String url = "https://api.queschat.com/api/$address";
     dynamic response = await http.Client().patch(Uri.parse(url),
@@ -71,6 +80,7 @@ patchDataRequest({address, myBody}) async {
     return body;
   } else {
     var data = {'message': 'noInternet'};
+    // throw Exception('No Internet');
     return data;
   }
 }
@@ -121,6 +131,7 @@ postImageDataRequest(
       }
       http.Response response =
           await http.Response.fromStream(await request.send());
+      print(response.body);
       var body = json.decode(response.body);
       return body;
     } else {
@@ -194,3 +205,4 @@ checkInternetIsConnected() async {
     return false;
   }
 }
+

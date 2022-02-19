@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/authentication/form_submitting_status.dart';
-
 import 'package:queschat/components/custom_radio_button.dart';
-import 'package:queschat/components/multi_file_viewer.dart';
+import 'package:queschat/components/multi_file_view.dart';
 import 'package:queschat/components/option_text_field.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/function/show_snack_bar.dart';
-
 import 'package:queschat/home/feeds/quiz/quiz_mcq/quiz_mcq_bloc.dart';
 import 'package:queschat/home/feeds/quiz/quiz_mcq/quiz_mcq_event.dart';
 import 'package:queschat/home/feeds/quiz/quiz_mcq/quiz_mcq_state.dart';
-
 import 'package:queschat/models/radio_model.dart';
 import 'package:queschat/uicomponents/custom_text_field.dart';
 import 'package:queschat/uicomponents/custom_ui_widgets.dart';
@@ -98,7 +95,7 @@ class _QuizMCQViewState extends State<QuizMCQView>
                                   );
                                 }),
                                 state.questionImages.length > 0
-                                    ? MultiFileViewer(media: state.questionImages)
+                                    ? MultiFileView(media: state.questionImages)
                                     : Container(),
                                 CustomButtonWithIcon(
                                   icon: Icons.camera,

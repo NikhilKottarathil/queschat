@@ -10,7 +10,7 @@ class CustomVideoPlayer extends StatefulWidget {
   CustomVideoPlayer({Key key,this.file,this.url}) : super(key: key);
 
   @override
-  _CustomVideoPlayerState createState() => _CustomVideoPlayerState();
+  State<CustomVideoPlayer> createState() => _CustomVideoPlayerState();
 }
 
 class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
@@ -18,26 +18,60 @@ class _CustomVideoPlayerState extends State<CustomVideoPlayer> {
 
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
     BetterPlayerDataSource betterPlayerDataSource;
     if(widget.file!=null){
       betterPlayerDataSource= BetterPlayerDataSource(
-    BetterPlayerDataSourceType.file,widget.file.path);
+          BetterPlayerDataSourceType.file,widget.file.path);
     }else{
       betterPlayerDataSource= BetterPlayerDataSource(
           BetterPlayerDataSourceType.network,widget.url);
     }
+   print( "betterPlayerDataSource");;
+    BetterPlayerConfiguration configuration
+    =BetterPlayerConfiguration(
+      autoDispose: true,
+      fit: BoxFit.contain,
+
+      controlsConfiguration: BetterPlayerControlsConfiguration(
+          enablePip:true,
+      ),
+      autoDetectFullscreenDeviceOrientation: true,
+      looping: false,
+    );
     _betterPlayerController = BetterPlayerController(
-        BetterPlayerConfiguration(),
+       configuration,
         betterPlayerDataSource: betterPlayerDataSource);
+    _betterPlayerController.addEventsListener((BetterPlayerEvent event) {
+      if (event.betterPlayerEventType == BetterPlayerEventType.initialized) {
+        _betterPlayerController.setOverriddenAspectRatio(
+            _betterPlayerController.videoPlayerController.value.aspectRatio);
+        setState(() {});
+      }
+    });
+  }
+  @override
+  void deactivate() {
+    // TODO: implement deactivate
+    _betterPlayerController.pause();
+
+    _betterPlayerController.dispose(forceDispose: true);
+    super.deactivate();
+  }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _betterPlayerController.pause();
+
+    _betterPlayerController.dispose(forceDispose: true);
   }
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 16 / 9,
-      child: BetterPlayer(
-        controller: _betterPlayerController,
-      ),
+
+    return BetterPlayer(
+      controller: _betterPlayerController,
     );
   }
 }

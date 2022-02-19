@@ -30,9 +30,9 @@ class LikeAndUnLikeFeed extends FeedEvent {
 
   EditedAFeed({this.feedId});
 }class DeleteFeed extends FeedEvent {
-  int feedIndex;
+  String  feedId;
 
-  DeleteFeed({this.feedIndex});
+  DeleteFeed({this.feedId});
 }class SaveAndUnSaveFeed extends FeedEvent {
   int feedIndex;
 

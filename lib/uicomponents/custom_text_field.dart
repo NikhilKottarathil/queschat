@@ -9,6 +9,7 @@ class CustomTextField extends StatefulWidget {
   var validator;
   var onChange;
   var text;
+  int maxLength;
 
   CustomTextField(
       {Key key,
@@ -16,6 +17,7 @@ class CustomTextField extends StatefulWidget {
       this.icon,
       this.validator,
       this.text,
+        this.maxLength,
       this.onChange,
       this.textInputType})
       : super(key: key);
@@ -43,6 +45,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
       keyboardType: widget.textInputType,
       style: TextStyles.smallRegularTextSecondary,
       validator: widget.validator,
+      maxLength: widget.maxLength!=null?widget.maxLength:widget.textInputType==TextInputType.phone?10:null,
+
       obscureText:
           widget.textInputType == TextInputType.visiblePassword ? true : false,
       enableSuggestions:
@@ -51,7 +55,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
           widget.textInputType == TextInputType.visiblePassword ? false : true,
       onChanged: widget.onChange,
       decoration: new InputDecoration(
+        counterText: '',
         prefixIcon: widget.icon,
+
         contentPadding: EdgeInsets.all(17),
         hintText: widget.hint,
         fillColor: AppColors.SecondaryLight,
@@ -198,7 +204,7 @@ class _TextFieldWithBoxBorderState extends State<TextFieldWithBoxBorder> {
         children: [
           widget.heading!=null?Text(
             widget.heading!=null?widget.heading:'',
-            style: TextStyle(color: AppColors.TextFourth, fontSize: 18),
+            style: TextStyles.mediumMediumTextSecondary,
           ):Container(),
           Expanded(
             child: Container(
@@ -230,7 +236,7 @@ class _TextFieldWithBoxBorderState extends State<TextFieldWithBoxBorder> {
 
                   errorText: widget.errorText,
                   prefixIcon: widget.icon,
-                  contentPadding: EdgeInsets.only(top: 17, bottom: 17,left: 17,right: 17),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16,vertical: 8),
                   hintText: widget.hint,
                   hintStyle: TextStyles.mediumRegularTextTertiary,
                   errorStyle: TextStyle(

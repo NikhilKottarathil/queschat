@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:queschat/pages/post_a_MCQ.dart';
+import 'package:queschat/components/custom_radio_buttons.dart';
 import 'package:queschat/constants/styles.dart';
 
 class SearchUserAdapter extends StatefulWidget {

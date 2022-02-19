@@ -2,8 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:queschat/constants/styles.dart';
 
-selectImage({context, File imageFile, var aspectRatios}) async {
+selectImage({context, File imageFile, List<CropAspectRatioPreset>  aspectRatios}) async {
   try {
     await showModalBottomSheet(
         elevation: 10,
@@ -23,7 +24,7 @@ selectImage({context, File imageFile, var aspectRatios}) async {
                 new ListTile(
                     leading: new Icon(
                       Icons.camera_enhance_sharp,
-                      color: Colors.red,
+                      color: AppColors.IconColor,
                     ),
                     title: new Text(
                       'Camera',
@@ -92,7 +93,7 @@ getImageFromCamera() async {
   }
 }
 
-Future cropImage({File image, var aspectRatios}) async {
+Future cropImage({File image, List<CropAspectRatioPreset> aspectRatios}) async {
   File croppedFile = await ImageCropper.cropImage(
       sourcePath: image.path,
       compressQuality: 30,
