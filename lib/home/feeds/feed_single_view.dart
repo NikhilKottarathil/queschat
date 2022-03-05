@@ -16,7 +16,7 @@ FeedSingleView({Key key,this.feedId,this.parentPage}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    print('feedMessageView ${feedId} $parentPage');
+    print('feedSingleView ${feedId} $parentPage');
     return Scaffold(
 
       appBar: appBarWithBackButton(context: context,titleString: 'Post'),

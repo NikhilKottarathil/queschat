@@ -49,6 +49,7 @@ class MessageRoomListBloc
     reference
         .child(detailsNode)
 
+
         .once()
         .then((value) {
       Map<dynamic, dynamic> allChannels = value.value;

@@ -118,8 +118,8 @@ class FeedAdapter extends StatelessWidget {
                                     onPressed: () {
                                       if (feedModel.userId ==
                                           AppData().userId) {
-                                        print(feedModel.id);
-                                        print(AppData().userId);
+                                        // print(feedModel.id);
+                                        // print(AppData().userId);
                                         if (feedModel.feedType == 'blog') {
                                           showOptionAlert(
                                               context, index, feedModel.id);
@@ -464,7 +464,7 @@ class MCQFeed extends StatelessWidget {
 
       // print(mcqModel.selectedAnswer);
       // print(mcqModel.correctAnswer);
-      print(mcqModel.optionA);
+      // print(mcqModel.optionA);
       return Container(
         color: Colors.transparent,
         // decoration: BoxDecoration(

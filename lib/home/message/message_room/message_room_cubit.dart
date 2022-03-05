@@ -277,7 +277,7 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
     if (ids.length < 25) {
       print('load messages');
 
-      loadMoreMessages();
+      // loadMoreMessages();
       print('load messages complete');
     } else {
       print('ids.length is high');
@@ -402,7 +402,7 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
 
   listenTypingUsers() async {
     reference
-        .child(detailsNode)
+        .child('TypingListener')
         .child(chatRoomModel.id)
         .child('is_typing')
         .onValue
@@ -773,6 +773,12 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
         .child(chatRoomModel.id)
         .child(getDayNode(messageModel.createdAt))
         .child(messageModel.id)
+        .child('message_type')
+        .set('deleted');
+    reference
+        .child(detailsNode)
+        .child(chatRoomModel.id)
+        .child('last_message')
         .child('message_type')
         .set('deleted');
   }

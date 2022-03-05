@@ -25,21 +25,19 @@ class MessageRoomAdapter extends StatelessWidget {
                 chatRoomModel.imageUrl,
               ))
           : ClipOval(
-            child: CircleAvatar(
-              radius: 24,
-              backgroundColor:        AppColors.TextTertiary,
-
-              child: Icon(
+              child: CircleAvatar(
+                radius: 24,
+                backgroundColor: AppColors.TextTertiary,
+                child: Icon(
                   CupertinoIcons.person_alt,
                   color: AppColors.White,
                   size: 36,
                 ),
+              ),
             ),
-          ),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
         children: [
           Text(
             chatRoomModel.name,
@@ -50,7 +48,7 @@ class MessageRoomAdapter extends StatelessWidget {
           chatRoomModel.lastMessage != null
               ? FutureBuilder(
                   future: authRepository.getDetailsOfSelectedUser(
-                      chatRoomModel.lastMessage.senderID,'any'),
+                      chatRoomModel.lastMessage.senderID, 'any'),
                   builder: (context, snapShot) {
                     if (snapShot.hasData) {
                       return Row(
@@ -61,18 +59,24 @@ class MessageRoomAdapter extends StatelessWidget {
                             child: Row(
                               children: [
                                 sendSeenIcons(chatRoomModel.lastMessage),
-                                SizedBox(width: 4,),
+                                SizedBox(
+                                  width: 4,
+                                ),
                               ],
                             ),
                           ),
-
                           Flexible(
                             child: Text(
                               chatRoomModel.lastMessage.messageType ==
                                       MessageType.text
                                   ? chatRoomModel.lastMessage.message
-                                  : chatRoomModel.lastMessage.messageMediaType
-                                      .toString(),
+                                  : chatRoomModel
+                                              .lastMessage.messageType ==
+                                          MessageType.deleted
+                                      ? 'deleted the message'
+                                      : chatRoomModel
+                                          .lastMessage.messageMediaType
+                                          .toString(),
                               style: TextStyles.smallRegularTextTertiary,
                             ),
                           ),
@@ -105,7 +109,9 @@ class MessageRoomAdapter extends StatelessWidget {
                   color: AppColors.TextTertiary,
                   borderRadius: BorderRadius.circular(10)),
               child: Text(
-                chatRoomModel.unreadMessageCount>999?'999+':chatRoomModel.unreadMessageCount.toString(),
+                chatRoomModel.unreadMessageCount > 999
+                    ? '999+'
+                    : chatRoomModel.unreadMessageCount.toString(),
                 style: TextStyle(color: Colors.white),
               ),
             ),
@@ -116,31 +122,37 @@ class MessageRoomAdapter extends StatelessWidget {
   }
 }
 
-
 class MessageRoomAdapterDummy extends StatelessWidget {
-
-
   @override
   Widget build(BuildContext context) {
-    var width= MediaQuery.of(context).size.width;
+    var width = MediaQuery.of(context).size.width;
     return ListTile(
       leading: ShimmerCircle(radius: 24),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-         ShimmerRectangle(height: 10,width:width/2,),
-         SizedBox(height: 8,),
-         ShimmerRectangle(height: 8,width:width/2,),
-
+          ShimmerRectangle(
+            height: 10,
+            width: width / 2,
+          ),
+          SizedBox(
+            height: 8,
+          ),
+          ShimmerRectangle(
+            height: 8,
+            width: width / 2,
+          ),
         ],
       ),
       trailing: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-        ShimmerRectangle(height: 8,width: 50,),
-       ]
-      ),
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ShimmerRectangle(
+              height: 8,
+              width: 50,
+            ),
+          ]),
     );
   }
 }

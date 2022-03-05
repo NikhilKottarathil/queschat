@@ -40,7 +40,7 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
     try {
        var element = await feedRepository.getSingleFeedDetails(feedId);
        List feeds = [element];
-       print('inital $feeds');
+       // print('inital $feeds');
 
        convertFeeds(feeds);
     }catch(e){
@@ -54,7 +54,7 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
     state.feedIds.clear();
     state.page = 1;
     var feeds = await feedRepository.getFeeds(state.page, 10, parentPage);
-    print('inital $feeds');
+    // print('inital $feeds');
 
     convertFeeds(feeds);
   }
@@ -62,7 +62,7 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
   getMoreFeeds() async {
     state.page = state.page + 1;
     var feeds = await feedRepository.getFeeds(state.page, 10, parentPage);
-    print('norw $feeds');
+    // print('norw $feeds');
 
     convertFeeds(feeds);
   }
@@ -127,9 +127,9 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
 
   convertFeeds(var feeds) async {
     try {
-      print('conver feed');
+      // print('conver feed');
       feeds.forEach((element) async {
-        print('fedd $element');
+        // print('fedd $element');
         if (!state.feedIds.contains(element['id'])) {
           var contentModel = await getContentModel(element);
 
@@ -263,7 +263,7 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
       if (mcq != null) {
         mcqList = mcq.split(',');
       }
-      print('mcqList$mcqList');
+      // print('mcqList$mcqList');
       QuizModel blogModel = QuizModel(
           content: element['description'],
           isQuizAttended:element['is_quiz_attended'],

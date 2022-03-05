@@ -26,6 +26,7 @@ Future<void> multipleMultiFormatFilePicker(
     FilePickerResult result = await FilePicker.platform.pickFiles(
       type: FileType.any,
       allowMultiple: true,
+
       allowCompression: true,
 
     );

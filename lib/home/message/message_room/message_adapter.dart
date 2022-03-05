@@ -25,7 +25,7 @@ class MessageAdapter extends StatefulWidget {
   MessageModel messageModel;
   BuildContext buildContext;
 
-  MessageAdapter({this.messageModel, this.buildContext});
+  MessageAdapter({Key key,this.messageModel, this.buildContext});
 
   @override
   State<MessageAdapter> createState() => _MessageAdapterState();
@@ -374,6 +374,7 @@ class _MessageAdapterState extends State<MessageAdapter>
                                     MessageType.feed
                                 ? Flexible(
                                     child: FeedMessageView(
+                                      key: widget.key,
                                       messageModel: widget.messageModel,
                                     ),
                                   )

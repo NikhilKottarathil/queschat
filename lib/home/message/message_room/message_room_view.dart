@@ -80,7 +80,7 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
     if (context.read<MessageRoomCubit>().messageRoomStatus ==
         MessageRoomStatus.Active) {
       reference
-          .child(context.read<MessageRoomCubit>().detailsNode)
+          .child('TypingListener')
           .child(context.read<MessageRoomCubit>().chatRoomModel.id)
           .child('is_typing')
           .child(AppData().userId)
@@ -142,12 +142,15 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
                   buildWhen: (prevState, state) {
                 return state is LoadList;
               }, builder: (context, state) {
+                    print('LoadList');
                 return state is LoadList
                     ? state.messageModels.length != 0
-                        ? ListView.separated(
+                        ?
+
+                ListView.separated(
                             reverse: true,
                             addAutomaticKeepAlives: true,
-                            cacheExtent: 99999999999999,
+
                             padding: EdgeInsets.symmetric(
                                 vertical: 20, horizontal: 10),
                             controller: scrollController,
@@ -155,14 +158,16 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
                             itemCount: state.messageModels.length,
                             itemBuilder: (BuildContext context, int index) {
                               return MessageAdapter(
+                                key:ObjectKey( state.messageModels[index].id),
                                 messageModel: state.messageModels[index],
                                 buildContext: context,
                               );
                             },
+
                             separatorBuilder:
                                 (BuildContext context, int index) {
                               return SizedBox(
-                                height: 20,
+                                height: 14,
                               );
                             },
                           )
@@ -187,7 +192,7 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
         MessageRoomStatus.Active) {
       if (_debounce?.isActive ?? false) _debounce.cancel();
       reference
-          .child(context.read<MessageRoomCubit>().detailsNode)
+          .child('TypingListener')
           .child(context.read<MessageRoomCubit>().chatRoomModel.id)
           .child('is_typing')
           .child(AppData().userId)
@@ -196,7 +201,7 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
 
       _debounce = Timer(const Duration(milliseconds: 1000), () {
         reference
-            .child(context.read<MessageRoomCubit>().detailsNode)
+            .child('TypingListener')
             .child(context.read<MessageRoomCubit>().chatRoomModel.id)
             .child('is_typing')
             .child(AppData().userId)

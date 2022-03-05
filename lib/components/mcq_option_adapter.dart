@@ -19,7 +19,7 @@ class MCQOptionAdapter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('answeredPercentage $option $answeredPercentage');
+    // print('answeredPercentage $option $answeredPercentage');
 
     return InkWell(
       onTap: () {
