@@ -74,7 +74,7 @@ class MessageRoomEditView extends StatelessWidget {
                         contentPadding: EdgeInsets.all(17),
                         hintText:
                             'Enter ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Group' : 'Channel'} Name',
-                        fillColor: AppColors.SecondaryLight,
+                        fillColor: AppColors.White,
                         filled: true,
                         hintStyle: TextStyles.smallRegularTextTertiary,
                         errorStyle: TextStyle(

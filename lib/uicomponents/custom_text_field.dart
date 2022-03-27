@@ -41,9 +41,11 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return new TextFormField(
+      cursorColor: AppColors.SecondaryColor,
+
       controller: controller,
       keyboardType: widget.textInputType,
-      style: TextStyles.smallRegularTextSecondary,
+      style: TextStyles.bodyTextPrimary,
       validator: widget.validator,
       maxLength: widget.maxLength!=null?widget.maxLength:widget.textInputType==TextInputType.phone?10:null,
 
@@ -60,25 +62,37 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
         contentPadding: EdgeInsets.all(17),
         hintText: widget.hint,
-        fillColor: AppColors.SecondaryLight,
-        filled: true,
-        hintStyle: TextStyles.smallRegularTertiary,
-        errorStyle: TextStyle(
-            fontSize: 12,
-            color: AppColors.TextError,
-            height: 1.1,
-            fontFamily: 'NunitoSans',
-            fontWeight: FontWeight.w400),
-        border: AppBorders.transparentBorder,
-        focusedBorder: AppBorders.transparentBorder,
-        disabledBorder: AppBorders.transparentBorder,
-        enabledBorder: AppBorders.transparentBorder,
-        errorBorder: AppBorders.transparentBorder,
-        focusedErrorBorder: AppBorders.transparentBorder,
+        // labelText: widget.hint,
+
+        prefixIconColor: AppColors.SecondaryColor,
+
+
+        hintStyle: TextStyles.smallRegularTextTertiary,
+        errorStyle:TextStyles.smallRegularTextError,
+        border: OutlineInputBorder(
+            borderSide: BorderSide(color: AppColors.BorderColor)
+        ),
+        focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: AppColors.SecondaryColor)
+        ),
+        disabledBorder:OutlineInputBorder(
+            borderSide: BorderSide(color: AppColors.BorderColor)
+        ),
+        enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: AppColors.BorderColor)
+        ),
+        errorBorder:OutlineInputBorder(
+            borderSide: BorderSide(color: AppColors.BorderColor)
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: AppColors.BorderColor)
+        ),
       ),
     );
   }
 }
+
+
 
 class CustomTextField2 extends StatefulWidget {
   String hint;
@@ -151,6 +165,8 @@ class _CustomTextField2State extends State<CustomTextField2> {
     );
   }
 }
+
+
 
 class TextFieldWithBoxBorder extends StatefulWidget {
   String heading;

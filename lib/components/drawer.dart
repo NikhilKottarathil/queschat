@@ -129,7 +129,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                                   }),
                               ActiveInactiveButton(
                                   icon: Image.asset(
-                                    "images/group.png",
+                                    "images/group_profile.png",
                                     color: AppColors.White,
                                   ),
                                   text: "Create Channel",

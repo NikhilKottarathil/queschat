@@ -1,5 +1,4 @@
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,12 +11,9 @@ import 'package:queschat/home/feeds/feeds_view.dart';
 import 'package:queschat/home/home/home_bloc.dart';
 import 'package:queschat/home/home/home_events.dart';
 import 'package:queschat/home/home/home_state.dart';
-import 'package:queschat/home/message/message_home/message_home_view.dart';
-import 'package:queschat/main.dart';
-import 'package:queschat/models/chat_room_model.dart';
+import 'package:queschat/home/message/message_room_list/message_room_list_view.dart';
 import 'package:queschat/router/app_router.dart';
 import 'package:queschat/uicomponents/appbars.dart';
-import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 
 class HomeView extends StatefulWidget {
   @override
@@ -29,38 +25,64 @@ class _HomeViewState extends State<HomeView>
   TabController _tabController;
 
   List<Widget> _buildScreens() {
-    return [MessageHomeView(), FeedsView()];
+    return [
+      BlocProvider(
+        create: (context) => allChatMessageRoomListBloc,
+        child: MessageRoomListView(),
+      ),
+      BlocProvider(
+        create: (context) => channelMessageRoomListBloc,
+        child: MessageRoomListView(),
+      ),
+      FeedsView(),
+    ];
   }
 
-  List<BottomNavyBarItem> _navBarsItems = [
-    BottomNavyBarItem(
-      icon: Padding(
-        padding: EdgeInsets.only(left: 10),
-        child: Image.asset(
-          "images/ic_chat.png",
-          color: AppColors.White,
-          height: 18,
-          width: 18,
-        ),
+  List<BottomNavigationBarItem> _navBarsItems = [
+    BottomNavigationBarItem(
+      icon: Image.asset(
+        'images/message_nav_icon.png',
+        color: AppColors.IconColor,
+        height: 22,
+        width: 22,
       ),
-      title: Text('Message'),
-      textAlign: TextAlign.center,
-
-      activeColor: AppColors.White,
+      label: '',
+      activeIcon: Image.asset(
+        'images/message_nav_icon.png',
+        color: AppColors.SecondaryColor,
+        height: 22,
+        width: 22,
+      ),
     ),
-    BottomNavyBarItem(
-      icon: Padding(
-        padding: EdgeInsets.only(left: 10),
-        child: Image.asset(
-          "images/feed_icon.png",
-          color: AppColors.White,
-          height: 18,
-          width: 18,
-        ),
+    BottomNavigationBarItem(
+      icon: Image.asset(
+        'images/channel_nav_icon.png',
+        color: AppColors.IconColor,
+        height: 22,
+        width: 22,
       ),
-      textAlign: TextAlign.center,
-      title: Text('Feed'),
-      activeColor: AppColors.White,
+      activeIcon: Image.asset(
+        'images/channel_nav_icon.png',
+        color: AppColors.SecondaryColor,
+        height: 22,
+        width: 22,
+      ),
+      label: '',
+    ),
+    BottomNavigationBarItem(
+      icon: Image.asset(
+        'images/feed_nav_icon.png',
+        color: AppColors.IconColor,
+        height: 22,
+        width: 22,
+      ),
+      label: '',
+      activeIcon: Image.asset(
+        'images/feed_nav_icon.png',
+        color: AppColors.SecondaryColor,
+        height: 22,
+        width: 22,
+      ),
     ),
   ];
 
@@ -68,7 +90,7 @@ class _HomeViewState extends State<HomeView>
   void initState() {
     // TODO: implement initState
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     //
     WidgetsBinding.instance.addObserver(this);
     DatabaseReference infoReference =
@@ -83,18 +105,16 @@ class _HomeViewState extends State<HomeView>
       userReference.set('online');
     });
 
-
-   listenDynamicLink(context);
+    listenDynamicLink(context);
   }
 
   @override
   Widget build(BuildContext context) {
-
     return WillPopScope(
       onWillPop: () {
         return appExitAlert(context);
       },
-    child: Scaffold(
+      child: Scaffold(
         appBar: homeAppBar(context),
         drawer: CustomDrawer(),
         body: BlocBuilder<HomeBloc, HomeState>(
@@ -109,18 +129,44 @@ class _HomeViewState extends State<HomeView>
             );
           },
         ),
-        bottomNavigationBar: BottomNavyBar(
-          backgroundColor: AppColors.PrimaryColorLight,
-          selectedIndex: context.read<HomeBloc>().state.tabIndex,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-itemCornerRadius: 10,
-          showElevation: true,
-          // use this to remove appBar's elevation
-          onItemSelected: (index) => setState(() {
-            context.read<HomeBloc>().add(ChangeTab(index));
-          }),
-          items: _navBarsItems,
+        bottomNavigationBar: Theme(
+          data: Theme.of(context).copyWith(
+              // sets the background color of the `BottomNavigationBar`
+              canvasColor: Colors.white,
+              // sets the active color of the `BottomNavigationBar` if `Brightness` is light
+              primaryColor: Colors.red,
+              shadowColor: AppColors.ShadowColor,
+              textTheme: Theme.of(context)
+                  .textTheme
+                  .copyWith(caption: new TextStyle(color: Colors.yellow))),
+          child: BottomNavigationBar(
+            // backgroundColor: AppColors.White,
+            currentIndex: context.read<HomeBloc>().state.tabIndex,
+            onTap: (index) => setState(() {
+              context.read<HomeBloc>().add(ChangeTab(index));
+            }),
+            elevation: 5,
+            type: BottomNavigationBarType.fixed,
+
+            fixedColor: AppColors.White,
+            showUnselectedLabels: false,
+            showSelectedLabels: false,
+            items: _navBarsItems,
+          ),
         ),
+        // bottomNavigationBar: BottomNavyBar(
+        //   backgroundColor: AppColors.PrimaryColor,
+        //
+        //   selectedIndex: context.read<HomeBloc>().state.tabIndex,
+        //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+        //   itemCornerRadius: 10,
+        //   showElevation: true,
+        //   // use this to remove appBar's elevation
+        //   onItemSelected: (index) => setState(() {
+        //     context.read<HomeBloc>().add(ChangeTab(index));
+        //   }),
+        //   items: _navBarsItems,
+        // ),
       ),
     );
   }
@@ -154,7 +200,7 @@ itemCornerRadius: 10,
 // ),
 // activeIcon: Image.asset(
 // "images/feed_icon.png",
-// height: 24,
+// height: 22,
 // ),
 // //  activeIcon: Container(
 // //    color: AppColors().ChatPrimaryColor,
@@ -166,7 +212,7 @@ itemCornerRadius: 10,
 // //        children: [
 // //          Image.asset(
 // //            "images/feed_icon_inactive.png",
-// //            height: 24,
+// //            height: 22,
 // //          ),
 // //          SizedBox(
 // //            width: 10,
@@ -186,7 +232,7 @@ itemCornerRadius: 10,
 // ),
 // activeIcon: Image.asset(
 // "images/ic_chat.png",
-// height: 24,
+// height: 22,
 // ),
 // // activeIcon: Card(
 // //   color: AppColors().ChatPrimaryColor,
@@ -198,7 +244,7 @@ itemCornerRadius: 10,
 // //       children: [
 // //         Image.asset(
 // //           "images/ic_chat_inactive.png",
-// //           height: 24,
+// //           height: 22,
 // //         ),
 // //         SizedBox(
 // //           width: 10,

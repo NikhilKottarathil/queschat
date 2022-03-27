@@ -36,7 +36,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           : null;
       state.imageUrl = user['profile_pic']['url'] != null
           ? 'https://api.queschat.com/' + user['profile_pic']['url']
-          : Urls().personUrl;
+          : null;
       add(UpdateData());
     } on Exception {
     }

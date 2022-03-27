@@ -44,7 +44,7 @@ class ResetPasswordView extends StatelessWidget {
                   formStatus is NewPasswordSubmittedSuccessfully) {
                 Navigator.of(buildContext).pop();
               } else {
-                print('reverse buttn submit');
+                print('reverse button submit');
 
                 buildContext
                     .read<ResetPasswordBloc>()
@@ -80,10 +80,10 @@ class ResetPasswordView extends StatelessWidget {
                                     children: [
                                       Text(
                                         'Enter mobile number',
-                                        style: TextStyles.largeRegularTextTertiary,
+                                        style: TextStyles.heading2TextPrimary,
                                       ),
                                       SizedBox(
-                                        height: 30,
+                                        height: 18,
                                       ),
                                       CustomTextField(
                                           hint: "phone number",
@@ -100,7 +100,7 @@ class ResetPasswordView extends StatelessWidget {
                                                       phoneNumber: value),
                                                 );
                                           },
-                                          icon: Icon(Icons.phone),
+                                          icon: Icon(Icons.phone,color: AppColors.IconColor),
                                           textInputType: TextInputType.phone),
                                     ],
                                   )
@@ -119,7 +119,7 @@ class ResetPasswordView extends StatelessWidget {
                                     children: [
                                       Text(
                                         'Verify OTP',
-                                        style: TextStyles.largeRegularTextTertiary,
+                                        style: TextStyles.heading2TextPrimary,
                                       ),
                                       SizedBox(
                                         height: 30,
@@ -155,7 +155,7 @@ class ResetPasswordView extends StatelessWidget {
                                     children: [
                                       Text(
                                         'Enter New Password',
-                                        style: TextStyles.largeRegularTextTertiary,
+                                        style: TextStyles.heading2TextPrimary,
                                       ),
                                       SizedBox(
                                         height: 30,
@@ -174,7 +174,7 @@ class ResetPasswordView extends StatelessWidget {
                                                       password: value),
                                                 );
                                           },
-                                          icon: Icon(Icons.lock),
+                                          icon: Icon(Icons.lock,color: AppColors.IconColor),
                                           textInputType:
                                               TextInputType.visiblePassword),
                                     ],
@@ -188,7 +188,7 @@ class ResetPasswordView extends StatelessWidget {
                                     is NewPasswordSubmittedSuccessfully
                                 ? Text(
                                     'Password Changed Successfully',
-                                    style: TextStyles.largeRegularTextTertiary,
+                                    style: TextStyles.heading2TextPrimary,
                                   )
                                 : Container();
                           },

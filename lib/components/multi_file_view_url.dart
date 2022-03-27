@@ -72,7 +72,7 @@ class _MultiFileViewUrlState extends State<MultiFileViewUrl> {
                                               CrossAxisAlignment.center,
                                           children: [
                                             Icon(
-                                              Icons.picture_as_pdf,
+                                              Icons.picture_as_pdf,color: AppColors.IconColor,
                                               size: 50,
                                             ),
                                             SizedBox(

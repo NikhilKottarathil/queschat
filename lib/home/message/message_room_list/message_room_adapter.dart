@@ -11,113 +11,138 @@ import 'package:queschat/router/app_router.dart';
 
 class MessageRoomAdapter extends StatelessWidget {
   ChatRoomModel chatRoomModel;
+  String parentPage;
 
-  MessageRoomAdapter({this.chatRoomModel});
+  MessageRoomAdapter({this.chatRoomModel, this.parentPage});
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: chatRoomModel.imageUrl != null
-          ? CircleAvatar(
-              radius: 24,
-              backgroundColor: AppColors.White,
-              backgroundImage: NetworkImage(
-                chatRoomModel.imageUrl,
-              ))
-          : ClipOval(
-              child: CircleAvatar(
-                radius: 24,
-                backgroundColor: AppColors.TextTertiary,
-                child: Icon(
-                  CupertinoIcons.person_alt,
-                  color: AppColors.White,
-                  size: 36,
+    return Column(
+      children: [
+        Divider(
+          color: AppColors.TextSixth,
+          height: 0,
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          leading: chatRoomModel.imageUrl != null
+              ? CircleAvatar(
+                  radius: 24,
+                  backgroundColor: AppColors.White,
+                  backgroundImage: NetworkImage(
+                    chatRoomModel.imageUrl,
+                  ))
+              : ClipOval(
+                  child: CircleAvatar(
+                    radius: 24,
+                    backgroundColor: AppColors.TextTertiary,
+                    child: Image.asset(
+                      chatRoomModel.messageRoomType == 'chat'
+                          ? 'images/user_profile.png'
+                          : chatRoomModel.messageRoomType == 'group'
+                              ? 'images/group_profile.png'
+                              : 'images/channel_profile.png',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(
+                chatRoomModel.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyles.subTitle2TextPrimary,
               ),
-            ),
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Text(
-            chatRoomModel.name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyles.mediumBoldTextTertiary,
-          ),
-          chatRoomModel.lastMessage != null
-              ? FutureBuilder(
-                  future: authRepository.getDetailsOfSelectedUser(
-                      chatRoomModel.lastMessage.senderID, 'any'),
-                  builder: (context, snapShot) {
-                    if (snapShot.hasData) {
-                      return Row(
-                        children: [
-                          Visibility(
-                            visible: chatRoomModel.lastMessage.senderID ==
-                                AppData().userId,
-                            child: Row(
-                              children: [
-                                sendSeenIcons(chatRoomModel.lastMessage),
-                                SizedBox(
-                                  width: 4,
-                                ),
-                              ],
+              SizedBox(
+                height: 2,
+              ),
+              if (parentPage != 'exploreChannel' &&
+                  chatRoomModel.lastMessage != null)
+                FutureBuilder(
+                    future: authRepository.getDetailsOfSelectedUser(
+                        chatRoomModel.lastMessage.senderID, 'any'),
+                    builder: (context, snapShot) {
+                      if (snapShot.hasData) {
+                        return Row(
+                          children: [
+                            Visibility(
+                              visible: chatRoomModel.lastMessage.senderID ==
+                                  AppData().userId,
+                              child: Row(
+                                children: [
+                                  sendSeenIcons(chatRoomModel.lastMessage),
+                                  SizedBox(
+                                    width: 4,
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          Flexible(
-                            child: Text(
-                              chatRoomModel.lastMessage.messageType ==
-                                      MessageType.text
-                                  ? chatRoomModel.lastMessage.message
-                                  : chatRoomModel
-                                              .lastMessage.messageType ==
-                                          MessageType.deleted
-                                      ? 'deleted the message'
-                                      : chatRoomModel
-                                          .lastMessage.messageMediaType
-                                          .toString(),
-                              style: TextStyles.smallRegularTextTertiary,
+                            Flexible(
+                              child: Text(
+                                chatRoomModel.lastMessage.messageType ==
+                                        MessageType.text
+                                    ? chatRoomModel.lastMessage.message
+                                    : chatRoomModel.lastMessage.messageType ==
+                                            MessageType.deleted
+                                        ? 'deleted the message'
+                                        : chatRoomModel
+                                            .lastMessage.messageMediaType
+                                            .toString(),
+                                style: TextStyles.bodyTextSecondary,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        );
+                      }
+                      return Text(
+                        '',
+                        style: TextStyles.smallRegularTextSecondary,
                       );
-                    }
-                    return Text(
-                      '',
-                      style: TextStyles.smallRegularTextSecondary,
-                    );
-                  })
-              : Container(),
-        ],
-      ),
-      trailing: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            getDisplayDateOrTime(chatRoomModel.lastMessage != null
-                ? chatRoomModel.lastMessage.createdAt
-                : chatRoomModel.createdTime),
-            style: TextStyle(color: AppColors.IconColor),
+                    }),
+              if (parentPage == 'exploreChannel')
+                Text(chatRoomModel.description != null
+                    ? chatRoomModel.description
+                    : '',maxLines: 2,overflow: TextOverflow.ellipsis,style: TextStyles.subBodyTextSecondary,),
+            ],
           ),
-          Visibility(
-            visible: chatRoomModel.unreadMessageCount > 0,
-            child: Container(
-              padding: EdgeInsets.fromLTRB(10, 3, 10, 3),
-              decoration: BoxDecoration(
-                  color: AppColors.TextTertiary,
-                  borderRadius: BorderRadius.circular(10)),
-              child: Text(
-                chatRoomModel.unreadMessageCount > 999
-                    ? '999+'
-                    : chatRoomModel.unreadMessageCount.toString(),
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ),
-        ],
-      ),
+          trailing: parentPage != 'exploreChannel'
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      getDisplayDateOrTime(chatRoomModel.lastMessage != null
+                          ? chatRoomModel.lastMessage.createdAt
+                          : chatRoomModel.createdTime),
+                      style: TextStyles.subBodyTextSecondary,
+                    ),
+                    Visibility(
+                      visible: chatRoomModel.unreadMessageCount > 0,
+                      child: Container(
+                        padding: EdgeInsets.fromLTRB(10, 3, 10, 3),
+                        decoration: BoxDecoration(
+                            color: AppColors.TextSecondary,
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Text(
+                          chatRoomModel.unreadMessageCount > 999
+                              ? '999+'
+                              : chatRoomModel.unreadMessageCount.toString(),
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : null,
+        ),
+        Divider(
+          color: AppColors.TextSixth,
+          height: 0,
+        ),
+      ],
     );
   }
 }

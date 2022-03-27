@@ -60,7 +60,7 @@ class _MultiFileViewState extends State<MultiFileView> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.center,
                                         children: [
-                                          Icon(Icons.picture_as_pdf,size: 50,),
+                                          Icon(Icons.picture_as_pdf,size: 50,color: AppColors.IconColor),
                                           SizedBox(height: 10,),
                                           Text(path.basename(item.path))
                                         ],

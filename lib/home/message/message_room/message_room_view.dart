@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/authentication/app_data.dart';
 import 'package:queschat/components/audio/record_button.dart';
@@ -11,7 +10,6 @@ import 'package:queschat/components/custom_progress_indicator.dart';
 import 'package:queschat/components/multiple_multi_format_file_picker.dart';
 import 'package:queschat/components/popups/show_new_feed_alert.dart';
 import 'package:queschat/components/shimmer_widget.dart';
-import 'package:queschat/constants/strings_and_urls.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/function/show_snack_bar.dart';
 import 'package:queschat/home/message/message_room/message_adapter.dart';
@@ -20,14 +18,14 @@ import 'package:queschat/home/message/message_room/message_room_info_view.dart';
 import 'package:queschat/home/message/message_room/message_room_state.dart';
 import 'package:queschat/models/message_model.dart';
 import 'package:queschat/router/app_router.dart';
-import 'package:shimmer/shimmer.dart';
 
 class MessageRoomView extends StatefulWidget {
   @override
   _MessageRoomViewState createState() => _MessageRoomViewState();
 }
 
-class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingObserver{
+class _MessageRoomViewState extends State<MessageRoomView>
+    with WidgetsBindingObserver {
   ScrollController scrollController = new ScrollController();
   DatabaseReference reference = FirebaseDatabase.instance.reference();
 
@@ -47,7 +45,6 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
         context.read<MessageRoomCubit>().loadMoreMessages();
       }
     });
-
   }
 
   @override
@@ -72,7 +69,6 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
 
     super.dispose();
   }
-
 
   @override
   void deactivate() {
@@ -123,7 +119,6 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
   //   }
   // }
 
-
   @override
   Widget build(BuildContext buildContext) {
     return Scaffold(
@@ -142,15 +137,12 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
                   buildWhen: (prevState, state) {
                 return state is LoadList;
               }, builder: (context, state) {
-                    print('LoadList');
+                print('LoadList');
                 return state is LoadList
                     ? state.messageModels.length != 0
-                        ?
-
-                ListView.separated(
+                        ? ListView.separated(
                             reverse: true,
                             addAutomaticKeepAlives: true,
-
                             padding: EdgeInsets.symmetric(
                                 vertical: 20, horizontal: 10),
                             controller: scrollController,
@@ -158,12 +150,11 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
                             itemCount: state.messageModels.length,
                             itemBuilder: (BuildContext context, int index) {
                               return MessageAdapter(
-                                key:ObjectKey( state.messageModels[index].id),
+                                key: ObjectKey(state.messageModels[index].id),
                                 messageModel: state.messageModels[index],
                                 buildContext: context,
                               );
                             },
-
                             separatorBuilder:
                                 (BuildContext context, int index) {
                               return SizedBox(
@@ -214,13 +205,13 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
   appBar() {
     return AppBar(
       // foregroundColor: AppColors.ChatPrimaryColor,
-      backgroundColor: AppColors.ChatPrimaryColor,
+      backgroundColor: AppColors.TextSixth,
       //
       // foregroundColor: AppColors.White,
       // backgroundColor: AppColors.White,
       shadowColor: Colors.transparent,
 
-      // elevation: .5,
+      elevation: .5,
       centerTitle: true,
       iconTheme: IconThemeData(color: AppColors.IconColor),
       title: Row(
@@ -247,19 +238,20 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
                   child: Container(
                     padding: EdgeInsets.all(5),
                     margin: EdgeInsets.only(right: 10),
-
-                    height: 36,
-                    width: 36,
-                    // color: Colors.green,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image: NetworkImage(state.chatRoomModel.imageUrl != null
-                            ? state.chatRoomModel.imageUrl
-                            : Urls().personUrl),
-                      ),
-                    ),
+                    child: state.chatRoomModel.imageUrl != null
+                        ? CircleAvatar(
+                            radius: 20,
+                            backgroundImage: NetworkImage(
+                                state.chatRoomModel.imageUrl.toString()),
+                          )
+                        : CircleAvatar(
+                            radius: 20,
+                            child: Image.asset(state.chatRoomModel.messageRoomType == 'chat'
+                                ? 'images/user_profile.png'
+                                : state.chatRoomModel.messageRoomType == 'group'
+                                ? 'images/group_profile.png'
+                                : 'images/channel_profile.png',),
+                          ),
                   ),
                 );
               }
@@ -277,7 +269,7 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
               }, builder: (context, state) {
                 if (state is InfoDetails) {
                   return Text(state.chatRoomModel.name,
-                      style: TextStyles.mediumMediumTextSecondary);
+                      style: TextStyles.subTitle1TextPrimary);
                 }
                 return ShimmerRectangle(
                   height: 10,
@@ -295,7 +287,7 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
 
                     return Text(
                       state.statusAndLastSeen,
-                      style: TextStyles.smallRegularTextTertiary,
+                      style: TextStyles.subBodyTextSecondary,
                     );
                   }
                   if (state is TypingUserState) {
@@ -318,13 +310,13 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
                                         : snapShot.data.toString() +
                                             ' ' +
                                             state.valueModels[index].value,
-                                    style: TextStyles.tinyRegularTextTertiary);
+                                    style: TextStyles.subBodyTextSecondary);
                               }
                               return Text(
                                   context
                                       .read<MessageRoomCubit>()
                                       .lastSeenAndStatus,
-                                  style: TextStyles.tinyRegularTextTertiary);
+                                  style: TextStyles.subBodyTextSecondary);
                             });
                       }),
                     );
@@ -364,11 +356,11 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
               height: 60,
               width: MediaQuery.of(context).size.width,
               padding: EdgeInsets.all(10),
-              color: AppColors.ChatPrimaryColor,
+              color: AppColors.TextSeven,
               child: Center(
                 child: Text(
                     "You can't send message to this${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? ' group' : 'channel'}, Because the  ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'group' : 'channel'} no longer exists",
-                    style: TextStyles.smallMediumTextTertiary,
+                    style: TextStyles.subTitle2TextSecondary,
                     textAlign: TextAlign.center),
               ),
             );
@@ -377,12 +369,12 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
             return Container(
               height: 60,
               width: MediaQuery.of(context).size.width,
-              color: AppColors.ChatPrimaryColor,
+              color: AppColors.TextSeven,
               padding: EdgeInsets.all(10),
               child: Center(
                 child: Text(
                   "You can't send message to this${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Group' : 'Channel'}, Because you're no longer a member",
-                  style: TextStyles.smallMediumTextTertiary,
+                  style: TextStyles.subTitle2TextSecondary,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -398,11 +390,11 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
               child: Container(
                 height: 60,
                 width: MediaQuery.of(context).size.width,
-                color: AppColors.ChatPrimaryColor,
+                color: AppColors.TextSeven,
                 child: Center(
                   child: Text(
                     "Join ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Group' : 'Channel'}",
-                    style: TextStyles.mediumBoldTextSecondary,
+                    style: TextStyles.subTitle2TextSecondary,
                   ),
                 ),
               ),
@@ -416,19 +408,20 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
                           .messageRoomType ==
                       'channel'
               ? Container(
-            height: 60,
-            width: MediaQuery.of(context).size.width,
-            padding: EdgeInsets.all(10),
-            color: AppColors.ChatPrimaryColor,
-            child: Center(
-              child: Text(
-                  "You can't send message to this${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? ' group' : 'channel'}, Only admin can message",
-                  style: TextStyles.smallMediumTextTertiary,
-                  textAlign: TextAlign.center),
-            ),
-          )
+                  height: 60,
+                  width: MediaQuery.of(context).size.width,
+                  padding: EdgeInsets.all(10),
+                  color: AppColors.TextSeven,
+                  child: Center(
+                    child: Text(
+                        "You can't send message to this${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? ' group' : 'channel'}, Only admin can message",
+                        style: TextStyles.subTitle2TextSecondary,
+                        textAlign: TextAlign.center),
+                  ),
+                )
               : Container(
-                  color: AppColors.ChatPrimaryColor,
+                  color: AppColors.TextSeven,
+
                   width: MediaQuery.of(context).size.width,
                   height: 60,
                   padding: EdgeInsets.only(right: 10),
@@ -445,12 +438,12 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
                             prefixIconConstraints: BoxConstraints(),
 
                             prefixIcon:
-                            // context
-                            //     .read<MessageRoomCubit>()
-                            //     .chatRoomModel
-                            //     .messageRoomType ==
-                            //     'channel'?
-                            IconButton(
+                                // context
+                                //     .read<MessageRoomCubit>()
+                                //     .chatRoomModel
+                                //     .messageRoomType ==
+                                //     'channel'?
+                                IconButton(
                               onPressed: () {
                                 showNewFeedAlert(context);
                               },
@@ -459,10 +452,9 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
                                 color: AppColors.IconColor,
                               ),
                               constraints: BoxConstraints(),
-                              padding: EdgeInsets.only(left: 14,right: 10
-                              ),
+                              padding: EdgeInsets.only(left: 14, right: 10),
                             ),
-                              // :SizedBox(width: 20,),
+                            // :SizedBox(width: 20,),
                             suffixIcon: IconButton(
                               onPressed: () {
                                 multipleMultiFormatFilePicker(
@@ -513,12 +505,12 @@ class _MessageRoomViewState extends State<MessageRoomView>  with WidgetsBindingO
                                   Icons.send,
                                   color: AppColors.White,
                                 ),
-                                height: 42,
-                                width: 42,
+                                height: 40,
+                                width: 40,
                                 clipBehavior: Clip.hardEdge,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Theme.of(context).primaryColor,
+                                  color: AppColors.PrimaryColor,
                                 ),
                               ),
                             ),

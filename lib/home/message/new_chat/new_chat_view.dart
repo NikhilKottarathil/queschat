@@ -63,8 +63,7 @@ class NewChatView extends StatelessWidget {
                       Expanded(
                         child: Text(
                           'Select Contact',
-                          style: TextStyle(
-                              fontSize: 20, color: AppColors.TextSecondary),
+                          style: TextStyles.heading2TextPrimary,
                         ),
                       ),
                       IconButton(
@@ -94,7 +93,7 @@ class NewChatView extends StatelessWidget {
                       Flexible(
                         child: TextField(
                           keyboardType: TextInputType.text,
-                          style: new TextStyle(color: Colors.black),
+                          style: TextStyles.bodyTextPrimary,
                           onChanged: (value) {
                             context.read<NewChatCubit>().searchUsers(value);
                           },
@@ -102,7 +101,7 @@ class NewChatView extends StatelessWidget {
                             hintText: 'Search...',
                             border: InputBorder.none,
                             hintStyle:
-                                TextStyle(color: AppColors.SecondaryColorLight),
+                               TextStyles.bodyTextSecondary,
                           ),
                         ),
                       ),
@@ -122,7 +121,7 @@ class NewChatView extends StatelessWidget {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Reading your contact please wait',style: TextStyles.mediumRegularTextTertiary,),
+                Text('Reading your contact please wait',style: TextStyles.subTitle2TextSecondary,),
                 SizedBox(height: 20,),
                 CustomProgressIndicator(),
               ],
@@ -130,7 +129,7 @@ class NewChatView extends StatelessWidget {
           } else if (state is LoadList){
             return Column(
               children: [
-                FlatButtonWithIcon(Icon(Icons.group,color: AppColors.IconColor,),"New Group",(){
+                FlatButtonWithIcon(Icon(Icons.group_add,color: AppColors.IconColor,size: 26,),"New Group",(){
                   Navigator.push(context, MaterialPageRoute(
                     builder: (_) => BlocProvider(
                       create: (context) => NewGroupCubit(authRepo: authRepository,isGroupOrChannel: 'group'),
@@ -138,7 +137,7 @@ class NewChatView extends StatelessWidget {
                     ),
                   ));
                 }),
-                FlatButtonWithIcon(Icon(Icons.group_add,color: AppColors.IconColor,),"New Channel",(){
+                FlatButtonWithIcon(Image.asset('images/channel_nav_icon.png',color: AppColors.IconColor,width: 24,height: 24,scale: 1),"New Channel",(){
 
                   Navigator.push(context, MaterialPageRoute(
                     builder: (_) => BlocProvider(

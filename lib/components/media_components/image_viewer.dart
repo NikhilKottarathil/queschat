@@ -91,7 +91,7 @@ class _ImageViewerState extends State<ImageViewer> {
                 ? CachedNetworkImage(
                     fit: BoxFit.contain,
                     imageUrl: widget.imageUrl,
-                    errorWidget: (context, url, error) => Icon(Icons.error),
+                    errorWidget: (context, url, error) => Icon(Icons.error,color: AppColors.IconColor),
                   )
                 : Image.file(
                     widget.imageFile,

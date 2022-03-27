@@ -28,14 +28,14 @@ class CustomTextButton2 extends StatelessWidget {
         action();
       },
       child: Text(
-        text,
+        text.toUpperCase(),
         style: TextStyle(
             color: textColor == null
                 ? AppColors.PrimaryColor
                 : textColor,
             fontWeight: FontWeight.w500,
-            fontFamily: 'DMSans',
-            fontSize: 14),
+            fontFamily: 'NunitoSans',
+            fontSize: 15),
         textAlign: TextAlign.center,
       ),
     );

@@ -51,8 +51,12 @@ class NotificationCountWidget extends StatelessWidget {
       onPressed: () {
         Navigator.pushNamed(context, '/inAppNotifications');
       },
-      icon: Icon(Icons.notifications_none_outlined,
-          color: AppColors.IconColor),
+      icon: Image.asset(
+      "images/notifications.png",
+      height: 24,
+      width: 24,
+      color: AppColors.IconColor,
+    ),
     );
   }
 }

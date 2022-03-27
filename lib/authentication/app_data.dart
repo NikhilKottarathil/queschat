@@ -44,7 +44,7 @@ class AppData {
     appDataModel.userId = user['id'] != null ? user['id'].toString() : '';
     appDataModel.profilePic = user['profile_pic']['url'] != null
         ? 'https://api.queschat.com/' + user['profile_pic']['url']
-        : Urls().personUrl;
+        : null;
 
   }
   Future<void> clearAllData() async {

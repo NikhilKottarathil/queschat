@@ -51,7 +51,7 @@ class _MessageRoomListViewState extends State<MessageRoomListView>
                         },
                       )
                     : state.displayModels.length != 0
-                        ? ListView.separated(
+                        ? ListView.builder(
                             // padding: EdgeInsets.only(top: 20, bottom: 20),
                             shrinkWrap: true,
                             itemCount: state.displayModels.length,
@@ -84,14 +84,16 @@ class _MessageRoomListViewState extends State<MessageRoomListView>
                                       child: MessageRoomAdapter(
                                         chatRoomModel:
                                             state.displayModels[index],
+                                        parentPage: context.read<MessageRoomListBloc>().parentPage,
                                       )));
                             },
-                            separatorBuilder:
-                                (BuildContext context, int index) {
-                              return SizedBox(
-                                height: 8,
-                              );
-                            },
+                            // separatorBuilder:
+                            //     (BuildContext context, int index) {
+                            //   return Divider(
+                            //     height: 8,
+                            //     color: AppColors.TextSixth,
+                            //   );
+                            // },
                           )
                         : Center(
                             child: Text('You have no channels'),
@@ -105,9 +107,10 @@ class _MessageRoomListViewState extends State<MessageRoomListView>
         onPressed: () {
           Navigator.pushNamed(context, '/exploreChannels');
         },
+        elevation: 2,
         label: Text(
-          'Explore',
-          style: TextStyles.smallRegularWhite,
+          'JOIN CHANNEL',
+          style: TextStyles.buttonWhite,
         ),
         backgroundColor: AppColors.PrimaryColorLight,
       ):null,
@@ -126,14 +129,15 @@ class _MessageRoomListViewState extends State<MessageRoomListView>
       //   context
       //       .read<MessageRoomListBloc>().add(UpdateList());
       // });
-      return Card(
-        margin: EdgeInsets.all(10),
-        elevation: 1,
-        color: AppColors.White,
-        shadowColor: AppColors.ShadowColor,
+      return Container(
+        margin: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: AppColors.White,
+          border: Border.all(color: AppColors.BorderColor),
+      ),
         child: TextField(
           keyboardType: TextInputType.text,
-          style: TextStyles.smallRegularTextTertiary,
+          style: TextStyles.subTitle2TextPrimary,
           maxLines: 1,
           textAlign: TextAlign.start,
           textAlignVertical: TextAlignVertical.center,
@@ -145,14 +149,14 @@ class _MessageRoomListViewState extends State<MessageRoomListView>
             alignLabelWithHint: true,
             prefixIcon: Icon(
               Icons.search,
-              color: AppColors.TextTertiary,
+              color: AppColors.IconColor,
             ),
             suffixIcon:
                 state.searchQuery != null && state.searchQuery.length != 0
                     ? IconButton(
                         icon: Icon(
                           Icons.clear,
-                          color: AppColors.TextTertiary,
+                          color: AppColors.IconColor,
                         ),
                         onPressed: () {
                           context
@@ -163,14 +167,22 @@ class _MessageRoomListViewState extends State<MessageRoomListView>
                         height: 0,
                         width: 0,
                       ),
-            hintText: 'Search...',
+            hintText:  context
+                .read<
+                MessageRoomListBloc>()
+                .parentPage ==
+                'channel'?"Search Channel's":context
+                .read<
+                MessageRoomListBloc>()
+                .parentPage ==
+                'exploreChannel'?"Search Channel's to join":"Search Chat's",
             border: InputBorder.none,
             disabledBorder: InputBorder.none,
             enabledBorder: InputBorder.none,
             errorBorder: InputBorder.none,
             focusedBorder: InputBorder.none,
             focusedErrorBorder: InputBorder.none,
-            hintStyle: TextStyles.smallRegularTextTertiary,
+            hintStyle: TextStyles.subTitle2TextSecondary,
           ),
         ),
       );

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:queschat/constants/styles.dart';
 
-
 class CustomButton extends StatelessWidget {
   String text;
   Function action;
@@ -12,16 +11,18 @@ class CustomButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(top: 30),
-      height: MediaQuery.of(context).size.height * .07,
       width: MediaQuery.of(context).size.width,
-      child: RaisedButton(
-        color: Colors.lightBlue.shade900,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+            primary: AppColors.PrimaryColorDark,
+            padding: EdgeInsets.all(18),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(5))),
         onPressed: action,
-        shape:
-            new RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
         child: Text(
-          text,
-          style:TextStyles.mediumMediumWhite,
+          text.toUpperCase(),
+
+          style: TextStyles.buttonWhite,
         ),
       ),
     );

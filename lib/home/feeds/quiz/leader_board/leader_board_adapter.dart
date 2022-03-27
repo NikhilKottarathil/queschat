@@ -81,6 +81,7 @@ class LeaderBoardAdapter extends StatelessWidget {
               : Icon(
                   CupertinoIcons.person_alt_circle_fill,
                   size: 38,
+              color: AppColors.IconColor
                 ),
         ),
       ],
@@ -113,7 +114,7 @@ class LeaderBoardWinnerAdapter extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: AppColors.PrimaryLightest,
+                      color: AppColors.PrimaryLighter,
                       width: 3.0,
                     ),
                   ),
@@ -142,7 +143,7 @@ class LeaderBoardWinnerAdapter extends StatelessWidget {
                       width: 28,
                       height: 28,
 
-                      color: AppColors.PrimaryLightest,
+                      color: AppColors.PrimaryLighter,
 
                       child: Center(
                         child: Text(

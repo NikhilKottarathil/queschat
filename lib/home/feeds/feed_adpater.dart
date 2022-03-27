@@ -72,19 +72,18 @@ class FeedAdapter extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                Container(
-                                  height: 40,
-                                  width: 40,
-                                  margin: EdgeInsets.only(right: 10),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    image: DecorationImage(
-                                      fit: BoxFit.cover,
-                                      image: NetworkImage(
-                                          feedModel.profilePicUrl.toString()),
-                                    ),
+                                if(feedModel.profilePicUrl!=null)
+
+                                  CircleAvatar(
+                                    radius: 20,
+                                    backgroundImage:  NetworkImage(
+                                        feedModel.profilePicUrl.toString()),
                                   ),
-                                ),
+                                if(feedModel.profilePicUrl==null)
+                                  CircleAvatar(
+                                    radius: 12,
+                                    child: Image.asset('images/user_profile.png'),
+                                  ),
                                 Text(
                                   feedModel.userName.toString(),
                                   style: TextStyles.mediumMediumTextSecondary,

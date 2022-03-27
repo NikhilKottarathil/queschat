@@ -64,7 +64,7 @@ class NewChannelCreateView extends StatelessWidget {
                         return Container(
                           margin: EdgeInsets.only(right: 10),
                           decoration: BoxDecoration(
-                            color: AppColors.SecondaryColorLight,
+                            color: AppColors.SecondaryColor,
                             shape: BoxShape.circle,
                             // border: Border.all(color: AppColors.BorderColor),
                           ),

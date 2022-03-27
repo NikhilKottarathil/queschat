@@ -80,7 +80,7 @@ class QuizPlayBloc extends Bloc<QuizPlayEvent, QuizPlayState> {
         likeCount: element['like_count'] != null ? element['like_count'] : '0',
         profilePicUrl: element['profile_pic'] != null
             ? 'https://api.queschat.com/' + element['profile_pic']
-            : Urls().personUrl,
+            : null,
         uploadedTime: getTimeDifferenceFromNowString(element['create_date']),
         contentModel: contentModel));
 

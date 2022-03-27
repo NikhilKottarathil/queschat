@@ -42,7 +42,7 @@
 //               child: Text(
 //                 chatGS.userName,
 //                 textAlign: TextAlign.start,
-//                 style: TextStyle(color: AppColors.SecondaryColorLight),
+//                 style: TextStyle(color: AppColors.SecondaryColor),
 //               )):Container(),
 //           Container(padding: EdgeInsets.all(10), child: Text(chatGS.message)),
 //           Align(

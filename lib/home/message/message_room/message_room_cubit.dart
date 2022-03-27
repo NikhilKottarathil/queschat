@@ -6,7 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:queschat/authentication/app_data.dart';
-import 'package:queschat/components/multi_file_view.dart';
 import 'package:queschat/constants/strings_and_urls.dart';
 import 'package:queschat/function/api_calls.dart';
 import 'package:queschat/function/file_types.dart';
@@ -20,7 +19,6 @@ import 'package:queschat/models/message_model.dart';
 import 'package:queschat/models/user_contact_model.dart';
 import 'package:queschat/models/value_model.dart';
 import 'package:queschat/router/app_router.dart';
-
 
 class MessageRoomCubit extends Cubit<MessageRoomState> {
   String parentPage;
@@ -60,16 +58,17 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
     messageLoadedDateTime = todayDateTime;
     if (parentPage == 'channelRoomsView' ||
         parentPage == 'dynamicLinkChannel' ||
-        parentPage == 'newChannelCreateView' || parentPage=='exploreChannelRoomsView') {
+        parentPage == 'newChannelCreateView' ||
+        parentPage == 'exploreChannelRoomsView') {
       dataNode = 'ChannelRoomsData';
       detailsNode = 'ChannelRooms';
     } else {
       dataNode = 'ChatRoomsData';
       detailsNode = 'ChatRooms';
     }
-    if(chatRoomModel.id!=null) {
-      AwesomeNotifications().cancel(
-          getAlphabetOrderNumberFromString(chatRoomModel.id));
+    if (chatRoomModel.id != null) {
+      AwesomeNotifications()
+          .cancel(getAlphabetOrderNumberFromString(chatRoomModel.id));
     }
     getMessageRoomInfo();
 
@@ -85,7 +84,7 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
   getLiveChat() async {
     print(AppData().userId);
     isInInitialState = false;
-
+    print('messageDataText LiveChat');
     reference
         .child(dataNode)
         .child(chatRoomModel.id)
@@ -457,7 +456,7 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
             } else {
               messageRoomUserStatus = MessageRoomUserStatus.Active;
             }
-            userRole=mapEntry.value['user_type'];
+            userRole = mapEntry.value['user_type'];
 
             if (isInInitialState) {
               getLiveChat();
@@ -482,7 +481,6 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
           return l2.name.compareTo(l1.name);
         });
         emit(MembersState(userContactModels: userContactModels));
-
       }
     });
   }
@@ -525,7 +523,7 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
               map['is_single_chat'].toString() == 'True' ? true : false;
           if (isSingleChat) {
             UserContactModel userContactModel = await authRepository
-                .getDetailsOfSelectedUser(messengerId,'any');
+                .getDetailsOfSelectedUser(messengerId, 'any');
             ChatRoomModel tempChatRoomModel = new ChatRoomModel(
                 id: chatRoomModel.id.toString(),
                 name: userContactModel.name,
@@ -689,7 +687,8 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
             sendNotificationRequest(
                 messageTypeString: messageType == MessageType.voice_note
                     ? 'voice_note'
-                    :  getFileTypeFromPath(file.path), message: textEditingController.text);
+                    : getFileTypeFromPath(file.path),
+                message: textEditingController.text);
           } else {
             throw Exception('Image Uploading  Failed');
           }
@@ -739,7 +738,9 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
 
         createMessageRoom(chatRoomMap);
         sendNotificationRequest(
-            messageTypeString: messageType==MessageType.text?'text':'feed', message: textEditingController.text);
+            messageTypeString:
+                messageType == MessageType.text ? 'text' : 'feed',
+            message: textEditingController.text);
 
         if (messageType == MessageType.text) {
           textEditingController.text = '';
@@ -974,10 +975,8 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
     Map<String, dynamic> requestBody = {
       'type': 'message_room',
       'message_room_type': chatRoomModel.messageRoomType,
-      'message': messageTypeString == 'text'
-          ? message
-          :messageTypeString,
-      'sender_id':AppData().userId.toString(),
+      'message': messageTypeString == 'text' ? message : messageTypeString,
+      'sender_id': AppData().userId.toString(),
       'message_room_id': chatRoomModel.id,
       'user_ids': userContactModels.map((e) => e.id).toList(),
     };

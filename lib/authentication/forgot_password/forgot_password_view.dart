@@ -101,7 +101,7 @@ class ForgotPasswordView extends StatelessWidget {
                                           },
                                           icon: new Icon(Icons.person,
                                               color: AppColors
-                                                  .SecondaryColorLight),
+                                                  .SecondaryColor),
                                           textInputType: TextInputType.phone),
                                     ],
                                   )
@@ -140,7 +140,7 @@ class ForgotPasswordView extends StatelessWidget {
                                           },
                                           icon: new Icon(Icons.phone_android,
                                               color: AppColors
-                                                  .SecondaryColorLight),
+                                                  .SecondaryColor),
                                           textInputType: TextInputType.number),
                                     ],
                                   )
@@ -180,7 +180,7 @@ class ForgotPasswordView extends StatelessWidget {
                                           },
                                           icon: new Icon(Icons.lock,
                                               color: AppColors
-                                                  .SecondaryColorLight),
+                                                  .SecondaryColor),
                                           textInputType:
                                               TextInputType.visiblePassword),
                                     ],

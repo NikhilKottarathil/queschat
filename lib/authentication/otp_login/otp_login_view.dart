@@ -63,9 +63,10 @@ class OTPLoginView extends StatelessWidget {
                               state.otpState == OTPState.showPhoneNumber
                                   ? 'Enter mobile number'
                                   : 'Verify OTP',
-                              style: TextStyles.largeRegularTextTertiary,
+                              style: TextStyles.heading2TextPrimary,
                             );
                           }),
+                          SizedBox(height: 18,),
                           BlocBuilder<OTPLoginBloc, OTPLoginState>(
                               builder: (context, state) {
                             return Visibility(
@@ -78,7 +79,7 @@ class OTPLoginView extends StatelessWidget {
                                   },
                                   text: state.otp,
                                   icon: new Icon(Icons.phone_android,
-                                      color: AppColors.SecondaryColorLight),
+                                      color: AppColors.IconColor),
                                   onChange: (value) {
                                     context.read<OTPLoginBloc>().add(
                                           PhoneNumberChanged(
@@ -136,7 +137,7 @@ class OTPLoginView extends StatelessWidget {
                                     child: Text(
                                       getDurationTime(
                                           state.pendingTimeInMills.toString()),
-                                      style: TextStyles.smallMediumTextTertiary,
+                                      style: TextStyles.bodyTextSecondary,
                                     ),
                                   ),
                                 ),

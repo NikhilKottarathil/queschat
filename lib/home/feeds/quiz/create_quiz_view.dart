@@ -133,7 +133,7 @@ class CreateQuizView extends StatelessWidget {
                                                   style: TextStyles
                                                       .smallRegularTextSecondary,
                                                 )),
-                                                Icon(Icons.calendar_today)
+                                                Icon(Icons.calendar_today,color: AppColors.IconColor)
                                               ],
                                             ),
                                           ),

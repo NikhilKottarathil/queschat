@@ -277,7 +277,7 @@ class _PostAMCQViewState extends State<PostAMCQView>
                                                                   child: state.optionAImage ==
                                                                       null
                                                                       ? Icon(Icons
-                                                                      .add_photo_alternate_outlined)
+                                                                      .add_photo_alternate_outlined,color: AppColors.IconColor)
                                                                       : Image.file(
                                                                     state
                                                                         .optionAImage,
@@ -335,7 +335,7 @@ class _PostAMCQViewState extends State<PostAMCQView>
                                                                   child: state.optionBImage ==
                                                                           null
                                                                       ? Icon(Icons
-                                                                          .add_photo_alternate_outlined)
+                                                                          .add_photo_alternate_outlined,color: AppColors.IconColor)
                                                                       : Image
                                                                           .file(
                                                                           state
@@ -396,7 +396,7 @@ class _PostAMCQViewState extends State<PostAMCQView>
                                                                 child: state.optionCImage ==
                                                                         null
                                                                     ? Icon(Icons
-                                                                        .add_photo_alternate_outlined)
+                                                                        .add_photo_alternate_outlined,color: AppColors.IconColor)
                                                                     : Image
                                                                         .file(
                                                                         state
@@ -454,7 +454,7 @@ class _PostAMCQViewState extends State<PostAMCQView>
                                                                   child: state.optionDImage ==
                                                                           null
                                                                       ? Icon(Icons
-                                                                          .add_photo_alternate_outlined)
+                                                                          .add_photo_alternate_outlined,color: AppColors.IconColor)
                                                                       : Image
                                                                           .file(
                                                                           state

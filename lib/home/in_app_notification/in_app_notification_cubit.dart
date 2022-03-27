@@ -67,9 +67,12 @@ class InAppNotificationCubit extends Cubit<InAppNotificationState> {
         .once()
         .then((value) async {
       Map<dynamic, dynamic> map = value.value;
-      await convertDataIntoModel(map);
-      updateList();
-
+      if(map!=null) {
+        await convertDataIntoModel(map);
+        updateList();
+      }else{
+        updateList();
+      }
       print('getInitialData  ${models.length}');
 
       if (newlyLoadedDataCount < initialCountLimit - 1) {
@@ -94,13 +97,13 @@ class InAppNotificationCubit extends Cubit<InAppNotificationState> {
         .child(AppData().userId)
         .child('Data')
         .orderByChild('created_time')
-        .endAt(models.last.createdTime.millisecondsSinceEpoch)
+        .endAt(models.isEmpty?DateTime.now().millisecondsSinceEpoch:models.last.createdTime.millisecondsSinceEpoch)
         .limitToLast(loadMoreLimit)
         .once()
         .then((value) async {
       Map<dynamic, dynamic> map = value.value;
 
-      if (value.value != null) {
+      if (map != null) {
         print('getLoadMoreData map length is  ${map.entries.length }');
 
         if (map.entries.length != 1) {

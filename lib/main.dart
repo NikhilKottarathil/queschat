@@ -47,9 +47,12 @@ class _MyAppState extends State<MyApp> {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
+
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarColor: AppColors.PrimaryColor,
-        statusBarIconBrightness: Brightness.light));
+      statusBarColor: AppColors.PrimaryColorLight,
+      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.light,
+    ));
 
     return WillPopScope(
       onWillPop: () {
@@ -59,6 +62,7 @@ class _MyAppState extends State<MyApp> {
         title: "Queschat",
         debugShowCheckedModeBanner: false,
         navigatorKey: MyApp.navigatorKey,
+
 
         theme: ThemeData(
             fontFamily: 'NunitoSans',

@@ -29,7 +29,7 @@ selectImage({context, File imageFile, List<CropAspectRatioPreset>  aspectRatios}
                     title: new Text(
                       'Camera',
                       style: TextStyle(
-                          color: Colors.blue.shade800, fontSize: 18),
+                          color: AppColors.TextTertiary, fontSize: 18),
                     ),
                     onTap: () async {
                       imageFile = await getImageFromCamera();
@@ -42,10 +42,10 @@ selectImage({context, File imageFile, List<CropAspectRatioPreset>  aspectRatios}
                       return imageFile;
                     }),
                 new ListTile(
-                  leading: new Icon(Icons.photo, color: Colors.red),
+                  leading: new Icon(Icons.photo, color: AppColors.IconColor),
                   title: new Text(
                     'Gallery',
-                    style: TextStyle(color: Colors.blue.shade800, fontSize: 18),
+                    style: TextStyle(color:AppColors.TextTertiary, fontSize: 18),
                   ),
                   onTap: () async {
                     imageFile = await getImageFromGallery();
@@ -94,7 +94,7 @@ getImageFromCamera() async {
 }
 
 Future cropImage({File image, List<CropAspectRatioPreset> aspectRatios}) async {
-  File croppedFile = await ImageCropper.cropImage(
+  File croppedFile = await ImageCropper().cropImage(
       sourcePath: image.path,
       compressQuality: 30,
       aspectRatioPresets: aspectRatios == null

@@ -57,7 +57,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
               : '0',
           profilePicUrl: element['profile_pic'] != null
               ? 'https://api.queschat.com/' + element['profile_pic']
-              : Urls().personUrl,
+              : null,
           uploadedTime: getTimeDifferenceFromNowString(element['create_date']),
         ));
 
@@ -84,7 +84,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
           : '0',
       profilePicUrl: element['profile_pic'] != null
           ? 'https://api.queschat.com/' + element['profile_pic']
-          : Urls().personUrl,
+          : null,
       uploadedTime: getTimeDifferenceFromNowString(element['create_date']),
     ));
 
@@ -111,7 +111,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
                   : '0',
               profilePicUrl: item['profile_pic'] != null
                   ? 'https://api.queschat.com/' + item['profile_pic']
-                  : Urls().personUrl,
+                  : null,
               uploadedTime: getTimeDifferenceFromNowString(item['create_date']),
             ));
           });
@@ -130,7 +130,7 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
                 : '0',
             profilePicUrl: element['profile_pic'] != null
                 ? 'https://api.queschat.com/' + element['profile_pic']
-                : Urls().personUrl,
+                : null,
             replays: replays,
             userId: element['user_id'].toString(),
             uploadedTime:

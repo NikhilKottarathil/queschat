@@ -34,21 +34,13 @@ class SplashScreen extends StatelessWidget {
           Navigator.pushReplacementNamed(context, '/login');
         }
       },
-      child: Container(
-        color: AppColors.PrimaryColor,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Image.asset(
-              //   // 'assets/app_logo.png',
-              //   fit: BoxFit.cover,
-              //   height: height * .08,
-              // ),
-              SizedBox(
-                height: height * .08,
-              )
-            ],
+      child: Scaffold(
+
+        body: Center(
+          child: Image.asset(
+            'images/app_logo.png',
+            fit: BoxFit.scaleDown,
+            height: height * .08,
           ),
         ),
       ),

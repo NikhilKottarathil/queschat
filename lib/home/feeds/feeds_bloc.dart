@@ -90,7 +90,7 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
                 element['like_count'] != null ? element['like_count'] : '0',
             profilePicUrl: element['profile_pic'] != null
                 ? 'https://api.queschat.com/' + element['profile_pic']
-                : Urls().personUrl,
+                : null,
             uploadedTime:
                 getTimeDifferenceFromNowString(element['create_date']),
             contentModel: contentModel));
@@ -119,7 +119,7 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
         likeCount: element['like_count'] != null ? element['like_count'] : '0',
         profilePicUrl: element['profile_pic'] != null
             ? 'https://api.queschat.com/' + element['profile_pic']
-            : Urls().personUrl,
+            : null,
         uploadedTime: getTimeDifferenceFromNowString(element['create_date']),
         contentModel: contentModel);
     emit(state);
@@ -153,7 +153,7 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
                   : '0',
               profilePicUrl: element['profile_pic'] != null
                   ? 'https://api.queschat.com/' + element['profile_pic']
-                  : Urls().personUrl,
+                  : null,
               uploadedTime:
                   getTimeDifferenceFromNowString(element['create_date']),
               contentModel: contentModel));

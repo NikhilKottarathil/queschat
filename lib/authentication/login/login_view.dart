@@ -19,13 +19,14 @@ class LoginView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.White,
       body: BlocListener<LoginBloc, LoginState>(
         listener: (context, state) {
           final formStatus = state.formStatus;
           if (formStatus is SubmissionFailed) {
             showSnackBar(context, formStatus.exception);
           } else if (formStatus is SubmissionSuccess) {
-              Navigator.pushReplacementNamed(context, '/home');
+            Navigator.pushReplacementNamed(context, '/home');
           }
         },
         child: Form(
@@ -43,43 +44,27 @@ class LoginView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(
-                          height: 100,
+                          height: MediaQuery.of(context).size.width * .25,
                         ),
                         Align(
                           alignment: Alignment.center,
-                          child: Text(
-                            "Queschat",
-                            style: TextStyle(
-                                color: Colors.lightBlue.shade900,
-                                fontSize: 43,
-                                fontWeight: FontWeight.bold),
-                          ),
+                          child: Image.asset('images/app_logo.png',
+                              height: MediaQuery.of(context).size.width * .28,
+                              width: MediaQuery.of(context).size.width * .28,
+                              fit: BoxFit.contain),
                         ),
+
+                        Spacer(),
+                        SizedBox(height: 30,),
+                        Text('Login', style: TextStyles.heading2TextPrimary),
                         SizedBox(
-                          height: 8,
-                        ),
-                        Align(
-                          alignment: Alignment.center,
-                          child: Text("Always a step ahead",
-                              textAlign: TextAlign.center,
-                              style: TextStyles.mediumRegularTextPrimary),
-                        ),
-                        SizedBox(
-                          height: 70,
-                        ),
-                        Text(
-                          'Login',
-                          style: TextStyles.largeRegularTertiary,
-                        ),
-                        SizedBox(
-                          height: 20,
+                          height: 18,
                         ),
                         BlocBuilder<LoginBloc, LoginState>(
                             builder: (context, state) {
                           return CustomTextField(
                               hint: "Phone  Number",
                               text: state.phoneNumber,
-
                               maxLength: 10,
                               validator: (value) {
                                 return state.phoneNumberValidationText;
@@ -91,11 +76,11 @@ class LoginView extends StatelessWidget {
                                     );
                               },
                               icon: new Icon(Icons.phone_android,
-                                  color: AppColors.SecondaryColorLight),
+                                  color: AppColors.IconColor),
                               textInputType: TextInputType.number);
                         }),
                         SizedBox(
-                          height: 20,
+                          height: 18,
                         ),
                         // _usernameField(),
                         BlocBuilder<LoginBloc, LoginState>(
@@ -112,11 +97,11 @@ class LoginView extends StatelessWidget {
                                     );
                               },
                               icon: new Icon(Icons.lock,
-                                  color: AppColors.SecondaryColorLight),
+                                  color: AppColors.IconColor),
                               textInputType: TextInputType.visiblePassword);
                         }),
                         SizedBox(
-                          height: 10,
+                          height: 8,
                         ),
                         Align(
                           alignment: Alignment.centerRight,
@@ -126,7 +111,7 @@ class LoginView extends StatelessWidget {
                             },
                             child: Text(
                               "Forgot password?",
-                              style: TextStyles.smallBoldTextPrimary,
+                              style: TextStyles.buttonTextPrimary,
                             ),
                           ),
                         ),
@@ -144,40 +129,39 @@ class LoginView extends StatelessWidget {
                                     }
                                   });
                         }),
-                        SizedBox(height: 40,),
+                        SizedBox(
+                          height: 32,
+                        ),
                         Center(
                           child: CustomTextButton2(
-                            text: 'Login with OTP',
-                            action: (){
+                            text: 'LOGIN WITH OTP',
+                            textColor: AppColors.PrimaryColor,
+                            action: () {
                               Navigator.pushNamed(context, '/otpLogin');
-
                             },
                           ),
                         ),
                         Spacer(),
+                        SizedBox(height: 70,),
                         Align(
                           alignment: Alignment.center,
-                          child: Padding(
-                            padding: EdgeInsets.only(top: 20),
-                            child: Column(
-                              children: [
-                                Text(
-                                  "Don't have account?",
-                                  style: TextStyles.smallMediumTextPrimary,
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(top: 10),
-                                  child: InkWell(
-                                    child: Text("Sign Up",
-                                        style: TextStyles
-                                            .mediumBoldPrimaryColor),
-                                    onTap: () {
-                                      Navigator.pushNamed(context, '/signUp');
-                                    },
-                                  ),
-                                )
-                              ],
-                            ),
+                          child: Column(
+                            children: [
+                              Text(
+                                "Don't have account?",
+                                style: TextStyles.bodyTextSecondary,
+                              ),
+                              SizedBox(
+                                height: 4,
+                              ),
+                              InkWell(
+                                child: Text("SIGN UP",
+                                    style: TextStyles.buttonPrimary),
+                                onTap: () {
+                                  Navigator.pushNamed(context, '/signUp');
+                                },
+                              )
+                            ],
                           ),
                         )
                       ],
@@ -191,6 +175,4 @@ class LoginView extends StatelessWidget {
       ),
     );
   }
-
-
 }

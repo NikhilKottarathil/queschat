@@ -61,41 +61,31 @@ class SignUpView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(
-                          height: 100,
+                          height: MediaQuery.of(context).size.width * .25,
                         ),
                         Align(
                           alignment: Alignment.center,
-                          child: Text(
-                            "Queschat",
-                            style: TextStyle(
-                                color: Colors.lightBlue.shade900,
-                                fontSize: 43,
-                                fontWeight: FontWeight.bold),
-                          ),
+                          child: Image.asset('images/app_logo.png',
+                              height: MediaQuery.of(context).size.width * .28,
+                              width: MediaQuery.of(context).size.width * .28,
+                              fit: BoxFit.contain),
                         ),
+
+                        Spacer(),
                         SizedBox(
-                          height: 8,
-                        ),
-                        Align(
-                          alignment: Alignment.center,
-                          child: Text("Always a step ahead",
-                              textAlign: TextAlign.center,
-                              style: TextStyles.mediumRegularTextPrimary),
-                        ),
-                        SizedBox(
-                          height: 70,
+                          height: 30,
                         ),
                         Text(
                           'Sign up',
-                          style: TextStyles.largeRegularTertiary,
+                          style: TextStyles.heading2TextPrimary,
                         ),
                         SizedBox(
-                          height: 20,
+                          height: 18,
                         ),
                         BlocBuilder<SignUpBloc, SignUpState>(
                           builder: (context, state) {
                             return CustomTextField(
-                                hint: "UserName",
+                                hint: "User Name",
                                 validator: (value) {
                                   return state.userNameValidationText;
                                 },
@@ -106,13 +96,13 @@ class SignUpView extends StatelessWidget {
                                         username: value),
                                   );
                                 },
-                                icon: new Icon(Icons.person,
-                                    color: AppColors.SecondaryColorLight),
+                                icon:  new Icon(Icons.person,
+                                    color: AppColors.IconColor),
                                 textInputType: TextInputType.text);
                           },
                         ),
                         SizedBox(
-                          height: 20,
+                          height: 18,
                         ),
                         BlocBuilder<SignUpBloc, SignUpState>(
                           builder: (context, state) {
@@ -129,12 +119,12 @@ class SignUpView extends StatelessWidget {
                                       );
                                 },
                                 icon: new Icon(Icons.phone_android,
-                                    color: AppColors.SecondaryColorLight),
+                                    color: AppColors.IconColor),
                                 textInputType: TextInputType.number);
                           },
                         ),
                         SizedBox(
-                          height: 20,
+                          height: 18,
                         ),
                         BlocBuilder<SignUpBloc, SignUpState>(
                           builder: (context, state) {
@@ -151,7 +141,7 @@ class SignUpView extends StatelessWidget {
                                       );
                                 },
                                 icon: new Icon(Icons.lock,
-                                    color: AppColors.SecondaryColorLight),
+                                    color: AppColors.IconColor),
                                 textInputType: TextInputType.visiblePassword);
                           },
                         ),
@@ -177,30 +167,28 @@ class SignUpView extends StatelessWidget {
                           },
                         ),
                         Spacer(),
+                        SizedBox(height: 70,),
                         Align(
                           alignment: Alignment.center,
-                          child: Padding(
-                            padding: EdgeInsets.only(top: 20),
-                            child: Column(
-                              children: [
-                                Text(
-                                  "Already have an account?",
-                                  style: TextStyles.smallMediumTextPrimary,
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(top: 10),
-                                  child: InkWell(
-                                    child: Text("Login",
-                                        style: TextStyles
-                                            .mediumBoldPrimaryColor),
-                                    onTap: () {
+                          child: Column(
+                            children: [
+                              Text(
+                                "Already have an account?",
+                                style: TextStyles.bodyTextSecondary,
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(top: 4),
+                                child: InkWell(
+                                  child: Text("LOGIN",
+                                      style: TextStyles
+                                          .buttonPrimary),
+                                  onTap: () {
 
-                                      Navigator.pushNamed(context, '/login');
-                                      },
-                                  ),
-                                )
-                              ],
-                            ),
+                                    Navigator.pushNamed(context, '/login');
+                                    },
+                                ),
+                              )
+                            ],
                           ),
                         )
                       ],

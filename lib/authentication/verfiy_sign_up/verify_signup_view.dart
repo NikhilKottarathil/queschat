@@ -52,10 +52,10 @@ class VerifySignUpView extends StatelessWidget {
                         ),
                         Text(
                           'Verify OTP',
-                          style: TextStyles.largeRegularTertiary,
+                          style: TextStyles.heading2TextPrimary,
                         ),
                         SizedBox(
-                          height: 5,
+                          height: 18,
                         ),
                         BlocBuilder<VerifySignUpBloc, VerifySignUpState>(
                             builder: (context, state) {
@@ -98,7 +98,7 @@ class VerifySignUpView extends StatelessWidget {
                                       child: Text(
                                         getDurationTime(
                                             state.pendingTimeInMills.toString()),
-                                        style: TextStyles.smallMediumTextSecondary,
+                                        style: TextStyles.bodyTextSecondary,
                                       ),
                                     ),
                                   ),
@@ -193,7 +193,7 @@ class VerifySignUpView extends StatelessWidget {
 //                                     );
 //                               },
 //                               icon: new Icon(Icons.phone_android,
-//                                   color: AppColors.SecondaryColorLight),
+//                                   color: AppColors.SecondaryColor),
 //                               textInputType: TextInputType.number);
 //                         }),
 //                         BlocBuilder<VerifySignUpBloc, VerifySignUpState>(

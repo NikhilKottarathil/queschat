@@ -23,17 +23,18 @@ class CommentAdapter extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Container(
-                height: 24,
-                width: 24,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: NetworkImage(commentModel.profilePicUrl.toString()),
-                  ),
-                ),
+              if(commentModel.profilePicUrl!=null)
+
+                CircleAvatar(
+                radius: 12,
+                backgroundImage:  NetworkImage(
+                    commentModel.profilePicUrl.toString()),
               ),
+              if(commentModel.profilePicUrl==null)
+                CircleAvatar(
+                  radius: 12,
+                  child: Image.asset('images/user_profile.png'),
+                ),
               SizedBox(
                 width: 10,
               ),

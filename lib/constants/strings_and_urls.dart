@@ -1,6 +1,5 @@
 class Urls {
-  String personUrl =
-      'https://clipartart.com/images/default-profile-picture-clipart.jpg';
+
   String serverAddress = 'https://api.queschat.com/';
   String apiAddress = 'https://api.queschat.com/api/';
   String categoryImage = 'icons/category.svg';

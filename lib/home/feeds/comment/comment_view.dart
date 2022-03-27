@@ -126,7 +126,7 @@ class _CommentViewState extends State<CommentView> {
                 BlocBuilder<CommentBloc, CommentState>(
                     builder: (context, state) {
                   return Container(
-                    color: AppColors.WhiteBlueShade,
+                    color: AppColors.PrimaryLightest,
                     padding: EdgeInsets.all(20),
                     child: TextFormField(
                       controller: controller,
@@ -177,7 +177,7 @@ class _CommentViewState extends State<CommentView> {
           ? Container(
               padding: EdgeInsets.only(left: 20, right: 20),
               decoration: BoxDecoration(
-                  color: AppColors.Tertiary,
+                  color: AppColors.SecondaryColor,
                   boxShadow: [
                     BoxShadow(color: Colors.grey.shade200, blurRadius: 2)
                   ],
@@ -188,18 +188,18 @@ class _CommentViewState extends State<CommentView> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Container(
-                        height: 24,
-                        width: 24,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: NetworkImage(
-                                commentModel.profilePicUrl.toString()),
-                          ),
-                        ),
+                      if(commentModel.profilePicUrl!=null)
+                      CircleAvatar(
+                        radius: 12,
+                       backgroundImage:  NetworkImage(
+                           commentModel.profilePicUrl.toString()),
                       ),
+                      if(commentModel.profilePicUrl==null)
+                      CircleAvatar(
+                        radius: 12,
+                       child: Image.asset('images/user_profile.png'),
+                      ),
+
                       SizedBox(
                         width: 5,
                       ),

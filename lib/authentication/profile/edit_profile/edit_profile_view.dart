@@ -46,234 +46,233 @@ class EditProfileView extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.all(20),
               child: LayoutBuilder(builder: (context, constraints) {
-                return SingleChildScrollView(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                        minWidth: constraints.maxWidth,
-                        minHeight: constraints.maxHeight),
-                    child: IntrinsicHeight(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: 100,
-                          ),
-                          // Text(
-                          //   'Edit Profile',
-                          //   style: TextStyles.largeRegularTertiary,
-                          // ),
-                          // SizedBox(
-                          //   height: 20,
-                          // ),
-                          BlocBuilder<EditProfileBloc, EditProfileState>(
-                            builder: (context, state) {
-                              return CustomTextField3(
-                                  label: "User Name",
-                                  hint: "Enter your name",
-                                  validator: (value) {
-                                    return state.userNameValidationText;
-                                  },
-                                  text: state.userName,
-                                  onChange: (value) {
-                                    context.read<EditProfileBloc>().add(
-                                          EditProfileUsernameChanged(
-                                              username: value),
-                                        );
-                                  },
-                                  textInputType: TextInputType.text);
-                            },
-                          ),
-                          dividerDefaultBold,
-                          SizedBox(
-                            height: 20,
-                          ),
-                          BlocBuilder<EditProfileBloc, EditProfileState>(
-                            builder: (context, state) {
-                              return CustomTextField3(
-                                  label: "Phone Number",
-                                  hint: "Phone Number",
-                                  validator: (value) {
-                                    return state.phoneNumberValidationText;
-                                  },
-                                  text: state.phoneNumber,
-                                  onChange: (value) {
-                                    context.read<EditProfileBloc>().add(
-                                          EditProfilePhoneNumberChanged(
-                                              phoneNumber: value),
-                                        );
-                                  },
-                                  textInputType: TextInputType.number);
-                            },
-                          ),
-                          dividerDefaultBold,
+                return Stack(
+                  children: [
+                    SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                            minWidth: constraints.maxWidth,
+                            minHeight: constraints.maxHeight),
+                        child: IntrinsicHeight(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
 
-                          SizedBox(
-                            height: 20,
-                          ),
-                          BlocBuilder<EditProfileBloc, EditProfileState>(
-                            builder: (context, state) {
-                              return CustomTextField3(
-                                  label: "About me",
-                                  hint: "About me",
-                                  validator: (value) {
-                                    return null;
-                                  },
-                                  text: state.bio,
-                                  onChange: (value) {
-                                    context.read<EditProfileBloc>().add(
-                                          EditProfileBioChanged(bio: value),
-                                        );
-                                  },
-                                  textInputType: TextInputType.text);
-                            },
-                          ),
-                          dividerDefaultBold,
-                          SizedBox(
-                            height: 20,
-                          ),
-                          BlocBuilder<EditProfileBloc, EditProfileState>(
-                            builder: (context, state) {
-                              return CustomTextField3(
-                                  label: "FaceBook (Optional)",
-                                  hint: "FaceBook Profile Link",
-                                  validator: (value) {
-                                    return null;
-                                  },
-                                  text: state.facebookLink,
-                                  onChange: (value) {
-                                    context.read<EditProfileBloc>().add(
-                                          EditProfileFacebookLinkChanged(
-                                              value: value),
-                                        );
-                                  },
-                                  textInputType: TextInputType.text);
-                            },
-                          ),
-
-                          dividerDefaultBold,
-                          SizedBox(
-                            height: 20,
-                          ),
-                          BlocBuilder<EditProfileBloc, EditProfileState>(
-                            builder: (context, state) {
-                              return CustomTextField3(
-                                  label: "Instagram  (Optional)",
-                                  hint: "Instagram Profile Link",
-                                  validator: (value) {
-                                    return null;
-                                  },
-                                  text: state.instagramLink,
-                                  onChange: (value) {
-                                    context.read<EditProfileBloc>().add(
-                                          EditProfileInstagramLinkChanged(
-                                              value: value),
-                                        );
-                                  },
-                                  textInputType: TextInputType.text);
-                            },
-                          ),
-
-                          dividerDefaultBold,
-                          SizedBox(
-                            height: 20,
-                          ),
-
-                          BlocBuilder<EditProfileBloc, EditProfileState>(
-                            builder: (context, state) {
-                              return CustomTextField3(
-                                  label: "LinkedIn (Optional)",
-                                  hint: "LinkedIn Profile Link",
-                                  validator: (value) {
-                                    return null;
-                                  },
-                                  text: state.linkedinLink,
-                                  onChange: (value) {
-                                    context.read<EditProfileBloc>().add(
-                                          EditProfileLinkedinLinkChanged(
-                                              value: value),
-                                        );
-                                  },
-                                  textInputType: TextInputType.text);
-                            },
-                          ),
-
-                          dividerDefaultBold,
-
-                          SizedBox(
-                            height: 20,
-                          ),
-                          BlocBuilder<EditProfileBloc, EditProfileState>(
-                            builder: (context, state) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Date of Birth (Optional)',
-                                    style: TextStyles.tinyRegularTextTertiary,
-                                  ),
-                                  GestureDetector(
-                                    onTap: () async {
-                                      final datePick = await showDatePicker(
-                                          context: context,
-                                          initialDate: state.birthDate != null
-                                              ? state.birthDate
-                                              : new DateTime.now(),
-                                          firstDate: new DateTime(1900),
-                                          lastDate: new DateTime(2050));
-                                      if (datePick != null) {
-                                        context.read<EditProfileBloc>().add(
-                                              EditProfileBirthDateChanged(
-                                                  value: datePick),
-                                            );
-                                      }
-                                    },
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Expanded(
-                                            child: Text(
-                                          state.birthDate != null
-                                              ?getDisplayDate(state.birthDate)
-                                              : '',
-                                          style: TextStyles
-                                              .smallRegularTextSecondary,
-                                        )),
-                                        Icon(Icons.calendar_today)
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-
-                          dividerDefaultBold,
-
-                          SizedBox(
-                            height: 20,
-                          ),
-
-                          BlocBuilder<EditProfileBloc, EditProfileState>(
-                            builder: (context, state) {
-                              return state.formStatus is FormSubmitting
-                                  ? CustomProgressIndicator()
-                                  : CustomButton(
-                                      text: "Save",
-                                      action: () {
-                                        if (_formKey.currentState.validate()) {
-                                          context
-                                              .read<EditProfileBloc>()
-                                              .add(EditProfileSubmitted());
-                                        }
+                              BlocBuilder<EditProfileBloc, EditProfileState>(
+                                builder: (context, state) {
+                                  return CustomTextField3(
+                                      label: "User Name",
+                                      hint: "Enter your name",
+                                      validator: (value) {
+                                        return state.userNameValidationText;
                                       },
-                                    );
-                            },
+                                      text: state.userName,
+                                      onChange: (value) {
+                                        context.read<EditProfileBloc>().add(
+                                              EditProfileUsernameChanged(
+                                                  username: value),
+                                            );
+                                      },
+                                      textInputType: TextInputType.text);
+                                },
+                              ),
+
+                              SizedBox(
+                                height: 20,
+                              ),
+                              BlocBuilder<EditProfileBloc, EditProfileState>(
+                                builder: (context, state) {
+                                  return CustomTextField3(
+                                      label: "Phone Number",
+                                      hint: "Phone Number",
+                                      validator: (value) {
+                                        return state.phoneNumberValidationText;
+                                      },
+                                      text: state.phoneNumber,
+                                      onChange: (value) {
+                                        context.read<EditProfileBloc>().add(
+                                              EditProfilePhoneNumberChanged(
+                                                  phoneNumber: value),
+                                            );
+                                      },
+                                      textInputType: TextInputType.number);
+                                },
+                              ),
+
+
+                              SizedBox(
+                                height: 20,
+                              ),
+                              BlocBuilder<EditProfileBloc, EditProfileState>(
+                                builder: (context, state) {
+                                  return CustomTextField3(
+                                      label: "About me",
+                                      hint: "About me",
+                                      validator: (value) {
+                                        return null;
+                                      },
+                                      text: state.bio,
+                                      onChange: (value) {
+                                        context.read<EditProfileBloc>().add(
+                                              EditProfileBioChanged(bio: value),
+                                            );
+                                      },
+                                      textInputType: TextInputType.text);
+                                },
+                              ),
+
+                              SizedBox(
+                                height: 20,
+                              ),
+                              BlocBuilder<EditProfileBloc, EditProfileState>(
+                                builder: (context, state) {
+                                  return CustomTextField3(
+                                      label: "FaceBook (Optional)",
+                                      hint: "FaceBook Profile Link",
+                                      validator: (value) {
+                                        return null;
+                                      },
+                                      text: state.facebookLink,
+                                      onChange: (value) {
+                                        context.read<EditProfileBloc>().add(
+                                              EditProfileFacebookLinkChanged(
+                                                  value: value),
+                                            );
+                                      },
+                                      textInputType: TextInputType.text);
+                                },
+                              ),
+
+
+                              SizedBox(
+                                height: 20,
+                              ),
+                              BlocBuilder<EditProfileBloc, EditProfileState>(
+                                builder: (context, state) {
+                                  return CustomTextField3(
+                                      label: "Instagram  (Optional)",
+                                      hint: "Instagram Profile Link",
+                                      validator: (value) {
+                                        return null;
+                                      },
+                                      text: state.instagramLink,
+                                      onChange: (value) {
+                                        context.read<EditProfileBloc>().add(
+                                              EditProfileInstagramLinkChanged(
+                                                  value: value),
+                                            );
+                                      },
+                                      textInputType: TextInputType.text);
+                                },
+                              ),
+
+
+                              SizedBox(
+                                height: 20,
+                              ),
+
+                              BlocBuilder<EditProfileBloc, EditProfileState>(
+                                builder: (context, state) {
+                                  return CustomTextField3(
+                                      label: "LinkedIn (Optional)",
+                                      hint: "LinkedIn Profile Link",
+                                      validator: (value) {
+                                        return null;
+                                      },
+                                      text: state.linkedinLink,
+                                      onChange: (value) {
+                                        context.read<EditProfileBloc>().add(
+                                              EditProfileLinkedinLinkChanged(
+                                                  value: value),
+                                            );
+                                      },
+                                      textInputType: TextInputType.text);
+                                },
+                              ),
+
+
+
+                              SizedBox(
+                                height: 20,
+                              ),
+                              BlocBuilder<EditProfileBloc, EditProfileState>(
+                                builder: (context, state) {
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Date of Birth (Optional)',
+                                        style: TextStyles.tinyRegularTextTertiary,
+                                      ),
+                                      GestureDetector(
+                                        onTap: () async {
+                                          final datePick = await showDatePicker(
+                                              context: context,
+                                              initialDate: state.birthDate != null
+                                                  ? state.birthDate
+                                                  : new DateTime.now(),
+                                              firstDate: new DateTime(1900),
+                                              lastDate: new DateTime(2050));
+                                          if (datePick != null) {
+                                            context.read<EditProfileBloc>().add(
+                                                  EditProfileBirthDateChanged(
+                                                      value: datePick),
+                                                );
+                                          }
+                                        },
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          children: [
+                                            Expanded(
+                                                child: Text(
+                                              state.birthDate != null
+                                                  ?getDisplayDate(state.birthDate)
+                                                  : '',
+                                              style: TextStyles
+                                                  .smallRegularTextSecondary,
+                                            )),
+                                            Icon(Icons.calendar_today,color: AppColors.IconColor,)
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+
+
+
+                              SizedBox(
+                                height: 100,
+                              ),
+
+
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: BlocBuilder<EditProfileBloc, EditProfileState>(
+                        builder: (context, state) {
+                          return state.formStatus is FormSubmitting
+                              ? CustomProgressIndicator()
+                              : CustomButton(
+                            text: "Save",
+                            action: () {
+                              if (_formKey.currentState.validate()) {
+                                context
+                                    .read<EditProfileBloc>()
+                                    .add(EditProfileSubmitted());
+                              }
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 );
               }),
             ),

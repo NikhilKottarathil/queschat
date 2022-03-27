@@ -30,7 +30,7 @@ class RecordButton extends StatefulWidget {
 
 class _RecordButtonState extends State<RecordButton> with SingleTickerProviderStateMixin {
   static const double size = 60;
-  static const double buttonSize = 42;
+  static const double buttonSize = 40;
 
   final double lockerHeight = 200;
   double timerWidth = 0;
@@ -119,7 +119,7 @@ class _RecordButtonState extends State<RecordButton> with SingleTickerProviderSt
         width: size,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(Globals.borderRadius),
-          color: AppColors.Tertiary.withOpacity(.2),
+          color: AppColors.TextSeven,
         ),
         padding: const EdgeInsets.symmetric(vertical: 15),
         child: Column(
@@ -154,7 +154,7 @@ class _RecordButtonState extends State<RecordButton> with SingleTickerProviderSt
           width: MediaQuery.of(context).size.width - 10,
           decoration: BoxDecoration(
             // borderRadius: BorderRadius.circular(Globals.borderRadius),
-            color: AppColors.Tertiary.withOpacity(.2),
+            color: AppColors.TextSeven,
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -191,7 +191,7 @@ class _RecordButtonState extends State<RecordButton> with SingleTickerProviderSt
         width: MediaQuery.of(context).size.width - 10,
         decoration: BoxDecoration(
           // borderRadius: BorderRadius.circular(Globals.borderRadius),
-          color: AppColors.Tertiary.withOpacity(.2),
+          color: AppColors.TextSeven,
         ),
         child: Padding(
           padding: const EdgeInsets.only(left: 15,),
@@ -240,7 +240,7 @@ class _RecordButtonState extends State<RecordButton> with SingleTickerProviderSt
                   clipBehavior: Clip.hardEdge,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Theme.of(context).primaryColor,
+                    color: AppColors.PrimaryColor,
                   ),
                 ),
               ),
@@ -265,7 +265,7 @@ class _RecordButtonState extends State<RecordButton> with SingleTickerProviderSt
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Theme.of(context).primaryColor,
+            color: AppColors.PrimaryColor,
           ),
         ),
       ),

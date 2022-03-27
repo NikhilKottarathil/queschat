@@ -277,7 +277,7 @@ class _MessageAdapterState extends State<MessageAdapter>
                       width: MediaQuery.of(context).size.width * .8,
                       height: MediaQuery.of(context).size.width * .8,
                     ),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
+                    errorWidget: (context, url, error) => Icon(Icons.error,color: AppColors.IconColor),
                   ),
                   borderRadius: BorderRadius.all(Radius.circular(12.0)),
                 ),

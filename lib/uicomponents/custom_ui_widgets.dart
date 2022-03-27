@@ -35,7 +35,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         decoration: new InputDecoration(
           hintText: widget.hint,
           border: InputBorder.none,
-          hintStyle: TextStyle(color: AppColors.SecondaryColorLight),
+          hintStyle: TextStyle(color: AppColors.SecondaryColor),
           prefixIcon: widget.icon,
         ),
       ),
@@ -50,7 +50,8 @@ class CustomButton extends StatefulWidget {
   Function action;
   bool isActive;
 
-  CustomButton({Key key, this.text, this.action,this.isActive=true}) : super(key: key);
+  CustomButton({Key key, this.text, this.action, this.isActive = true})
+      : super(key: key);
 }
 
 class _CustomButtonState extends State<CustomButton> {
@@ -61,9 +62,9 @@ class _CustomButtonState extends State<CustomButton> {
       height: MediaQuery.of(context).size.height * .07,
       width: MediaQuery.of(context).size.width,
       child: RaisedButton(
-        color: widget.isActive?AppColors.PrimaryColor:AppColors.TextFourth,
-        onPressed: (){
-          if(widget.isActive){
+        color: widget.isActive ? AppColors.PrimaryColor : AppColors.TextFourth,
+        onPressed: () {
+          if (widget.isActive) {
             widget.action();
           }
         },
@@ -134,7 +135,7 @@ class _ActiveInactiveButtonState extends State<ActiveInactiveButton> {
           // decoration: widget.isActive
           //     ? BoxDecoration(
           //     borderRadius: BorderRadius.circular(30),
-          //     color: AppColors.SecondaryColorLight)
+          //     color: AppColors.SecondaryColor)
           //     : null,
           child: Row(
             children: <Widget>[
@@ -185,11 +186,11 @@ class _CustomButtonWithIconState extends State<CustomButtonWithIcon> {
           children: [
             Icon(
               widget.icon,
-              color: AppColors.SecondaryColorLight,
+              color: AppColors.SecondaryColor,
             ),
             Text(
               "  " + widget.text,
-              style: TextStyle(color: AppColors.SecondaryColorLight),
+              style: TextStyle(color: AppColors.SecondaryColor),
             ),
           ],
         ),
@@ -199,7 +200,7 @@ class _CustomButtonWithIconState extends State<CustomButtonWithIcon> {
 }
 
 class FlatButtonWithIcon extends StatelessWidget {
-  Icon icon;
+  var icon;
   String text;
   Function action;
 
@@ -210,6 +211,7 @@ class FlatButtonWithIcon extends StatelessWidget {
     return InkWell(
       onTap: action,
       child: Container(
+        padding: EdgeInsets.symmetric(vertical: 12),
           child: Row(
         children: [
           Expanded(
@@ -220,8 +222,6 @@ class FlatButtonWithIcon extends StatelessWidget {
                 shape: BoxShape.circle,
                 // border: Border.all(color: AppColors.BorderColor),
               ),
-              height: 50,
-              width: 50,
               child: icon,
             ),
           ),
@@ -229,7 +229,7 @@ class FlatButtonWithIcon extends StatelessWidget {
               flex: 4,
               child: Text(
                 text,
-                style: TextStyle(color: AppColors.TextSecondary, fontSize: 18),
+                style: TextStyles.subTitle1TextPrimary,
               ))
         ],
       )),
