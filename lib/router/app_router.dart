@@ -25,6 +25,8 @@ import 'package:queschat/home/feeds/quiz/leader_board/leader_board_view.dart';
 import 'package:queschat/home/feeds/quiz/post_quiz_bloc.dart';
 import 'package:queschat/home/home/home_bloc.dart';
 import 'package:queschat/home/home/home_view.dart';
+import 'package:queschat/home/home/home_view_2.dart';
+import 'package:queschat/home/home/home_view_3.dart';
 import 'package:queschat/home/in_app_notification/in_app_notification_cubit.dart';
 import 'package:queschat/home/in_app_notification/in_app_notification_view.dart';
 import 'package:queschat/home/message/message_home/message_home_bloc.dart';
@@ -102,11 +104,9 @@ class AppRouter {
 
       case '/profile':
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (context) => profileBloc,
-            child: ProfileView(),
-          ),
+          builder: (_) => ProfileView(),
         );
+
       case '/forgotPassword':
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
@@ -179,7 +179,7 @@ class AppRouter {
                     PostBlogBloc(feedRepo: feedRepository, parentPage: 'home'),
               ),
             ],
-            child: HomeView(),
+            child: HomeView2(),
           ),
         );
 

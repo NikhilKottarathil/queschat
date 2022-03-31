@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/function/show_snack_bar.dart';
 import 'package:queschat/home/message/message_room/message_room_cubit.dart';
@@ -8,6 +9,7 @@ import 'package:queschat/home/message/message_room_list/message_room_adapter.dar
 import 'package:queschat/home/message/message_room_list/message_room_list_bloc.dart';
 import 'package:queschat/home/message/message_room_list/message_room_list_event.dart';
 import 'package:queschat/home/message/message_room_list/message_room_list_state.dart';
+import 'package:queschat/main.dart';
 import 'package:queschat/models/chat_room_model.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -51,7 +53,7 @@ class _MessageRoomListViewState extends State<MessageRoomListView>
                         },
                       )
                     : state.displayModels.length != 0
-                        ? ListView.builder(
+                        ? ListView.separated(
                             // padding: EdgeInsets.only(top: 20, bottom: 20),
                             shrinkWrap: true,
                             itemCount: state.displayModels.length,
@@ -61,7 +63,7 @@ class _MessageRoomListViewState extends State<MessageRoomListView>
                                   child: InkWell(
                                       onTap: () {
                                         Navigator.pushNamed(
-                                            context, '/messageRoom',
+                                            MyApp.navigatorKey.currentContext, '/messageRoom',
                                             arguments: {
                                               'parentPage': context
                                                           .read<
@@ -86,7 +88,9 @@ class _MessageRoomListViewState extends State<MessageRoomListView>
                                             state.displayModels[index],
                                         parentPage: context.read<MessageRoomListBloc>().parentPage,
                                       )));
-                            },
+                            }, separatorBuilder: (BuildContext context, int index) {
+                              return dividerDefault;
+                },
                             // separatorBuilder:
                             //     (BuildContext context, int index) {
                             //   return Divider(
@@ -103,17 +107,55 @@ class _MessageRoomListViewState extends State<MessageRoomListView>
           ],
         ),
       ),
-      floatingActionButton: context.read<MessageRoomListBloc>().parentPage=='channel'?FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.pushNamed(context, '/exploreChannels');
-        },
-        elevation: 2,
-        label: Text(
-          'JOIN CHANNEL',
-          style: TextStyles.buttonWhite,
+      floatingActionButton: context.read<MessageRoomListBloc>().parentPage=='channel'?GestureDetector(
+          onTap: () {
+                Navigator.pushNamed( MyApp.navigatorKey.currentContext, '/exploreChannels');
+              },
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 24,vertical: 12),
+          decoration: BoxDecoration(
+            color: AppColors.White,
+            border: Border.all(color: AppColors.PrimaryColorLight, width: 1.3),
+            borderRadius: BorderRadius.circular(32),
+              boxShadow: [
+                BoxShadow(
+                    color: AppColors.ShadowColor,
+                    offset: Offset(1, 3),
+                    spreadRadius: 4,
+                    blurRadius: 6)
+              ],
+          ),
+
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FaIcon(FontAwesomeIcons.userPlus,size: 18,color: AppColors.PrimaryColorLight,),
+              SizedBox(width: 8,),
+              Text(
+                'JOIN CHANNEL',
+                style: TextStyles.buttonPrimaryColorLight,
+              ),
+            ],
+          ),
         ),
-        backgroundColor: AppColors.PrimaryColorLight,
       ):null,
+      // floatingActionButton: context.read<MessageRoomListBloc>().parentPage=='channel'?FloatingActionButton.extended(
+      //   onPressed: () {
+      //     Navigator.pushNamed(context, '/exploreChannels');
+      //   },
+      //   elevation: 2,
+      //
+      //   label: Container(
+      //     decoration: BoxDecoration(
+      //       border: Border.all(color: AppColors.BorderColor)
+      //     ),
+      //     child: Text(
+      //       'JOIN CHANNEL',
+      //       style: TextStyles.buttonWhite,
+      //     ),
+      //   ),
+      //   backgroundColor: AppColors.White,
+      // ):null,
     );
   }
 

@@ -48,7 +48,7 @@ class _PostAMCQViewState extends State<PostAMCQView>
     // create: (context) => PostMcqBloc(feedRepo: feedRepo),
 
     return Scaffold(
-      appBar: appBarWithBackButton(context: context, titleString: "Post a POLL"),
+      appBar: appBarWithBackButton(context: context, titleString: "Post a Poll"),
       body: BlocListener<PostMcqBloc, PostMcqState>(
         listener: (context, state) {
           final formStatus = state.formSubmissionStatus;
@@ -167,7 +167,7 @@ class _PostAMCQViewState extends State<PostAMCQView>
                                         child: Column(
                                           children: [
                                             OptionTextField(
-                                              hint: 'Enter here',
+                                              hint: 'Enter first option here',
                                               optionKey: "A",
                                               text: state.optionA,
                                               textInputType:
@@ -184,7 +184,7 @@ class _PostAMCQViewState extends State<PostAMCQView>
                                               },
                                             ),
                                             OptionTextField(
-                                              hint: 'Enter here',
+                                              hint: 'Enter second option here',
                                               optionKey: "B",
                                               text: state.optionB,
                                               validator: (value) {
@@ -199,7 +199,7 @@ class _PostAMCQViewState extends State<PostAMCQView>
                                               },
                                             ),
                                             OptionTextField(
-                                              hint: 'Enter here',
+                                              hint: 'Enter third option here',
                                               optionKey: "C",
                                               text: state.optionC,
                                               validator: (value) {
@@ -214,7 +214,7 @@ class _PostAMCQViewState extends State<PostAMCQView>
                                               },
                                             ),
                                             OptionTextField(
-                                              hint: 'Enter here',
+                                              hint: 'Enter fourth option here',
                                               optionKey: "D",
                                               text: state.optionD,
                                               validator: (value) {

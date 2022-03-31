@@ -21,6 +21,7 @@ import 'package:queschat/home/feeds/post_blog/post_blog_view.dart';
 import 'package:queschat/home/feeds/quiz/quiz_play/quiz_play_bloc.dart';
 import 'package:queschat/home/feeds/quiz/quiz_play/quiz_play_view.dart';
 import 'package:queschat/home/report_a_content/report_view.dart';
+import 'package:queschat/main.dart';
 import 'package:queschat/models/blog_nodel.dart';
 import 'package:queschat/models/mcq_model.dart';
 import 'package:queschat/models/quiz_model.dart';
@@ -45,7 +46,7 @@ class FeedAdapter extends StatelessWidget {
         return GestureDetector(
           onTap: () {
             if (parentPage != 'singleView') {
-              Navigator.pushNamed(context, '/feedSingleView', arguments: {
+              Navigator.pushNamed(MyApp.navigatorKey.currentContext, '/feedSingleView', arguments: {
                 'parentPage': 'feedAdapter',
                 'feedId': feedModel.id
               });
@@ -54,19 +55,20 @@ class FeedAdapter extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
                 color: AppColors.White,
-                boxShadow: [
-                  BoxShadow(
-                      color: AppColors.ShadowColor,
-                      offset: Offset(0, 3),
-                      blurRadius: 6)
-                ],
+                border: parentPage!='messageRoom'?Border.all(color: AppColors.BorderColor):null,
+                // boxShadow: parentPage!='messageRoom'?[
+                //   BoxShadow(
+                //       color: AppColors.ShadowColor,
+                //       offset: Offset(0, 3),
+                //       blurRadius: 6)
+                // ]:null,
                 borderRadius: BorderRadius.circular(10)),
             child: Column(
               children: [
                 parentPage != 'messageRoom'
                     ? Container(
                         padding: EdgeInsets.only(
-                            top: 5, bottom: 5, right: 5, left: 14),
+                            top: 12, bottom: 5, right: 5, left: 14),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -81,62 +83,53 @@ class FeedAdapter extends StatelessWidget {
                                   ),
                                 if(feedModel.profilePicUrl==null)
                                   CircleAvatar(
-                                    radius: 12,
+                                    radius: 20,
                                     child: Image.asset('images/user_profile.png'),
                                   ),
-                                Text(
-                                  feedModel.userName.toString(),
-                                  style: TextStyles.mediumMediumTextSecondary,
+                                SizedBox(width: 12,),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      feedModel.userName.toString(),
+                                      style:TextStyle(fontSize:17,color: AppColors.TextPrimary,height:1.15,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400),
+                                    ),
+                                    Text(
+                                      feedModel.uploadedTime,
+                                      style:TextStyle(fontSize:13,color: AppColors.TextSecondary,height:1.25,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.access_time_rounded,
-                                  color: AppColors.IconColor,
-                                ),
-                                SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  feedModel.uploadedTime,
-                                  style: TextStyle(
-                                      color: AppColors.IconColor, fontSize: 14),
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                IconButton(
-                                    iconSize: 24,
-                                    padding: EdgeInsets.zero,
-                                    constraints: BoxConstraints(),
-                                    icon: Image.asset(
-                                        'images/three_dot_vertical.png',
-                                        color: AppColors.TextTertiary),
-                                    onPressed: () {
-                                      if (feedModel.userId ==
-                                          AppData().userId) {
-                                        // print(feedModel.id);
-                                        // print(AppData().userId);
-                                        if (feedModel.feedType == 'blog') {
-                                          showOptionAlert(
-                                              context, index, feedModel.id);
-                                        } else {
-                                          showConfirmDeleteAlert(
-                                              context, index, feedModel.id);
-                                        }
-                                      } else {
-                                        showReportAlert(
-                                            buildContext: context,
-                                            reportedModel: 'Feed',
-                                            reportedModelId: feedModel.id);
-                                        print(
-                                            'Wrong  feed in my Feeds or id not matching');
-                                      }
-                                    }),
-                              ],
-                            )
+                            IconButton(
+                                iconSize: 24,
+                                padding: EdgeInsets.zero,
+                                constraints: BoxConstraints(),
+                                icon: Image.asset(
+                                    'images/three_dot_vertical.png',
+                                    color: AppColors.TextTertiary),
+                                onPressed: () {
+                                  if (feedModel.userId ==
+                                      AppData().userId) {
+                                    // print(feedModel.id);
+                                    // print(AppData().userId);
+                                    if (feedModel.feedType == 'blog') {
+                                      showOptionAlert(
+                                          context, index, feedModel.id);
+                                    } else {
+                                      showConfirmDeleteAlert(
+                                          context, index, feedModel.id);
+                                    }
+                                  } else {
+                                    showReportAlert(
+                                        buildContext: context,
+                                        reportedModel: 'Feed',
+                                        reportedModelId: feedModel.id);
+                                    print(
+                                        'Wrong  feed in my Feeds or id not matching');
+                                  }
+                                })
                           ],
                         ),
                       )
@@ -189,7 +182,7 @@ class FeedAdapter extends StatelessWidget {
                             ConnectionRepository connectionRepository =
                                 ConnectionRepository();
 
-                            Navigator.of(context).push(
+                            Navigator.of(MyApp.navigatorKey.currentContext).push(
                               MaterialPageRoute(
                                 builder: (_) => MultiBlocProvider(
                                   providers: [
@@ -324,7 +317,7 @@ class FeedAdapter extends StatelessWidget {
                             content: element['description'],
                             images: media,
                             heading: element['name']);
-                        Navigator.of(context).push(
+                        Navigator.of(MyApp.navigatorKey.currentContext).push(
                           MaterialPageRoute(
                               builder: (_) => MultiBlocProvider(
                                     providers: [
@@ -778,10 +771,10 @@ class QuizFeed extends StatelessWidget {
                       color: AppColors.GreenSecondary,
                       onPressed: () {
                         if(quizModel.isQuizAttended){
-                          Navigator.pushNamed(context, '/leaderBoard',arguments: {'quizId':state.feedModelList[index].id});
+                          Navigator.pushNamed(MyApp.navigatorKey.currentContext, '/leaderBoard',arguments: {'quizId':state.feedModelList[index].id});
 
                         }else {
-                          Navigator.of(context).push(MaterialPageRoute(
+                          Navigator.of(MyApp.navigatorKey.currentContext).push(MaterialPageRoute(
                             builder: (_) =>
                                 BlocProvider(
                                   create: (context) =>
@@ -833,7 +826,7 @@ class BlogFeed extends StatelessWidget {
 
       return Container(
         width: double.infinity,
-        color: Colors.grey.shade100,
+        color: Colors.transparent,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

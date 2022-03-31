@@ -11,6 +11,7 @@ class CustomTextField extends StatefulWidget {
   var text;
   int maxLength;
 
+
   CustomTextField(
       {Key key,
       this.hint,
@@ -29,6 +30,7 @@ class CustomTextField extends StatefulWidget {
 class _CustomTextFieldState extends State<CustomTextField> {
   TextEditingController controller = new TextEditingController();
 
+  bool isVisible=false;
   @override
   void initState() {
     // TODO: implement initState
@@ -50,7 +52,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       maxLength: widget.maxLength!=null?widget.maxLength:widget.textInputType==TextInputType.phone?10:null,
 
       obscureText:
-          widget.textInputType == TextInputType.visiblePassword ? true : false,
+          widget.textInputType == TextInputType.visiblePassword ?isVisible? false : true : false,
       enableSuggestions:
           widget.textInputType == TextInputType.visiblePassword ? false : true,
       autocorrect:
@@ -60,6 +62,14 @@ class _CustomTextFieldState extends State<CustomTextField> {
         counterText: '',
         prefixIcon: widget.icon,
 
+        suffixIcon:Visibility(
+          visible: widget.textInputType == TextInputType.visiblePassword,
+          child:IconButton(icon:Icon(isVisible?Icons.visibility_off:Icons.visibility,color: AppColors.IconColor),
+          onPressed: (){
+            setState(() {
+              isVisible=!isVisible;
+            });
+          },)),
         contentPadding: EdgeInsets.all(17),
         hintText: widget.hint,
         // labelText: widget.hint,

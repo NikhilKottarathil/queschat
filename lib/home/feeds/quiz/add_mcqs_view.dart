@@ -28,7 +28,7 @@ class AddMCQsView extends StatelessWidget {
         child: Scaffold(
           appBar: appBarWithBackButton(
               context: context,
-              titleString: "",
+              titleString: "Add Poll",
               // tailActions: [
               //   TextButton(
               //       onPressed: () {
@@ -221,28 +221,37 @@ void showPostAlert(BuildContext buildContext,QuizMcqState quizMcqState) {
       useRootNavigator: true,
       backgroundColor: Colors.white,
       builder: (context){
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        CustomButton(
-          action: () {
-            buildContext.read<PostQuizBloc>().add(PostQuizSubmitted(quizMcqState));
-            Navigator.pop(context);
-          },
-          text: 'Post',
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 5.0, bottom: 20),
-          child: TextButton(
-              onPressed: () {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+
+        children: [
+          Align(
+            alignment: Alignment.centerLeft,
+              child: Text('Are your sure ?',style: TextStyles.heading2TextPrimary,)),
+          CustomButton(
+            action: () {
+              buildContext.read<PostQuizBloc>().add(PostQuizSubmitted(quizMcqState));
+              Navigator.pop(context);
+            },
+            text: 'Post',
+          ),
+          SizedBox(height: 10,),
+          GestureDetector(
+              onTap: () {
                 Navigator.pop(context);
               },
-              child: Text(
-                'Cancel',
-                style: TextStyles.smallRegularTextSecondary,
-              )),
-        )
-      ],
+              child: Padding(
+                padding: const EdgeInsets.only(top: 10.0, bottom: 20,left: 20,right: 20),
+
+                child: Text(
+                  'Cancel',
+                  style: TextStyles.buttonPrimary,
+                ),
+              ))
+        ],
+      ),
     );
   });
 }

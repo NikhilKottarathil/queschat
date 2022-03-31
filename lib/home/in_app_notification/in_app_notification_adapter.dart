@@ -97,7 +97,7 @@ class InAppNotificationAdapter extends StatelessWidget {
       children: [
         Text(title, style: TextStyles.smallRegularTextSecondary),
         Align(
-            alignment: Alignment.bottomRight,
+            alignment: Alignment.bottomLeft,
             child: Text(getDisplayDateOrTime(model.createdTime),
                 style: TextStyles.tinyRegularTextTertiary)),
       ],

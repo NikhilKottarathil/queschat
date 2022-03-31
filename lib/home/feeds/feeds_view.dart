@@ -34,6 +34,7 @@ class _FeedsViewState extends State<FeedsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade100,
       body: BlocListener<FeedsBloc, FeedsState>(
         listener: (context, state) async {
           if (state.pageScrollStatus is ScrollToTop) {
@@ -56,7 +57,7 @@ class _FeedsViewState extends State<FeedsView> {
             children: [
               Expanded(
                 child: state.feedModelList.length==0?Center(child: Text('No Post to Show',style: TextStyles.mediumMediumTextTertiary,),): ListView.separated(
-                  padding: EdgeInsets.all(20),
+                  padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
                   controller: scrollController,
                   shrinkWrap: true,
                   itemCount: state.feedModelList.length,

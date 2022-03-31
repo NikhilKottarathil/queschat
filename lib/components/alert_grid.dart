@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:queschat/components/info_widget.dart';
 import 'package:queschat/constants/styles.dart';
 
 class AlertGrid extends StatefulWidget {
-  String heading, description;
+  String heading, description,description2;
   Function action;
 
 
 
   @override
   _AlertGridState createState() => _AlertGridState();
-  AlertGrid({Key key, this.heading, this.description, this.action})
+  AlertGrid({Key key, this.heading, this.description,this.description2, this.action})
       : super(key: key);
 }
 
@@ -23,7 +25,6 @@ class _AlertGridState extends State<AlertGrid> {
 
       },
       child: Container(
-        height: MediaQuery.of(context).size.height * .1,
         width: double.infinity,
         padding: EdgeInsets.all(15),
         margin: EdgeInsets.all(5),
@@ -31,29 +32,42 @@ class _AlertGridState extends State<AlertGrid> {
           borderRadius: BorderRadius.circular(10),
           color: Colors.white,
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(widget.heading,
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                    textAlign: TextAlign.start),
-               if(widget.description!=null) Text(
-                  widget.description,
-                  style: TextStyle(fontSize: 15),
-                  textAlign: TextAlign.start,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(widget.heading,
+                          style: TextStyle(
+                            fontSize: 20,
+                          ),
+                          textAlign: TextAlign.start),
+                     if(widget.description!=null) Text(
+                        widget.description,
+                        style: TextStyle(fontSize: 15),
+                        textAlign: TextAlign.start,
+                      ),
+
+                    ],
+                  ),
                 ),
+                SizedBox(width: 12,),
+                // IconButton(
+                //   // icon: Image.asset("image/ic_keyboard_backspace_24px"),
+                     new FaIcon(FontAwesomeIcons.circleChevronRight,color: AppColors.PrimaryColor,size:MediaQuery.of(context).size.height*.04 ,),
+                //     onPressed: widget.action),
               ],
             ),
-            // IconButton(
-            //   // icon: Image.asset("image/ic_keyboard_backspace_24px"),
-                 new Icon(Icons.navigate_next,color: AppColors.PrimaryColor,size:MediaQuery.of(context).size.height*.04 ,),
-            //     onPressed: widget.action),
+            if(widget.description2!=null)
+              Padding(
+                padding: const EdgeInsets.only(top: 12.0),
+                child: InfoWidget(message: widget.description2,),
+              ),
           ],
         ),
       ),

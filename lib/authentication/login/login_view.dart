@@ -48,9 +48,8 @@ class LoginView extends StatelessWidget {
                         ),
                         Align(
                           alignment: Alignment.center,
-                          child: Image.asset('images/app_logo.png',
-                              height: MediaQuery.of(context).size.width * .28,
-                              width: MediaQuery.of(context).size.width * .28,
+                          child: Image.asset('images/logo_with_name.png',
+                              width: MediaQuery.of(context).size.width * .6,
                               fit: BoxFit.contain),
                         ),
 

@@ -14,24 +14,22 @@ void showNewFeedAlert(BuildContext buildContext) {
   showGeneralDialog(
     barrierLabel: "Barrier",
     barrierDismissible: true,
-    barrierColor: Colors.black.withOpacity(0.9),
+    barrierColor: Colors.black.withOpacity(0.8),
     transitionDuration: Duration(milliseconds: 500),
     context: buildContext,
     pageBuilder: (context, __, ___) {
-      return Container(
-        margin: EdgeInsets.only(
-            bottom: MediaQuery.of(buildContext).size.height * .025),
+      return SafeArea(
         child: Scaffold(
           backgroundColor: Colors.transparent,
           body: Align(
-              alignment: Alignment.bottomCenter,
+              alignment: Alignment.topCenter,
               child: Container(
                 margin: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).size.height * .1),
+                    bottom: MediaQuery.of(context).size.height * .02,top: AppBar().preferredSize.height),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     // AlertGrid(
                     //     heading: "Ask a Doubt",
@@ -44,8 +42,8 @@ void showNewFeedAlert(BuildContext buildContext) {
                     //               builder: (context) => AskADoubt()));
                     //     }),
                     AlertGrid(
-                        heading: "Post A POLL",
-                        description: "Challenge your fellow beings",
+                        heading: "Post A Poll",
+                        description: "Create a multi choice question",
                         action: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
@@ -62,7 +60,7 @@ void showNewFeedAlert(BuildContext buildContext) {
                         }),
                     AlertGrid(
                         heading: "Post A Quiz",
-                        description: "Challenge your fellow beings",
+                        description: "Create a quiz with multiple questions",
                         action: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
@@ -84,7 +82,8 @@ void showNewFeedAlert(BuildContext buildContext) {
                         'channel')
                       AlertGrid(
                           heading: "Post A Blog",
-                          description: "Share what you know",
+                          description: "Write a blog to share your knowledge",
+                          description2: 'Blogs posted in a channel will be visible for everyone in the platform as a feed in home page',
                           action: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
@@ -102,26 +101,26 @@ void showNewFeedAlert(BuildContext buildContext) {
                   ],
                 ),
               )),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: Container(
-              height: MediaQuery.of(context).size.height * .085,
-              width: MediaQuery.of(context).size.height * .085,
-              decoration:
-                  BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-              child: Icon(Icons.close, color: Colors.black, size: 40),
-            ),
-          ),
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerFloat,
+          // floatingActionButton: FloatingActionButton(
+          //   onPressed: () {
+          //     Navigator.pop(context);
+          //   },
+          //   child: Container(
+          //     height: MediaQuery.of(context).size.height * .085,
+          //     width: MediaQuery.of(context).size.height * .085,
+          //     decoration:
+          //         BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+          //     child: Icon(Icons.close, color: Colors.black, size: 40),
+          //   ),
+          // ),
+          // floatingActionButtonLocation:
+          //     FloatingActionButtonLocation.centerFloat,
         ),
       );
     },
     transitionBuilder: (_, anim, __, child) {
       return SlideTransition(
-        position: Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim),
+        position: Tween(begin: Offset(1, 0), end: Offset(0, 0)).animate(anim),
         child: child,
       );
     },

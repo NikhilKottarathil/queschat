@@ -63,7 +63,7 @@ class PostBlogView extends StatelessWidget {
                                 Flexible(
                                   child: Container(
                                     padding: EdgeInsets.all(4),
-                                    color: AppColors.ShadowColor,
+                                    color: Colors.transparent,
                                     constraints: BoxConstraints(
                                         minHeight: 500,
                                         minWidth: double.infinity),
@@ -79,9 +79,7 @@ class PostBlogView extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                SizedBox(
-                                  height: 10,
-                                ),
+
                                 // BlocBuilder<PostBlogBloc, PostBlogState>(
                                 //   builder: (context, state) {
                                 //     return Visibility(

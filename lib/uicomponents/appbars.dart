@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:queschat/constants/strings_and_urls.dart';
 import 'package:queschat/constants/styles.dart';
@@ -12,38 +13,60 @@ import 'package:queschat/router/app_router.dart';
 
 Widget homeAppBar(BuildContext context) {
   return AppBar(
-    leadingWidth: 44,
+    // leadingWidth: 44,
 
-    backgroundColor: Colors.white,
-    elevation: .3,
-    shadowColor: AppColors.ShadowColor,
+    // leading: Container(),
+    leadingWidth: MediaQuery.of(context).size.width*.7,
+    // backgroundColor: Colors.white,
+    backgroundColor: AppColors.PrimaryColorLight,
+    // elevation: .3,
+    elevation: 0,
+      shadowColor: Colors.transparent,
+    bottomOpacity: 0,
+    foregroundColor: Colors.transparent,
+
+    // shadowColor: AppColors.ShadowColor,
     iconTheme: IconThemeData(color: AppColors.IconColor),
-    leading: GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(context, '/profile');
-      },
-      child: Padding(
-        padding: const EdgeInsets.only(left: 20),
-        child: Image.asset(
-          'images/user.png',
-          fit: BoxFit.scaleDown,
+    leading:  Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(width: 20,),
+        Flexible(
+          child: Image.asset('images/logo_with_name.png',
+              color: AppColors.White,
+              height: 30,
+              fit: BoxFit.scaleDown),
         ),
-      ),
+      ],
     ),
-    titleSpacing: 32,
+    centerTitle: false,
+    // leading: GestureDetector(
+    //   onTap: () {
+    //     Navigator.pushNamed(context, '/profile');
+    //   },
+    //   child: Padding(
+    //     padding: const EdgeInsets.only(left: 20),
+    //     child: Image.asset(
+    //       'images/user.png',
+    //       fit: BoxFit.scaleDown,
+    //     ),
+    //   ),
+    // ),
+
+    // titleSpacing: 32,
     // title: AppName(
     //     textAlign: TextAlign.center,
     //     size: MediaQuery.of(context).size.height * .035),
-    title: BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
-      return Text(
-        state.tabIndex == 0
-            ? 'All Chats'
-            : state.tabIndex == 1
-            ? 'Channels'
-            : 'Feeds',
-        style: TextStyles.heading2TextPrimary,
-      );
-    }),
+    // title: BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
+    //   return Text(
+    //     state.tabIndex == 0
+    //         ? 'All Chats'
+    //         : state.tabIndex == 1
+    //         ? 'Channels'
+    //         : 'Feeds',
+    //     style: TextStyles.heading2TextPrimary,
+    //   );
+    // }),
 
     actions: <Widget>[
       new IconButton(
@@ -63,12 +86,16 @@ Widget homeAppBar(BuildContext context) {
             await [Permission.contacts].request();
           }
         },
-        icon: Image.asset(
-          "images/add_box.png",
-          height: 24,
-          width: 24,
-          color: AppColors.IconColor,
+        icon: FaIcon(
+
+          FontAwesomeIcons.penToSquare,color: AppColors.White,size: 24,
         ),
+        // icon: Image.asset(
+        //   "images/add_box.png",
+        //   height: 24,
+        //   width: 24,
+        //   color: AppColors.IconColor,
+        // ),
       ),
       NotificationCountWidget(),
     ],
@@ -82,19 +109,19 @@ Widget appBarWithBackButton({BuildContext context,
   var tailActions,
   bool isCenterTitle}) {
   return AppBar(
-    backgroundColor: Colors.white,
+    backgroundColor:AppColors.PrimaryColorLight,
     elevation: .5,
-    shadowColor: AppColors.ShadowColor,
+    shadowColor:Colors.transparent,
     centerTitle: isCenterTitle != null ? isCenterTitle : true,
     actions: tailActions,
-    iconTheme: IconThemeData(color: AppColors.IconColor),
+    iconTheme: IconThemeData(color: AppColors.White),
     title: Text(
       titleString,
-      style: TextStyles.heading2TextPrimary,
+      style: TextStyles.heading2White,
     ),
     leading: IconButton(
       icon: prefixIcon != null ? prefixIcon : Icon(
-          Icons.arrow_back, color: AppColors.IconColor),
+          Icons.arrow_back, color: AppColors.White),
       onPressed: () {
         action != null ? action() : Navigator.of(context).pop();
       },

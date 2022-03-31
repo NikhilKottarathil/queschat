@@ -37,7 +37,7 @@ class AppColors{
 
   static const ChatPrimaryColor= Color(0xffFFFFFF);
   // static const ChatPrimaryColor= Color(0xffc0dffc);
-  static const ChatSecondaryColor= Color(0xffF5F5F5);
+  static const ChatSecondaryColor= Color(0xFF9fb2c1);
 
 
 
@@ -46,6 +46,7 @@ class AppColors{
 
 
   static const White=  Color(0xFFFFFFFF);
+  static const WhiteSecondary=  Color(0xFFCFCFCF);
 
   static const Color DividerBase=const Color(0xFFF2F4F5);
 
@@ -56,6 +57,13 @@ class AppBorders {
   borderSide: BorderSide(
   color:Colors.transparent));
 }
+ const List<BoxShadow> appShadow = [
+  BoxShadow(
+      color: AppColors.ShadowColor,
+      offset: Offset(1, 3),
+      spreadRadius: 4,
+      blurRadius: 4)
+];
 const  dividerDefault=const Divider(
   thickness: 1,
   color: AppColors.DividerBase,
@@ -76,13 +84,42 @@ class TextStyles{
   static const TextStyle buttonPrimary=const TextStyle(fontSize:15,color: AppColors.PrimaryColor,height:1.25,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
 
 
+
+  static const TextStyle heading1PrimaryColorLight=const TextStyle(fontSize:26,color: AppColors.PrimaryColorLight,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle heading2PrimaryColorLight=const TextStyle(fontSize:22,color: AppColors.PrimaryColorLight,height:1.15,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
+  static const TextStyle subTitle1PrimaryColorLight=const TextStyle(fontSize:17,color: AppColors.PrimaryColorLight,height:1.15,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle subTitle2PrimaryColorLight=const TextStyle(fontSize:15,color: AppColors.PrimaryColorLight,height:1.15,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle bodyPrimaryColorLight=const TextStyle(fontSize:15,color: AppColors.PrimaryColorLight,height:1.25,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle subBodyPrimaryColorLight=const TextStyle(fontSize:13,color: AppColors.PrimaryColorLight,height:1.25,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle buttonPrimaryColorLight=const TextStyle(fontSize:15,color: AppColors.PrimaryColorLight,height:1.25,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
+  static const TextStyle buttonBoldPrimaryColorLight=const TextStyle(fontSize:15,color: AppColors.PrimaryColorLight,height:1.25,fontFamily: 'NunitoSans',fontWeight: FontWeight.bold);
+
+  
+  static const TextStyle heading1Secondary=const TextStyle(fontSize:26,color: AppColors.SecondaryColor,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle heading2Secondary=const TextStyle(fontSize:22,color: AppColors.SecondaryColor,height:1.15,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
+  static const TextStyle subTitle1Secondary=const TextStyle(fontSize:17,color: AppColors.SecondaryColor,height:1.15,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle subTitle2Secondary=const TextStyle(fontSize:15,color: AppColors.SecondaryColor,height:1.1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle bodySecondary=const TextStyle(fontSize:15,color: AppColors.SecondaryColor,height:1.25,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle subBodySecondary=const TextStyle(fontSize:13,color: AppColors.SecondaryColor,height:1.25,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle buttonSecondary=const TextStyle(fontSize:15,color: AppColors.SecondaryColor,height:1.25,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+
+
   static const TextStyle heading1White=const TextStyle(fontSize:26,color: AppColors.White,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
   static const TextStyle heading2White=const TextStyle(fontSize:22,color: AppColors.White,height:1.15,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
   static const TextStyle subTitle1White=const TextStyle(fontSize:17,color: AppColors.White,height:1.15,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle subTitle1BoldWhite=const TextStyle(fontSize:17,color: AppColors.White,height:1.15,fontFamily: 'NunitoSans',fontWeight: FontWeight.w700);
   static const TextStyle subTitle2White=const TextStyle(fontSize:15,color: AppColors.White,height:1.1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
   static const TextStyle bodyWhite=const TextStyle(fontSize:15,color: AppColors.White,height:1.25,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
   static const TextStyle subBodyWhite=const TextStyle(fontSize:13,color: AppColors.White,height:1.25,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
   static const TextStyle buttonWhite=const TextStyle(fontSize:15,color: AppColors.White,height:1.25,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+
+  static const TextStyle heading1WhiteSecondary=const TextStyle(fontSize:26,color: AppColors.WhiteSecondary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle heading2WhiteSecondary=const TextStyle(fontSize:22,color: AppColors.WhiteSecondary,height:1.15,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
+  static const TextStyle subTitle1WhiteSecondary=const TextStyle(fontSize:17,color: AppColors.WhiteSecondary,height:1.15,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle subTitle2WhiteSecondary=const TextStyle(fontSize:15,color: AppColors.WhiteSecondary,height:1.1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle bodyWhiteSecondary=const TextStyle(fontSize:15,color: AppColors.WhiteSecondary,height:1.25,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle subBodyWhiteSecondary=const TextStyle(fontSize:13,color: AppColors.WhiteSecondary,height:1.25,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle buttonWhiteSecondary=const TextStyle(fontSize:15,color: AppColors.WhiteSecondary,height:1.25,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
 
 
   static const TextStyle heading1TextPrimary=const TextStyle(fontSize:26,color: AppColors.TextPrimary,height:1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
@@ -98,8 +135,8 @@ class TextStyles{
   static const TextStyle heading2TextSecondary=const TextStyle(fontSize:22,color: AppColors.TextSecondary,height:1.15,fontFamily: 'NunitoSans',fontWeight: FontWeight.w500);
   static const TextStyle subTitle1TextSecondary=const TextStyle(fontSize:17,color: AppColors.TextSecondary,height:1.15,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
   static const TextStyle subTitle2TextSecondary=const TextStyle(fontSize:15,color: AppColors.TextSecondary,height:1.1,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
-  static const TextStyle bodyTextSecondary=const TextStyle(fontSize:15,color: AppColors.TextSecondary,height:1.25,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
-  static const TextStyle subBodyTextSecondary=const TextStyle(fontSize:13,color: AppColors.TextSecondary,height:1.25,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle bodyTextSecondary=const TextStyle(fontSize:15,color: AppColors.TextSecondary,height:1.5,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
+  static const TextStyle subBodyTextSecondary=const TextStyle(fontSize:13,color: AppColors.TextSecondary,height:1.5,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
   static const TextStyle buttonTextSecondary=const TextStyle(fontSize:15,color: AppColors.TextSecondary,height:1.25,fontFamily: 'NunitoSans',fontWeight: FontWeight.w400);
 
 

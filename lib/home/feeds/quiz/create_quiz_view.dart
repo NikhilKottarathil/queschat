@@ -170,7 +170,7 @@ class CreateQuizView extends StatelessWidget {
                                     return TextFieldWithBoxBorder(
                                       hint: 'Enter description',
                                       text: state.content,
-                                      heading: 'description',
+                                      heading: 'Description',
                                       height: 300,
                                       textInputType: TextInputType.multiline,
                                       validator: (value) {
@@ -220,7 +220,7 @@ class CreateQuizView extends StatelessWidget {
                           return state.formSubmissionStatus is FormSubmitting
                               ? CustomProgressIndicator()
                               : CustomButton(
-                                  text: "NEXT",
+                                  text: "Add Polls",
                                   action: () async {
                                     if (_formKey.currentState.validate()) {
                                       context

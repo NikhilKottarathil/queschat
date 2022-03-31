@@ -22,11 +22,11 @@ messageSelectionAppBar(
                 builder: (context, state) {
               return SafeArea(
                 child: Scaffold(
-                  backgroundColor: Colors.black12,
+                  backgroundColor: Colors.black38,
                   appBar: PreferredSize(
                     preferredSize: AppBar().preferredSize,
                     child: Container(
-                      color: AppColors.White,
+                      color: AppColors.PrimaryColorLight,
                       height: AppBar().preferredSize.height,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -37,22 +37,30 @@ messageSelectionAppBar(
                               },
                               icon: Icon(
                                 Icons.clear,
-                                color: AppColors.IconColor,
+                                color: AppColors.White,
                               )),
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               if (messageModel.senderID == AppData().userId)
-                                IconButton(
-                                    onPressed: () {
+                                GestureDetector(
+                                    onTap: () {
                                       context
                                           .read<MessageRoomCubit>()
                                           .deleteMessage(messageModel);
                                       Navigator.of(context).pop();
                                     },
-                                    icon: Icon(
-                                      Icons.delete,
-                                      color: AppColors.IconColor,
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.delete,
+                                          color: AppColors.White,
+                                        ),
+                                        SizedBox(width: 8,),
+                                        Text('DELETE',style: TextStyles.buttonWhite,)
+                                      ],
                                     )),
                               // if (messageModel.senderID == AppData().userId && messageModel.messageType==MessageType.feed)
                               //   IconButton(
@@ -67,14 +75,20 @@ messageSelectionAppBar(
                               //         color: AppColors.IconColor,
                               //       )),
                               if (messageModel.senderID != AppData().userId)
-                                IconButton(
-                                    iconSize: 20,
-                                    padding: EdgeInsets.zero,
-                                    constraints: BoxConstraints(),
-                                    icon: Image.asset(
-                                        'images/three_dot_vertical.png',
-                                        color: AppColors.TextTertiary),
-                                    onPressed: () {
+                                GestureDetector(
+
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Image.asset(
+                                            'images/three_dot_vertical.png',
+                                            height: 20,
+                                            color: AppColors.White),
+                                        SizedBox(width: 8,),
+                                        Text('REPORT',style: TextStyles.buttonWhite,)
+                                      ],
+                                    ),
+                                    onTap: () {
                                       showReportAlert(
                                           buildContext: context,
                                           reportedModel:

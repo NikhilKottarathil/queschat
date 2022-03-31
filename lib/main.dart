@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -12,11 +13,13 @@ import 'package:queschat/router/app_router.dart';
 
 final AppRouter appRouter = AppRouter();
 
+List<CameraDescription> cameras;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp();
+  cameras = await availableCameras();
 
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   // await flutterLocalNotificationsPlugin
@@ -72,7 +75,7 @@ class _MyAppState extends State<MyApp> {
                   statusBarIconBrightness: Brightness.light,
                   statusBarBrightness: Brightness.light,
                 )),
-            scaffoldBackgroundColor: AppColors.White),
+            scaffoldBackgroundColor: Colors.grey.shade50),
         onGenerateRoute: appRouter.onGenerateRoute,
       ),
     );

@@ -11,6 +11,7 @@ import 'package:queschat/components/multiple_multi_format_file_picker.dart';
 import 'package:queschat/components/popups/show_new_feed_alert.dart';
 import 'package:queschat/components/shimmer_widget.dart';
 import 'package:queschat/constants/styles.dart';
+import 'package:queschat/function/open_camera.dart';
 import 'package:queschat/function/show_snack_bar.dart';
 import 'package:queschat/home/message/message_room/message_adapter.dart';
 import 'package:queschat/home/message/message_room/message_room_cubit.dart';
@@ -123,6 +124,22 @@ class _MessageRoomViewState extends State<MessageRoomView>
   Widget build(BuildContext buildContext) {
     return Scaffold(
       appBar: appBar(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      // floatingActionButton: Column(
+      //   mainAxisSize: MainAxisSize.min,
+      //   children: [
+      //     FloatingActionButton(
+      //       onPressed: () {
+      //         showNewFeedAlert(context);
+      //       },
+      //       child: Image.asset(
+      //         'images/app_logo.png',
+      //         fit: BoxFit.scaleDown,
+      //       ),
+      //     ),
+      //     SizedBox(height: 80,)
+      //   ],
+      // ),
       body: BlocListener<MessageRoomCubit, MessageRoomState>(
         listener: (context, state) async {
           if (state is ErrorMessageState) {
@@ -205,15 +222,16 @@ class _MessageRoomViewState extends State<MessageRoomView>
   appBar() {
     return AppBar(
       // foregroundColor: AppColors.ChatPrimaryColor,
-      backgroundColor: AppColors.TextSixth,
+      backgroundColor: AppColors.PrimaryColorLight,
       //
       // foregroundColor: AppColors.White,
       // backgroundColor: AppColors.White,
       shadowColor: Colors.transparent,
 
       elevation: .5,
+
       centerTitle: true,
-      iconTheme: IconThemeData(color: AppColors.IconColor),
+      iconTheme: IconThemeData(color: AppColors.PrimaryColorLight),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
@@ -246,11 +264,14 @@ class _MessageRoomViewState extends State<MessageRoomView>
                           )
                         : CircleAvatar(
                             radius: 20,
-                            child: Image.asset(state.chatRoomModel.messageRoomType == 'chat'
-                                ? 'images/user_profile.png'
-                                : state.chatRoomModel.messageRoomType == 'group'
-                                ? 'images/group_profile.png'
-                                : 'images/channel_profile.png',),
+                            child: Image.asset(
+                              state.chatRoomModel.messageRoomType == 'chat'
+                                  ? 'images/user_profile.png'
+                                  : state.chatRoomModel.messageRoomType ==
+                                          'group'
+                                      ? 'images/group_profile.png'
+                                      : 'images/channel_profile.png',
+                            ),
                           ),
                   ),
                 );
@@ -260,81 +281,118 @@ class _MessageRoomViewState extends State<MessageRoomView>
               );
             },
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              BlocBuilder<MessageRoomCubit, MessageRoomState>(
-                  buildWhen: (previousState, state) {
-                return state is InfoDetails;
-              }, builder: (context, state) {
-                if (state is InfoDetails) {
-                  return Text(state.chatRoomModel.name,
-                      style: TextStyles.subTitle1TextPrimary);
-                }
-                return ShimmerRectangle(
-                  height: 10,
-                  width: 100,
-                );
-              }),
-              BlocBuilder<MessageRoomCubit, MessageRoomState>(
-                buildWhen: (previousState, state) {
-                  return state is StatusAndLastSeenState ||
-                      state is TypingUserState;
-                },
-                builder: (context, state) {
-                  if (state is StatusAndLastSeenState) {
-                    print('last seen ${state.statusAndLastSeen}');
-
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                BlocBuilder<MessageRoomCubit, MessageRoomState>(
+                    buildWhen: (previousState, state) {
+                  return state is InfoDetails;
+                }, builder: (context, state) {
+                  if (state is InfoDetails) {
                     return Text(
-                      state.statusAndLastSeen,
-                      style: TextStyles.subBodyTextSecondary,
-                    );
+                        state.chatRoomModel.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyles.subTitle1White);
                   }
-                  if (state is TypingUserState) {
-                    print('valueModels lingth ${state.valueModels.length} ');
-
-                    return Wrap(
-                      direction: Axis.horizontal,
-                      children:
-                          List.generate(state.valueModels.length, (index) {
-                        return FutureBuilder(
-                            future: authRepository.getDetailsOfSelectedUser(
-                                state.valueModels[index].key, 'any'),
-                            builder: (context, snapShot) {
-                              if (snapShot.hasData) {
-                                print('2222 ${state.valueModels[index].value}');
-                                return Text(
-                                    state.valueModels.length > 1 &&
-                                            index < state.valueModels.length - 1
-                                        ? snapShot.data.toString() + ', '
-                                        : snapShot.data.toString() +
-                                            ' ' +
-                                            state.valueModels[index].value,
-                                    style: TextStyles.subBodyTextSecondary);
-                              }
-                              return Text(
-                                  context
-                                      .read<MessageRoomCubit>()
-                                      .lastSeenAndStatus,
-                                  style: TextStyles.subBodyTextSecondary);
-                            });
-                      }),
-                    );
-                  }
-                  return SizedBox(
-                    height: 0,
+                  return ShimmerRectangle(
+                    height: 10,
+                    width: 100,
                   );
-                },
-              ),
-            ],
+                }),
+                BlocBuilder<MessageRoomCubit, MessageRoomState>(
+                  buildWhen: (previousState, state) {
+                    return state is StatusAndLastSeenState ||
+                        state is TypingUserState;
+                  },
+                  builder: (context, state) {
+                    if (state is StatusAndLastSeenState) {
+                      print('last seen ${state.statusAndLastSeen}');
+
+                      return Text(
+                        state.statusAndLastSeen,
+                        style: TextStyles.subBodyWhiteSecondary,
+                      );
+                    }
+                    if (state is TypingUserState) {
+                      print('valueModels lingth ${state.valueModels.length} ');
+
+                      return Wrap(
+                        direction: Axis.horizontal,
+                        children:
+                            List.generate(state.valueModels.length, (index) {
+                          return FutureBuilder(
+                              future: authRepository.getDetailsOfSelectedUser(
+                                  state.valueModels[index].key, 'any'),
+                              builder: (context, snapShot) {
+                                if (snapShot.hasData) {
+                                  print(
+                                      '2222 ${state.valueModels[index].value}');
+                                  return Text(
+                                      state.valueModels.length > 1 &&
+                                              index <
+                                                  state.valueModels.length - 1
+                                          ? snapShot.data.name.toString() + ', '
+                                          : snapShot.data.name.toString() +
+                                              ' ' +
+                                              state.valueModels[index].value,
+                                      style: TextStyles.subBodyWhiteSecondary);
+                                }
+                                return Text(
+                                    context
+                                        .read<MessageRoomCubit>()
+                                        .lastSeenAndStatus,
+                                    style: TextStyles.subBodyWhiteSecondary);
+                              });
+                        }),
+                      );
+                    }
+                    return SizedBox(
+                      height: 0,
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ],
       ),
+      actions: [
+        InkWell(
+          onTap: () {
+            showNewFeedAlert(context);
+          },
+          child: Container(
+            margin: EdgeInsets.only(top: 12, right: 10, left: 0, bottom: 12),
+            padding: EdgeInsets.only(right: 16,left: 10),
+            decoration: BoxDecoration(
+                color: AppColors.White,
+                borderRadius: BorderRadius.circular(32)),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.edit,
+                  color: AppColors.PrimaryColorLight,
+                  size: 18,
+                ),
+                SizedBox(
+                  width: 4,
+                ),
+                Text(
+                  'NEW POST',
+                  style: TextStyles.subBodyPrimaryColorLight,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
       titleSpacing: 0,
       leading: IconButton(
         icon: Icon(
           Icons.arrow_back,
-          color: AppColors.IconColor,
+          color: AppColors.White,
         ),
         onPressed: () => Navigator.of(context).pop(),
       ),
@@ -356,7 +414,10 @@ class _MessageRoomViewState extends State<MessageRoomView>
               height: 60,
               width: MediaQuery.of(context).size.width,
               padding: EdgeInsets.all(10),
-              color: AppColors.TextSeven,
+              decoration: BoxDecoration(
+                color: AppColors.White,
+                boxShadow: appShadow,
+              ),
               child: Center(
                 child: Text(
                     "You can't send message to this${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? ' group' : 'channel'}, Because the  ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'group' : 'channel'} no longer exists",
@@ -369,7 +430,10 @@ class _MessageRoomViewState extends State<MessageRoomView>
             return Container(
               height: 60,
               width: MediaQuery.of(context).size.width,
-              color: AppColors.TextSeven,
+              decoration: BoxDecoration(
+                color: AppColors.White,
+                boxShadow: appShadow,
+              ),
               padding: EdgeInsets.all(10),
               child: Center(
                 child: Text(
@@ -390,7 +454,10 @@ class _MessageRoomViewState extends State<MessageRoomView>
               child: Container(
                 height: 60,
                 width: MediaQuery.of(context).size.width,
-                color: AppColors.TextSeven,
+                decoration: BoxDecoration(
+                  color: AppColors.White,
+                  boxShadow: appShadow,
+                ),
                 child: Center(
                   child: Text(
                     "Join ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Group' : 'Channel'}",
@@ -411,7 +478,10 @@ class _MessageRoomViewState extends State<MessageRoomView>
                   height: 60,
                   width: MediaQuery.of(context).size.width,
                   padding: EdgeInsets.all(10),
-                  color: AppColors.TextSeven,
+                  decoration: BoxDecoration(
+                    color: AppColors.White,
+                    boxShadow: appShadow,
+                  ),
                   child: Center(
                     child: Text(
                         "You can't send message to this${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? ' group' : 'channel'}, Only admin can message",
@@ -420,56 +490,70 @@ class _MessageRoomViewState extends State<MessageRoomView>
                   ),
                 )
               : Container(
-                  color: AppColors.TextSeven,
-
+                  decoration: BoxDecoration(
+                    color: AppColors.White,
+                    boxShadow: appShadow,
+                  ),
                   width: MediaQuery.of(context).size.width,
                   height: 60,
                   padding: EdgeInsets.only(right: 10),
                   child: Row(
                     children: [
+                      // IconButton(
+                      //   iconSize: 40,
+                      //   color: AppColors.PrimaryColorLight,
+                      //   onPressed: () {
+                      //     showNewFeedAlert(context);
+                      //   },
+                      //
+                      //   icon: Image.asset('images/app_logo.png',fit: BoxFit.scaleDown,),
+                      //
+                      //   constraints: BoxConstraints(),
+                      //   padding: EdgeInsets.only(left: 14, right: 10),
+                      // ),
                       Expanded(
                         child: TextField(
                           controller: context
                               .read<MessageRoomCubit>()
                               .textEditingController,
                           onChanged: _onTextChanged,
+                          style: TextStyles.subTitle2TextPrimary,
                           decoration: InputDecoration(
                             hintText: "Write your message…",
+                            hintStyle: TextStyles.subTitle2TextSecondary,
                             prefixIconConstraints: BoxConstraints(),
-
-                            prefixIcon:
-                                // context
-                                //     .read<MessageRoomCubit>()
-                                //     .chatRoomModel
-                                //     .messageRoomType ==
-                                //     'channel'?
+                            // prefixIcon:
+                            suffixIcon: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
                                 IconButton(
-                              onPressed: () {
-                                showNewFeedAlert(context);
-                              },
-                              icon: Icon(
-                                Icons.attach_file,
-                                color: AppColors.IconColor,
-                              ),
-                              constraints: BoxConstraints(),
-                              padding: EdgeInsets.only(left: 14, right: 10),
-                            ),
-                            // :SizedBox(width: 20,),
-                            suffixIcon: IconButton(
-                              onPressed: () {
-                                multipleMultiFormatFilePicker(
-                                    buildContext: buildContext,
-                                    roomName: context
-                                        .read<MessageRoomCubit>()
-                                        .chatRoomModel
-                                        .name);
-                              },
-                              icon: Icon(
-                                Icons.perm_media,
-                                color: AppColors.IconColor,
-                              ),
-                              constraints: BoxConstraints(),
-                              padding: EdgeInsets.all(0),
+                                  onPressed: () {
+                                    multipleMultiFormatFilePicker(
+                                        buildContext: buildContext,
+                                        roomName: context
+                                            .read<MessageRoomCubit>()
+                                            .chatRoomModel
+                                            .name);
+                                  },
+                                  icon: Icon(
+                                    Icons.attachment,
+                                    color: AppColors.PrimaryColorLight,
+                                  ),
+                                  constraints: BoxConstraints(),
+                                  padding: EdgeInsets.all(0),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    getMediaFromCamera(context);
+                                  },
+                                  icon: Icon(
+                                    Icons.camera_alt,
+                                    color: AppColors.PrimaryColorLight,
+                                  ),
+                                  constraints: BoxConstraints(),
+                                  padding: EdgeInsets.only(left: 18, right: 18),
+                                ),
+                              ],
                             ),
                             border: AppBorders.transparentBorder,
                             errorBorder: AppBorders.transparentBorder,
@@ -510,7 +594,7 @@ class _MessageRoomViewState extends State<MessageRoomView>
                                 clipBehavior: Clip.hardEdge,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: AppColors.PrimaryColor,
+                                  color: AppColors.PrimaryColorLight,
                                 ),
                               ),
                             ),

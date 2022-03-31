@@ -35,7 +35,7 @@ class MessageRoomInfoView extends StatelessWidget {
           if (context.read<MessageRoomCubit>().userRole != 'user')
             IconButton(
               splashColor: Colors.transparent,
-              icon: Icon(Icons.person_add),
+              icon: Icon(Icons.person_add,color: AppColors.IconColor,),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -91,7 +91,7 @@ class MessageRoomInfoView extends StatelessWidget {
                                         .length
                                         .toString() +
                                     '\tMembers ',
-                                style: TextStyles.mediumBoldTextSecondary,
+                                style: TextStyles.subTitle1TextPrimary,
                               ),
                               Flexible(
                                 child: ListView.builder(
@@ -154,147 +154,155 @@ class MessageRoomInfoView extends StatelessWidget {
           return state is TextMessageState;
         },
         builder: (context, state) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Visibility(
-                visible: context.read<MessageRoomCubit>().messageRoomStatus ==
-                        MessageRoomStatus.Active &&
-                    context.read<MessageRoomCubit>().messageRoomUserStatus ==
-                        MessageRoomUserStatus.Active &&
-                    context.read<MessageRoomCubit>().userRole != 'user',
-                child: InkWell(
-                  onTap: () async {
-                  await generateMessageRoomDynamicLink(
-                        messageRoomType: context
-                            .read<MessageRoomCubit>()
-                            .chatRoomModel
-                            .messageRoomType,
-                        id: context.read<MessageRoomCubit>().chatRoomModel.id);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(6.0),
-                    child: Card(
-                      child: SizedBox(
-                          width: double.infinity,
-                          height: 40,
-                          child: Center(
-                              child: Text(
-                            'Invite via link',
-                            style: TextStyles.mediumBoldTextTertiary,
-                          ))),
+          return Padding(
+            padding: const EdgeInsets.only(top: 10,bottom: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Visibility(
+                  visible: context.read<MessageRoomCubit>().messageRoomStatus ==
+                          MessageRoomStatus.Active &&
+                      context.read<MessageRoomCubit>().messageRoomUserStatus ==
+                          MessageRoomUserStatus.Active &&
+                      context.read<MessageRoomCubit>().userRole != 'user',
+                  child: InkWell(
+                    onTap: () async {
+                    await generateMessageRoomDynamicLink(
+                          messageRoomType: context
+                              .read<MessageRoomCubit>()
+                              .chatRoomModel
+                              .messageRoomType,
+                          id: context.read<MessageRoomCubit>().chatRoomModel.id);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 10),
+                      child: Container(
+                        color: AppColors.PrimaryColor,
+                        child: SizedBox(
+                            width: double.infinity,
+                            height: 40,
+                            child: Center(
+                                child: Text(
+                              'Invite via link',
+                              style: TextStyles.buttonWhite,
+                            ))),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Visibility(
-                visible: context.read<MessageRoomCubit>().userRole != 'owner' &&
-                    context.read<MessageRoomCubit>().messageRoomUserStatus ==
-                        MessageRoomUserStatus.Active,
-                child: InkWell(
-                  onTap: () {
-                    showCustomBottomSheet(
-                        context: context,
-                        positiveText: 'EXIT',
-                        positiveAction: () {
-                          context
-                              .read<MessageRoomCubit>()
-                              .removeUserFromMessageRoom(AppData().userId);
-                          if (context
-                                  .read<MessageRoomCubit>()
-                                  .chatRoomModel
-                                  .messageRoomType ==
-                              'channel') {
+                Visibility(
+                  visible: context.read<MessageRoomCubit>().userRole != 'owner' &&
+                      context.read<MessageRoomCubit>().messageRoomUserStatus ==
+                          MessageRoomUserStatus.Active,
+                  child: InkWell(
+                    onTap: () {
+                      showCustomBottomSheet(
+                          context: context,
+                          positiveText: 'EXIT',
+                          positiveAction: () {
+                            context
+                                .read<MessageRoomCubit>()
+                                .removeUserFromMessageRoom(AppData().userId);
+                            if (context
+                                    .read<MessageRoomCubit>()
+                                    .chatRoomModel
+                                    .messageRoomType ==
+                                'channel') {
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pop();
+                            }
+                          },
+                          content:
+                              'Exit From ${context.read<MessageRoomCubit>().chatRoomModel.name} ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Group' : 'Channel'}');
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 10),
+                      child: Container(
+                        color: AppColors.PrimaryColor,
+                        child: SizedBox(
+                            width: double.infinity,
+                            height: 40,
+                            child: Center(
+                                child: Text(
+                                  '${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Exit from Group' : 'Leave Channel'}',
+                                  style: TextStyles.buttonWhite,
+                                ))),
+                      ),
+                    ),
+
+                  ),
+                ),
+                Visibility(
+                  visible: context.read<MessageRoomCubit>().userRole != 'owner' &&
+                      context.read<MessageRoomCubit>().messageRoomUserStatus ==
+                          MessageRoomUserStatus.Removed,
+                  child: InkWell(
+                    onTap: () {
+                      showCustomBottomSheet(
+                          context: context,
+                          positiveText: 'DELETE',
+                          positiveAction: () {
+                            context
+                                .read<MessageRoomCubit>()
+                                .deleteUserFromGroup();
                             Navigator.of(context).pop();
                             Navigator.of(context).pop();
-                          }
-                        },
-                        content:
-                            'Exit From ${context.read<MessageRoomCubit>().chatRoomModel.name} ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Group' : 'Channel'}');
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(6.0),
-                    child: Card(
-                      child: SizedBox(
-                          width: double.infinity,
-                          height: 40,
-                          child: Center(
-                              child: Text(
-                            '${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Exit from Group' : 'Leave Channel'}',
-                            style: TextStyles.mediumBoldTextTertiary,
-                          ))),
+                          },
+                          content:
+                              'Delete ${context.read<MessageRoomCubit>().chatRoomModel.name} ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Group' : 'Channel'}');
+                    },
+                   child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 10),
+                      child: Container(
+                        color: AppColors.PrimaryColor,
+                        child: SizedBox(
+                            width: double.infinity,
+                            height: 40,
+                            child: Center(
+                                child: Text(
+                              'Delete ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Group' : 'Channel'}',
+                              style: TextStyles.buttonWhite,
+                            ))),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Visibility(
-                visible: context.read<MessageRoomCubit>().userRole != 'owner' &&
-                    context.read<MessageRoomCubit>().messageRoomUserStatus ==
-                        MessageRoomUserStatus.Removed,
-                child: InkWell(
-                  onTap: () {
-                    showCustomBottomSheet(
-                        context: context,
-                        positiveText: 'DELETE',
-                        positiveAction: () {
-                          context
-                              .read<MessageRoomCubit>()
-                              .deleteUserFromGroup();
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop();
-                        },
-                        content:
-                            'Delete ${context.read<MessageRoomCubit>().chatRoomModel.name} ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Group' : 'Channel'}');
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(6.0),
-                    child: Card(
-                      child: SizedBox(
-                          width: double.infinity,
-                          height: 40,
-                          child: Center(
-                              child: Text(
-                            'Delete ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Group' : 'Channel'}',
-                            style: TextStyles.mediumBoldTextTertiary,
-                          ))),
+                Visibility(
+                  visible: context.read<MessageRoomCubit>().userRole == 'owner',
+                  child: InkWell(
+                    onTap: () {
+                      showCustomBottomSheet(
+                          context: context,
+                          positiveText: 'DELETE',
+                          positiveAction: () {
+                            context.read<MessageRoomCubit>().deleteMessageRoom();
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                          },
+                          content:
+                              'Do you want to delete the ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Group' : 'Channel'}, All messages and media removed permanently,\nWill you like to continue ',
+                          heading:
+                              'Delete ${context.read<MessageRoomCubit>().chatRoomModel.name} ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Group' : 'Channel'}');
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 10),
+                      child: Container(
+                        color: AppColors.PrimaryColor,
+                        child: SizedBox(
+                            width: double.infinity,
+                            height: 40,
+                            child: Center(
+                                child: Text(
+                              'Delete ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Group' : 'Channel'}',
+                              style: TextStyles.buttonWhite,
+                            ))),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Visibility(
-                visible: context.read<MessageRoomCubit>().userRole == 'owner',
-                child: InkWell(
-                  onTap: () {
-                    showCustomBottomSheet(
-                        context: context,
-                        positiveText: 'DELETE',
-                        positiveAction: () {
-                          context.read<MessageRoomCubit>().deleteMessageRoom();
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop();
-                        },
-                        content:
-                            'Do you want to delete the ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Group' : 'Channel'}, All messages and media removed permanently,\nWill you like to continue ',
-                        heading:
-                            'Delete ${context.read<MessageRoomCubit>().chatRoomModel.name} ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Group' : 'Channel'}');
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(6.0),
-                    child: Card(
-                      child: SizedBox(
-                          width: double.infinity,
-                          height: 40,
-                          child: Center(
-                              child: Text(
-                            'Delete ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Group' : 'Channel'}',
-                            style: TextStyles.mediumBoldTextTertiary,
-                          ))),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           );
         },
       ),
@@ -315,7 +323,7 @@ class MessageRoomInfoView extends StatelessWidget {
                     Container(
                       margin: EdgeInsets.only(right: 10),
                       decoration: BoxDecoration(
-                        color: AppColors.SecondaryColor,
+                        color: AppColors.PrimaryColorLight,
                         shape: BoxShape.circle,
                         // border: Border.all(color: AppColors.BorderColor),
                       ),
@@ -364,11 +372,11 @@ class MessageRoomInfoView extends StatelessWidget {
                         children: [
                           Text(
                             state.chatRoomModel.name,
-                            style: TextStyles.xMediumBoldTextSecondary,
+                            style: TextStyles.heading2TextPrimary,
                           ),
                           Text(
                             'Created at ${getDisplayDateOrTime(state.chatRoomModel.createdTime)}',
-                            style: TextStyles.smallRegularTextTertiary,
+                            style: TextStyles.bodyTextSecondary,
                           ),
                         ],
                       ),
@@ -404,14 +412,14 @@ class MessageRoomInfoView extends StatelessWidget {
                       ),
                       Text(
                         'Description',
-                        style: TextStyles.mediumMediumTextTertiary,
+                        style: TextStyles.subTitle1TextPrimary,
                       ),
                       SizedBox(
                         height: 4,
                       ),
                       Text(
                         state.chatRoomModel.description,
-                        style: TextStyles.smallRegularTextTertiary,
+                        style: TextStyles.bodyTextSecondary,
                       ),
                     ],
                   )

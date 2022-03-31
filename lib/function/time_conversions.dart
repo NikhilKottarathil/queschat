@@ -21,6 +21,13 @@ String get24HourFormatTime(DateTime dateTime) {
 
   return time;
 }
+String getDisplayTime(DateTime dateTime) {
+  DateFormat formatStyle = DateFormat('hh:mm a');
+
+  String time =formatStyle.format(dateTime);
+
+  return time;
+}
 
 String getTimeDifferenceFromNowString(String date) {
   // Dat  dateTime = DateFormat.w.format(DateTime.now());

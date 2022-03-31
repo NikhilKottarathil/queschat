@@ -1,5 +1,5 @@
+// import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/authentication/app_data.dart';
@@ -37,6 +37,39 @@ class _HomeViewState extends State<HomeView>
       FeedsView(),
     ];
   }
+
+  // List<BottomNavyBarItem> _navBarsItems = [
+  //   BottomNavyBarItem(
+  //     icon: Image.asset(
+  //       'images/message_nav_icon.png',
+  //       height: 22,
+  //       width: 22,
+  //     ),
+  //     title: Text('All Chat'),
+  //     activeColor: AppColors.PrimaryColorLight,
+  //     inactiveColor:AppColors.IconColor,
+  //   ),
+  //   BottomNavyBarItem(
+  //     icon: Image.asset(
+  //       'images/message_nav_icon.png',
+  //       height: 22,
+  //       width: 22,
+  //     ),
+  //     title: Text('Channels'),
+  //     activeColor: AppColors.PrimaryColorLight,
+  //     inactiveColor:AppColors.IconColor,
+  //   ),
+  //   BottomNavyBarItem(
+  //     icon: Image.asset(
+  //       'images/message_nav_icon.png',
+  //       height: 22,
+  //       width: 22,
+  //     ),
+  //     title: Text('Feeds'),
+  //     activeColor: AppColors.PrimaryColorLight,
+  //     inactiveColor:AppColors.IconColor,
+  //   ),
+  // ];
 
   List<BottomNavigationBarItem> _navBarsItems = [
     BottomNavigationBarItem(
@@ -129,6 +162,7 @@ class _HomeViewState extends State<HomeView>
             );
           },
         ),
+
         bottomNavigationBar: Theme(
           data: Theme.of(context).copyWith(
               // sets the background color of the `BottomNavigationBar`
@@ -155,12 +189,13 @@ class _HomeViewState extends State<HomeView>
           ),
         ),
         // bottomNavigationBar: BottomNavyBar(
-        //   backgroundColor: AppColors.PrimaryColor,
+        //   backgroundColor: AppColors.White,
         //
         //   selectedIndex: context.read<HomeBloc>().state.tabIndex,
         //   mainAxisAlignment: MainAxisAlignment.spaceAround,
         //   itemCornerRadius: 10,
         //   showElevation: true,
+        //
         //   // use this to remove appBar's elevation
         //   onItemSelected: (index) => setState(() {
         //     context.read<HomeBloc>().add(ChangeTab(index));

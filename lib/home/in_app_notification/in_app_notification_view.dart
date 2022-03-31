@@ -36,7 +36,7 @@ class InAppNotificationView extends StatelessWidget {
       },
       child: Scaffold(
         appBar:
-            appBarWithBackButton(context: context, titleString: 'Notification'),
+            appBarWithBackButton(context: context, titleString: 'Notifications'),
         body: Column(
           children: [
             Expanded(

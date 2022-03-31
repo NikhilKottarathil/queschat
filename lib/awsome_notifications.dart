@@ -164,9 +164,8 @@ Future<void> displayMessage(RemoteMessage message) async {
                     body: data['body_message'],
                     payload: data,
                     roundedLargeIcon: true,
-                    // largeIcon: chatRoomModel.imageUrl,
-                    largeIcon:
-                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiB88zjt7Xh0zNX6WIi_LBVjklAhUBzhRZtg&usqp=CAU',
+                    largeIcon: userContactModel.profilePic!=null?userContactModel.profilePic:'assets/user_profile.png',
+
                     notificationLayout: NotificationLayout.Messaging,
                     category: NotificationCategory.Message),
               );
@@ -197,9 +196,9 @@ Future<void> displayMessage(RemoteMessage message) async {
                     body: data['body_message'],
                     roundedLargeIcon: true,
                     payload: data,
-                    // largeIcon:data['icon_url']!=null? Urls().serverAddress+data['icon_url']:'',
-                    largeIcon:
-                        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiB88zjt7Xh0zNX6WIi_LBVjklAhUBzhRZtg&usqp=CAU',
+                    largeIcon:data['icon_url']!=null? Urls().serverAddress+data['icon_url']:'',
+                    // largeIcon:
+                    //     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiB88zjt7Xh0zNX6WIi_LBVjklAhUBzhRZtg&usqp=CAU',
                     notificationLayout: NotificationLayout.MessagingGroup,
                     category: NotificationCategory.Message),
               );

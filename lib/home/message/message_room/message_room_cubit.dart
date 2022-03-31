@@ -276,7 +276,7 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
     if (ids.length < 25) {
       print('load messages');
 
-      // loadMoreMessages();
+      loadMoreMessages();
       print('load messages complete');
     } else {
       print('ids.length is high');

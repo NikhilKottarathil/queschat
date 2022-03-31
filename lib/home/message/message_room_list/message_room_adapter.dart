@@ -24,7 +24,7 @@ class MessageRoomAdapter extends StatelessWidget {
           height: 0,
         ),
         ListTile(
-          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 4),
           leading: chatRoomModel.imageUrl != null
               ? CircleAvatar(
                   radius: 24,

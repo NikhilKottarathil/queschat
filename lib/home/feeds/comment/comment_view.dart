@@ -50,7 +50,7 @@ class _CommentViewState extends State<CommentView> {
       child: Scaffold(
         appBar: appBarWithBackButton(
           context: context,
-          titleString: 'Commens',
+          titleString: 'Comments',
         ),
         body: BlocListener<CommentBloc, CommentState>(
           listener: (context, state) async {
@@ -126,7 +126,11 @@ class _CommentViewState extends State<CommentView> {
                 BlocBuilder<CommentBloc, CommentState>(
                     builder: (context, state) {
                   return Container(
-                    color: AppColors.PrimaryLightest,
+                    decoration: BoxDecoration(
+                        color: AppColors.White,
+
+                        boxShadow: appShadow
+                    ),
                     padding: EdgeInsets.all(20),
                     child: TextFormField(
                       controller: controller,
@@ -149,7 +153,7 @@ class _CommentViewState extends State<CommentView> {
                             },
                             icon: Icon(
                               Icons.send,
-                              color: AppColors.PrimaryColor,
+                              color:state.comment.isNotEmpty? AppColors.PrimaryColor:AppColors.IconColor,
                             ),
                           )),
                     ),

@@ -6,14 +6,14 @@ import 'package:queschat/components/custom_alert_dialoug.dart';
 import 'package:queschat/components/shimmer_widget.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/home/message/message_room/message_room_cubit.dart';
-import 'package:queschat/home/message/new_chat/new_chat_cubit.dart';
 import 'package:queschat/models/chat_room_model.dart';
 import 'package:queschat/models/user_contact_model.dart';
 import 'package:queschat/router/app_router.dart';
 
-
 class MessageRoomMemberContactView extends StatelessWidget {
-  UserContactModel contact; BuildContext parentContext;
+  UserContactModel contact;
+  BuildContext parentContext;
+
   MessageRoomMemberContactView(this.contact, this.parentContext);
 
   @override
@@ -38,14 +38,14 @@ class MessageRoomMemberContactView extends StatelessWidget {
           child: ClipOval(
             child: contact.profilePic != null
                 ? Image.network(
-              contact.profilePic,
-              fit: BoxFit.cover,
-            )
-                : Icon(
-              CupertinoIcons.person_alt_circle_fill,
-              color: AppColors.IconColor,
-              size: 48,
-            ),
+                    contact.profilePic,
+                    fit: BoxFit.cover,
+                  )
+                : Image.asset(
+                    'images/user_profile.png',
+                    width: 48,
+                    height: 48,
+                  ),
           ),
           backgroundColor: Colors.white,
         ),
@@ -54,11 +54,11 @@ class MessageRoomMemberContactView extends StatelessWidget {
           children: [
             Text(
               contact.name,
-              style: TextStyles.mediumBoldTextSecondary,
+              style: TextStyles.subTitle2TextSecondary,
             ),
             Text(
               phones,
-              style: TextStyles.smallRegularTextTertiary,
+              style: TextStyles.subBodyTextTertiary,
             ),
           ],
         ),
@@ -68,24 +68,25 @@ class MessageRoomMemberContactView extends StatelessWidget {
           children: [
             contact.userType == 'owner'
                 ? Text(
-              'Owner',
-              style: TextStyles.smallRegularTertiary,
-            )
+                    'Owner',
+                    style: TextStyles.bodySecondary,
+                  )
                 : contact.userType == 'admin'
-                ? Text(
-              'Admin',
-              style: TextStyles.smallRegularTertiary,
-            )
-                : SizedBox(
-              height: 1,
-              width: 1,
-            ),
+                    ? Text(
+                        'Admin',
+                        style: TextStyles.bodySecondary,
+                      )
+                    : SizedBox(
+                        height: 1,
+                        width: 1,
+                      ),
             Visibility(
               visible: contact.id != AppData().userId,
               maintainSize: true,
               maintainAnimation: true,
               maintainState: true,
               child: PopupMenuButton(
+                padding: EdgeInsets.only(left: 0),
                 iconSize: 24,
                 itemBuilder: (_) {
                   List<PopupMenuItem<String>> menuItems = [];
@@ -93,13 +94,14 @@ class MessageRoomMemberContactView extends StatelessWidget {
                     PopupMenuItem<String>(
                       child: Text(
                         'Message ${contact.name}',
-                        style: TextStyles.smallRegularTextTertiary,
+                        style: TextStyles.bodyTextSecondary,
                       ),
                       onTap: () {
-
                         print('message pressed');
-                        if (allChatMessageRoomListBloc.state.models.any((element) =>
-                        element.messengerId == contact.id && element.isSingleChat)) {
+                        if (allChatMessageRoomListBloc.state.models.any(
+                            (element) =>
+                                element.messengerId == contact.id &&
+                                element.isSingleChat)) {
                           print('message exit');
 
                           try {
@@ -108,15 +110,13 @@ class MessageRoomMemberContactView extends StatelessWidget {
                               '/messageRoom',
                               arguments: {
                                 'parentPage': 'newChatExisting',
-                                'chatRoomModel': ChatRoomModel(
-                                    id: 'fjkghkfdjgh'),
+                                'chatRoomModel':
+                                    ChatRoomModel(id: 'fjkghkfdjgh'),
                               },
                             );
-                          }catch(e){
+                          } catch (e) {
                             print(e);
                           }
-
-
                         } else {
                           print('message new');
 
@@ -137,20 +137,19 @@ class MessageRoomMemberContactView extends StatelessWidget {
                       },
                     ),
                   );
-                  if (context.read<MessageRoomCubit>().userRole ==
-                      'admin' ||
+                  if (context.read<MessageRoomCubit>().userRole == 'admin' ||
                       context.read<MessageRoomCubit>().userRole == 'owner')
                     menuItems.add(PopupMenuItem<String>(
                       child: Text(
                         'Remove ${contact.name}',
-                        style: TextStyles.smallRegularTextTertiary,
+                        style: TextStyles.bodyTextSecondary,
                       ),
                       onTap: () {
                         print('pressed');
                         customAlertDialog(
                             context: context,
                             heading:
-                            'Remove ${contact.name} from ${context.read<MessageRoomCubit>().chatRoomModel.name}',
+                                'Remove ${contact.name} from ${context.read<MessageRoomCubit>().chatRoomModel.name}',
                             positiveText: 'Yes',
                             positiveAction: () {
                               context
@@ -159,31 +158,30 @@ class MessageRoomMemberContactView extends StatelessWidget {
                             });
                       },
                     ));
-                  if (context.read<MessageRoomCubit>().userRole ==
-                      'owner') {
+                  if (context.read<MessageRoomCubit>().userRole == 'owner') {
                     contact.userType == 'user'
                         ? menuItems.add(PopupMenuItem<String>(
-                      child: Text(
-                        'Make As Admin',
-                        style: TextStyles.smallRegularTextTertiary,
-                      ),
-                      onTap: () {
-                        context
-                            .read<MessageRoomCubit>()
-                            .makeAsAdmin(contact.id);
-                      },
-                    ))
+                            child: Text(
+                              'Make As Admin',
+                              style: TextStyles.bodyTextSecondary,
+                            ),
+                            onTap: () {
+                              context
+                                  .read<MessageRoomCubit>()
+                                  .makeAsAdmin(contact.id);
+                            },
+                          ))
                         : menuItems.add(PopupMenuItem<String>(
-                      child: Text(
-                        'Dismiss as Admin',
-                        style: TextStyles.smallRegularTextTertiary,
-                      ),
-                      onTap: () {
-                        context
-                            .read<MessageRoomCubit>()
-                            .dismissAsAdmin(contact.id);
-                      },
-                    ));
+                            child: Text(
+                              'Dismiss as Admin',
+                              style: TextStyles.bodyTextSecondary,
+                            ),
+                            onTap: () {
+                              context
+                                  .read<MessageRoomCubit>()
+                                  .dismissAsAdmin(contact.id);
+                            },
+                          ));
                   }
 
                   return menuItems;
@@ -196,13 +194,11 @@ class MessageRoomMemberContactView extends StatelessWidget {
       ),
     );
   }
-
 }
-class MessageRoomMemberContactViewDummy extends StatelessWidget {
 
+class MessageRoomMemberContactViewDummy extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-
     return BlocProvider.value(
       value: context.read<MessageRoomCubit>(),
       child: ListTile(
@@ -224,10 +220,7 @@ class MessageRoomMemberContactViewDummy extends StatelessWidget {
             )
           ],
         ),
-
       ),
     );
   }
-
 }
-

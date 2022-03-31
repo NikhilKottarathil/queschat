@@ -86,16 +86,16 @@ class _MessageAdapterState extends State<MessageAdapter>
     return Align(
       alignment: Alignment.centerRight,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+        padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
         margin: EdgeInsets.only(left: width * .2),
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.BorderColor),
-          color: AppColors.ChatSecondaryColor,
+          color: AppColors.White,
           borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(18),
+            bottomLeft: Radius.circular(8),
             bottomRight: Radius.circular(0),
-            topRight: Radius.circular(18),
-            topLeft: Radius.circular(18),
+            topRight: Radius.circular(8),
+            topLeft: Radius.circular(8),
           ),
         ),
         child: Column(
@@ -106,6 +106,7 @@ class _MessageAdapterState extends State<MessageAdapter>
             Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 _displayMessageSendTime(),
                 sendSeenIcons(widget.messageModel),
@@ -121,16 +122,16 @@ class _MessageAdapterState extends State<MessageAdapter>
     return Align(
       alignment: Alignment.centerLeft,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+        padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
         margin: EdgeInsets.only(right: width * .2),
         decoration: BoxDecoration(
-          color: AppColors.ChatPrimaryColor,
-          border: Border.all(color: AppColors.BorderColor),
+          color: AppColors.TextFifth,
+          // border: Border.all(color: AppColors.BorderColor),
           borderRadius: BorderRadius.only(
             bottomLeft: Radius.circular(0),
-            bottomRight: Radius.circular(18),
-            topRight: Radius.circular(18),
-            topLeft: Radius.circular(18),
+            bottomRight: Radius.circular(8),
+            topRight: Radius.circular(8),
+            topLeft: Radius.circular(8),
           ),
         ),
         child: Stack(
@@ -141,8 +142,9 @@ class _MessageAdapterState extends State<MessageAdapter>
               children: [
                 _displaySenderName(),
                 contentView(context),
+
                 SizedBox(
-                  height: 12,
+                  height: 24,
                 )
               ],
             ),
@@ -159,17 +161,17 @@ class _MessageAdapterState extends State<MessageAdapter>
 
   Widget _displayMessageSendTime() {
     return Padding(
-      padding: EdgeInsets.only(right: 4),
+      padding: EdgeInsets.only(right: 6,left:6,top: 4),
       child: Text(
-        get24HourFormatTime(widget.messageModel.createdAt),
-        style: TextStyle(color: AppColors.TextTertiary),
+        getDisplayTime(widget.messageModel.createdAt),
+        style: TextStyles.subBodyTextSecondary,
       ),
     );
   }
 
   Widget _displaySenderName() {
     return Padding(
-      padding: EdgeInsets.only(left: 6, top: 0, bottom: 2),
+      padding: EdgeInsets.only(left: 6, top: 5, bottom: 5,right: 6),
       child: Text(
           widget.buildContext
                   .read<MessageRoomCubit>()
@@ -182,7 +184,7 @@ class _MessageAdapterState extends State<MessageAdapter>
                       (element) => element.id == widget.messageModel.senderID)
                   .name
               : 'Unknown User',
-          style: TextStyles.smallRegularTextFourth),
+          style: TextStyles.subBodySecondary),
     );
   }
 
@@ -196,7 +198,7 @@ class _MessageAdapterState extends State<MessageAdapter>
         alignment: Alignment.center,
         child: Text(
           widget.messageModel.message,
-          style: TextStyles.smallRegularTextTertiary,
+          style: TextStyles.subTitle2TextSecondary,
         ),
       ),
     );
@@ -206,13 +208,13 @@ class _MessageAdapterState extends State<MessageAdapter>
     return Container(
       margin: EdgeInsets.only(left: width * .2),
       decoration: BoxDecoration(
-        color: AppColors.ChatSecondaryColor,
+        color: AppColors.White,
         border: Border.all(color: AppColors.BorderColor),
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(18),
+          bottomLeft: Radius.circular(8),
           bottomRight: Radius.circular(0),
-          topRight: Radius.circular(18),
-          topLeft: Radius.circular(18),
+          topRight: Radius.circular(8),
+          topLeft: Radius.circular(8),
         ),
       ),
       padding: EdgeInsets.all(25),
@@ -229,14 +231,14 @@ class _MessageAdapterState extends State<MessageAdapter>
     return Container(
       decoration: BoxDecoration(
         color: isSendMessage
-            ? AppColors.ChatSecondaryColor
-            : AppColors.ChatPrimaryColor,
-        border: Border.all(color: AppColors.BorderColor),
+            ? AppColors.White
+            : AppColors.TextFifth,
+        border:isSendMessage? Border.all(color: AppColors.BorderColor):null,
         borderRadius: BorderRadius.only(
-          bottomLeft: !isSendMessage ? Radius.circular(0) : Radius.circular(18),
-          bottomRight: isSendMessage ? Radius.circular(0) : Radius.circular(18),
-          topRight: Radius.circular(18),
-          topLeft: Radius.circular(18),
+          bottomLeft: !isSendMessage ? Radius.circular(0) : Radius.circular(8),
+          bottomRight: isSendMessage ? Radius.circular(0) : Radius.circular(8),
+          topRight: Radius.circular(8),
+          topLeft: Radius.circular(8),
         ),
       ),
       margin: EdgeInsets.only(
@@ -245,7 +247,7 @@ class _MessageAdapterState extends State<MessageAdapter>
       padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
       child: Text(
         'deleted the message',
-        style: TextStyles.smallRegularTextSecondary,
+        style: TextStyles.bodyTextPrimary,
       ),
     );
   }
@@ -253,10 +255,10 @@ class _MessageAdapterState extends State<MessageAdapter>
   Widget contentView(BuildContext context) {
     return widget.messageModel.messageType == MessageType.text
         ? Padding(
-            padding: const EdgeInsets.all(4.0),
+            padding: const EdgeInsets.only(left: 6.0,right: 6,bottom: 2,top: 2),
             child: Text(
               widget.messageModel.message,
-              style: TextStyles.smallRegularTextSecondary,
+              style: TextStyles.bodyTextPrimary,
             ),
           )
         : widget.messageModel.messageType == MessageType.image
@@ -401,11 +403,13 @@ Future<File> getThumbnail(String videoUrl) async {
 }
 
 Widget sendSeenIcons(MessageModel messageModel) {
-  return Container(
+  return Padding(
+    padding: EdgeInsets.only(right: 6),
     child: !messageModel.isSingleMessage
         ? Icon(
             Icons.check,
             size: 18,
+
             color: AppColors.IconColor,
           )
         : messageModel.messageStatus == MessageStatus.sending
@@ -413,18 +417,26 @@ Widget sendSeenIcons(MessageModel messageModel) {
                 size: 18, color: AppColors.IconColor)
             : messageModel.messageStatus == MessageStatus.sent
                 ? Icon(Icons.check, size: 18, color: AppColors.IconColor)
-                : messageModel.messageStatus == MessageStatus.delivered
-                    ? Icon(
-                        Icons.check,
-                        size: 18,
-                        color: AppColors.PrimaryColorLight,
-                      )
-                    : messageModel.messageStatus == MessageStatus.seen
-                        ? Icon(
-                            Icons.check,
-                            size: 18,
-                            color: AppColors.PrimaryColorLight,
-                          )
+                : messageModel.messageStatus == MessageStatus.delivered||messageModel.messageStatus == MessageStatus.seen
+                        ? Stack(
+                          children: [
+                            Icon(
+                              Icons.check,
+                              size: 18,
+                              color: AppColors.PrimaryColor,
+                            ),
+                            // Row(
+                            //   children: [
+                            //     SizedBox(width: 6,),
+                            //     Icon(
+                            //       Icons.check_sharp,
+                            //       size: 18,
+                            //       color: AppColors.PrimaryColor,
+                            //     ),
+                            //   ],
+                            // ),
+                          ],
+                        )
                         : Icon(
                             Icons.error_outline,
                             size: 18,

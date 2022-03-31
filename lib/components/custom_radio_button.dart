@@ -17,7 +17,7 @@ class CustomRadioButton extends StatelessWidget {
       clipBehavior: Clip.hardEdge,
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.IconColor : Colors.transparent,
+          color: isSelected ? AppColors.PrimaryColorLight : Colors.transparent,
           shape: BoxShape.circle,
           border: Border.all(color: AppColors.BorderColor),
         ),
@@ -32,7 +32,7 @@ class CustomRadioButton extends StatelessWidget {
           child: Center(
             child: Text(
               optionKey,
-              style: TextStyles.smallMediumTextSecondary,
+              style:isSelected?TextStyles.smallMediumWhite: TextStyles.smallMediumTextSecondary,
             ),
           ),
         ),
