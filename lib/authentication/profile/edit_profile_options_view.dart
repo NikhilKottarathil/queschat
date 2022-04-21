@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:queschat/repository/auth_repo.dart';
 import 'package:queschat/authentication/forgot_password/forgot_password_bloc.dart';
 import 'package:queschat/authentication/forgot_password/forgot_password_view.dart';
 import 'package:queschat/authentication/profile/edit_profile/edit_profile_view.dart';
 import 'package:queschat/authentication/profile/profile_bloc.dart';
-import 'package:queschat/authentication/profile/profile_state.dart';
 import 'package:queschat/authentication/profile/profile_events.dart';
+import 'package:queschat/authentication/profile/profile_state.dart';
 import 'package:queschat/constants/styles.dart';
+import 'package:queschat/repository/auth_repo.dart';
 import 'package:queschat/router/app_router.dart';
 import 'package:queschat/uicomponents/appbars.dart';
 

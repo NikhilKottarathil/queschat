@@ -5,11 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:queschat/awsome_notifications.dart';
 import 'package:queschat/components/app_exit_alert.dart';
-import 'package:queschat/components/custom_progress_indicator.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/router/app_router.dart';
-
-
 
 final AppRouter appRouter = AppRouter();
 
@@ -37,7 +34,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   @override
   void initState() {
     // TODO: implement initState
@@ -65,16 +61,14 @@ class _MyAppState extends State<MyApp> {
         title: "Queschat",
         debugShowCheckedModeBanner: false,
         navigatorKey: MyApp.navigatorKey,
-
-
         theme: ThemeData(
             fontFamily: 'NunitoSans',
             appBarTheme: AppBarTheme(
                 systemOverlayStyle: SystemUiOverlayStyle(
-                  statusBarColor: AppColors.PrimaryColorLight,
-                  statusBarIconBrightness: Brightness.light,
-                  statusBarBrightness: Brightness.light,
-                )),
+              statusBarColor: AppColors.PrimaryColorLight,
+              statusBarIconBrightness: Brightness.light,
+              statusBarBrightness: Brightness.light,
+            )),
             scaffoldBackgroundColor: Colors.grey.shade50),
         onGenerateRoute: appRouter.onGenerateRoute,
       ),
@@ -104,5 +98,3 @@ class _MyAppState extends State<MyApp> {
     // );
   }
 }
-
-

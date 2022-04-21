@@ -8,6 +8,7 @@ class AppColors{
   static const PrimaryColorLight =  Color(0xff3D6687);
 
   static const SecondaryColor =  Color(0xff367CB5);
+  static const PrimaryIconBackground =  Color(0xff9fb2c1);
 
   static const PrimaryLighter =  Color(0xffBCE0FD);
   static const PrimaryLightest =  Color(0xffF5FAFF);

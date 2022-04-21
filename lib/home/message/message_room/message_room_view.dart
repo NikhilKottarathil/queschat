@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:queschat/app_text_selection_controler.dart';
 import 'package:queschat/authentication/app_data.dart';
 import 'package:queschat/components/audio/record_button.dart';
 import 'package:queschat/components/custom_progress_indicator.dart';
@@ -18,7 +21,6 @@ import 'package:queschat/home/message/message_room/message_room_cubit.dart';
 import 'package:queschat/home/message/message_room/message_room_info_view.dart';
 import 'package:queschat/home/message/message_room/message_room_state.dart';
 import 'package:queschat/models/message_model.dart';
-import 'package:queschat/router/app_router.dart';
 
 class MessageRoomView extends StatefulWidget {
   @override
@@ -26,17 +28,27 @@ class MessageRoomView extends StatefulWidget {
 }
 
 class _MessageRoomViewState extends State<MessageRoomView>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   ScrollController scrollController = new ScrollController();
   DatabaseReference reference = FirebaseDatabase.instance.reference();
 
+  FocusNode _textFieldFocusNode = FocusNode();
   Timer _debounce;
+
+  TextSelectionControls _textSelectionControls;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
+    if (Platform.isAndroid) {
+      _textSelectionControls = AppMaterialTextSelectionControls(
+          controller: context.read<MessageRoomCubit>().textEditingController);
+    } else {
+      _textSelectionControls = AppCupertinoTextSelectionControls(
+          controller: context.read<MessageRoomCubit>().textEditingController);
+    }
     addActiveMessageRoom(context.read<MessageRoomCubit>().chatRoomModel.id);
     WidgetsBinding.instance.addObserver(this);
 
@@ -185,10 +197,51 @@ class _MessageRoomViewState extends State<MessageRoomView>
                               style: TextStyles.smallRegularTextSecondary,
                             ),
                           )
-                    : Container();
+                    : Center(child: CircularProgressIndicator(color: AppColors.PrimaryColorLight,));
               }),
             ),
             bottomWidget(buildContext),
+            BlocBuilder<MessageRoomCubit, MessageRoomState>(
+                buildWhen: (previousState, state) {
+              return state is TextMessageState;
+            }, builder: (context, state) {
+              return Offstage(
+                offstage: !context.read<MessageRoomCubit>().emojiShowing,
+                child: SizedBox(
+                  height: 250,
+                  child: EmojiPicker(
+                      onEmojiSelected: (Category category, Emoji emoji) {
+                        context.read<MessageRoomCubit>().onEmojiSelected(emoji);
+                      },
+                      onBackspacePressed:
+                          context.read<MessageRoomCubit>().onBackspacePressed,
+                      config: Config(
+                          columns: 7,
+                          // Issue: https://github.com/flutter/flutter/issues/28894
+                          emojiSizeMax: 32 * (Platform.isIOS ? 1.30 : 1.0),
+                          verticalSpacing: 0,
+                          horizontalSpacing: 0,
+                          initCategory: Category.RECENT,
+                          bgColor: const Color(0xFFF2F2F2),
+                          indicatorColor: Colors.blue,
+                          iconColor: Colors.grey,
+                          iconColorSelected: Colors.blue,
+                          progressIndicatorColor: Colors.blue,
+                          backspaceColor: Colors.blue,
+                          skinToneDialogBgColor: Colors.white,
+                          skinToneIndicatorColor: Colors.grey,
+                          enableSkinTones: true,
+                          showRecentsTab: true,
+                          recentsLimit: 28,
+                          noRecentsText: 'No Recents',
+                          noRecentsStyle: const TextStyle(
+                              fontSize: 20, color: Colors.black26),
+                          tabIndicatorAnimDuration: kTabScrollDuration,
+                          categoryIcons: const CategoryIcons(),
+                          buttonMode: ButtonMode.MATERIAL)),
+                ),
+              );
+            }),
           ],
         ),
       ),
@@ -241,17 +294,9 @@ class _MessageRoomViewState extends State<MessageRoomView>
             },
             builder: (context, state) {
               if (state is InfoDetails) {
-                return InkWell(
+                return GestureDetector(
                   onTap: () {
-                    if (!state.chatRoomModel.isSingleChat) {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => BlocProvider.value(
-                                    value: context.read<MessageRoomCubit>(),
-                                    child: MessageRoomInfoView(),
-                                  )));
-                    }
+                   gotoMessageRoomInfo(state);
                   },
                   child: Container(
                     padding: EdgeInsets.all(5),
@@ -276,8 +321,12 @@ class _MessageRoomViewState extends State<MessageRoomView>
                   ),
                 );
               }
-              return ShimmerCircle(
-                radius: 18,
+              return Container(
+                padding: EdgeInsets.all(5),
+                margin: EdgeInsets.only(right: 10),
+                child: ShimmerCircle(
+                  radius: 20,
+                ),
               );
             },
           ),
@@ -287,66 +336,97 @@ class _MessageRoomViewState extends State<MessageRoomView>
               children: [
                 BlocBuilder<MessageRoomCubit, MessageRoomState>(
                     buildWhen: (previousState, state) {
-                  return state is InfoDetails;
+                  return state is InfoDetails || state is InitialState;
                 }, builder: (context, state) {
                   if (state is InfoDetails) {
-                    return Text(
-                        state.chatRoomModel.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyles.subTitle1White);
+                    return GestureDetector(
+                      onTap: (){
+
+                        gotoMessageRoomInfo(state);
+
+                      },
+                      child: Text(state.chatRoomModel.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyles.subTitle1White),
+                    );
                   }
                   return ShimmerRectangle(
-                    height: 10,
+                    height: 12,
                     width: 100,
                   );
                 }),
                 BlocBuilder<MessageRoomCubit, MessageRoomState>(
                   buildWhen: (previousState, state) {
                     return state is StatusAndLastSeenState ||
-                        state is TypingUserState;
+                        state is TypingUserState ||
+                        state is InitialState;
                   },
                   builder: (context, state) {
-                    if (state is StatusAndLastSeenState) {
-                      print('last seen ${state.statusAndLastSeen}');
-
-                      return Text(
-                        state.statusAndLastSeen,
-                        style: TextStyles.subBodyWhiteSecondary,
-                      );
-                    }
                     if (state is TypingUserState) {
-                      print('valueModels lingth ${state.valueModels.length} ');
+                      print('typingUsers length ${state.typingUsers.length} ');
+                      print('typingUsers  ${state.typingUsers} ');
+                      print(
+                          'userS  ${context.read<MessageRoomCubit>().userContactModels.map((e) => e.id).toList()} ');
 
                       return Wrap(
                         direction: Axis.horizontal,
                         children:
-                            List.generate(state.valueModels.length, (index) {
-                          return FutureBuilder(
-                              future: authRepository.getDetailsOfSelectedUser(
-                                  state.valueModels[index].key, 'any'),
-                              builder: (context, snapShot) {
-                                if (snapShot.hasData) {
-                                  print(
-                                      '2222 ${state.valueModels[index].value}');
-                                  return Text(
-                                      state.valueModels.length > 1 &&
-                                              index <
-                                                  state.valueModels.length - 1
-                                          ? snapShot.data.name.toString() + ', '
-                                          : snapShot.data.name.toString() +
-                                              ' ' +
-                                              state.valueModels[index].value,
-                                      style: TextStyles.subBodyWhiteSecondary);
-                                }
-                                return Text(
-                                    context
-                                        .read<MessageRoomCubit>()
-                                        .lastSeenAndStatus,
-                                    style: TextStyles.subBodyWhiteSecondary);
-                              });
+                            List.generate(state.typingUsers.length, (index) {
+                          return Text(
+                              state.typingUsers.length > 1 &&
+                                      index < state.typingUsers.length - 1
+                                  ? context
+                                          .read<MessageRoomCubit>()
+                                          .userContactModels
+                                          .singleWhere((element) =>
+                                              element.id ==
+                                              state.typingUsers[index])
+                                          .name
+                                          .toString() +
+                                      ', '
+                                  : context
+                                          .read<MessageRoomCubit>()
+                                          .userContactModels
+                                          .singleWhere((element) =>
+                                              element.id.toString() ==
+                                              state.typingUsers[index]
+                                                  .toString())
+                                          .name
+                                          .toString() +
+                                      ' Typing',
+                              style: TextStyles.subBodyWhiteSecondary);
                         }),
                       );
+                    }
+                    if (state is StatusAndLastSeenState) {
+                      print('last seen ${state.statusAndLastSeen}');
+
+                      return state.statusAndLastSeen
+                              .toString()
+                              .trim()
+                              .isNotEmpty
+                          ? Text(
+                              state.statusAndLastSeen,
+                              style: TextStyles.subBodyWhiteSecondary,
+                            )
+                          : context
+                                      .read<MessageRoomCubit>()
+                                      .chatRoomModel
+                                      .messageRoomType !=
+                                  'chat'
+                              ? Text(
+                                  context
+                                          .read<MessageRoomCubit>()
+                                          .userContactModels
+                                          .length
+                                          .toString() +
+                                      ' Members',
+                                  style: TextStyles.subBodyWhiteSecondary,
+                                )
+                              : SizedBox(
+                                  height: 0,
+                                );
                     }
                     return SizedBox(
                       height: 0,
@@ -359,34 +439,58 @@ class _MessageRoomViewState extends State<MessageRoomView>
         ],
       ),
       actions: [
-        InkWell(
-          onTap: () {
-            showNewFeedAlert(context);
-          },
-          child: Container(
-            margin: EdgeInsets.only(top: 12, right: 10, left: 0, bottom: 12),
-            padding: EdgeInsets.only(right: 16,left: 10),
-            decoration: BoxDecoration(
-                color: AppColors.White,
-                borderRadius: BorderRadius.circular(32)),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.edit,
-                  color: AppColors.PrimaryColorLight,
-                  size: 18,
-                ),
-                SizedBox(
-                  width: 4,
-                ),
-                Text(
-                  'NEW POST',
-                  style: TextStyles.subBodyPrimaryColorLight,
-                ),
-              ],
-            ),
-          ),
-        ),
+        BlocBuilder<MessageRoomCubit, MessageRoomState>(
+            buildWhen: (previousState, currentState) {
+          return currentState is TextMessageState;
+        }, builder: (context, state) {
+          if (state is TextMessageState) {
+            return (!(state.userRole == 'user' &&
+                        context
+                                .read<MessageRoomCubit>()
+                                .chatRoomModel
+                                .messageRoomType ==
+                            'channel') &&
+                    state.messageRoomStatus == MessageRoomStatus.Active &&
+                    state.messageRoomUserStatus == MessageRoomUserStatus.Active)
+                ? InkWell(
+                    onTap: () {
+                      showNewFeedAlert(context);
+                    },
+                    child: Container(
+                      margin: EdgeInsets.only(
+                          top: 12, right: 10, left: 0, bottom: 12),
+                      padding: EdgeInsets.only(right: 16, left: 10),
+                      decoration: BoxDecoration(
+                          color: AppColors.White,
+                          borderRadius: BorderRadius.circular(32)),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.edit,
+                            color: AppColors.PrimaryColorLight,
+                            size: 18,
+                          ),
+                          SizedBox(
+                            width: 4,
+                          ),
+                          Text(
+                            'NEW POST',
+                            style: TextStyles.subBodyPrimaryColorLight,
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : SizedBox(
+                    height: 0,
+                    width: 0,
+                  );
+          }
+          return SizedBox(
+            height: 0,
+            width: 0,
+          );
+        }),
       ],
       titleSpacing: 0,
       leading: IconButton(
@@ -512,7 +616,36 @@ class _MessageRoomViewState extends State<MessageRoomView>
                       //   padding: EdgeInsets.only(left: 14, right: 10),
                       // ),
                       Expanded(
-                        child: TextField(
+                        // child: GestureDetector(
+                        //   behavior: HitTestBehavior.opaque,
+                        //   onTap: () {
+                        //     FocusScope.of(context)
+                        //         .requestFocus(_textFieldFocusNode);
+                        //   },
+                        //   onLongPress: () {
+                        //     showMenu(
+                        //       context: context,
+                        //       // TODO: Position dynamically based on cursor or textfield
+                        //       position: RelativeRect.fromLTRB(0.0, 400.0, 300.0, 0.0),
+                        //       items: [
+                        //         PopupMenuItem(
+                        //           child: Text(
+                        //             "Paste",
+                        //           ),
+                        //           onTap: (){
+                        //             FlutterClipboard.paste().then((value) {
+                        //               context.read<MessageRoomCubit>().textEditingController.text=context.read<MessageRoomCubit>().textEditingController.text+value;
+                        //             });
+                        //           },
+                        //         ),
+                        //       ],
+                        //     );
+                        //   },
+                        //   child: IgnorePointer(
+                        child: TextFormField(
+                          focusNode: _textFieldFocusNode,
+                          selectionControls: _textSelectionControls,
+                          enableInteractiveSelection: true,
                           controller: context
                               .read<MessageRoomCubit>()
                               .textEditingController,
@@ -522,7 +655,19 @@ class _MessageRoomViewState extends State<MessageRoomView>
                             hintText: "Write your message…",
                             hintStyle: TextStyles.subTitle2TextSecondary,
                             prefixIconConstraints: BoxConstraints(),
-                            // prefixIcon:
+                            prefixIcon: IconButton(
+                              onPressed: () {
+                                context
+                                    .read<MessageRoomCubit>()
+                                    .showAndHideEmoji();
+                              },
+                              icon: Icon(
+                                Icons.emoji_emotions_outlined,
+                                color: AppColors.PrimaryColorLight,
+                              ),
+                              constraints: BoxConstraints(),
+                              // padding: EdgeInsets.all(0),
+                            ),
                             suffixIcon: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -563,6 +708,8 @@ class _MessageRoomViewState extends State<MessageRoomView>
                             focusedErrorBorder: AppBorders.transparentBorder,
                           ),
                         ),
+                        // ),
+                        // ),
                       ),
                       Stack(
                         children: [
@@ -626,5 +773,24 @@ class _MessageRoomViewState extends State<MessageRoomView>
             )
           : Container();
     });
+  }
+
+  void gotoMessageRoomInfo(InfoDetails state) {
+    if (!state.chatRoomModel.isSingleChat) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (_) => BlocProvider.value(
+                value: context.read<MessageRoomCubit>(),
+                child: MessageRoomInfoView(),
+              )));
+    } else {
+      Navigator.pushNamed(context, '/userProfile', arguments: {
+        'userId': context
+            .read<MessageRoomCubit>()
+            .chatRoomModel
+            .messengerId
+      });
+    }
   }
 }

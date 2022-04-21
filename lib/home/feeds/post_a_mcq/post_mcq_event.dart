@@ -2,6 +2,11 @@ import 'package:flutter/cupertino.dart';
 
 abstract class PostMcqEvent {}
 
+class NumberOfOptionChanged extends PostMcqEvent {
+  final int index;
+
+  NumberOfOptionChanged({this.index});
+}
 class QuestionChanged extends PostMcqEvent {
   final String question;
 

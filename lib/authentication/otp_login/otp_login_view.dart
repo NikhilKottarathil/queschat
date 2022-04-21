@@ -9,7 +9,6 @@ import 'package:queschat/constants/styles.dart';
 import 'package:queschat/function/show_snack_bar.dart';
 import 'package:queschat/function/time_conversions.dart';
 import 'package:queschat/router/app_router.dart';
-import 'package:queschat/uicomponents/appbars.dart';
 import 'package:queschat/uicomponents/custom_button.dart';
 import 'package:queschat/uicomponents/custom_button_2.dart';
 import 'package:queschat/uicomponents/custom_text_field.dart';
@@ -23,17 +22,18 @@ class OTPLoginView extends StatelessWidget {
     var height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: appBarWithBackButton(context: context, titleString: 'Login with OTP'),
+      // appBar: appBarWithBackButton(context: context, titleString: 'Login with OTP'),
       body: BlocProvider(
         create: (context) => OTPLoginBloc(authRepo: authRepository),
         child: BlocListener<OTPLoginBloc, OTPLoginState>(
-          listener: (context, state) {
+          listener: (context, state) async {
             final formStatus = state.formStatus;
             if (formStatus is SubmissionFailed) {
               showSnackBar(context, formStatus.exception);
             } else if (formStatus is SubmissionSuccess) {
-              Navigator.of(context).pop();
+              // Navigator.of(context).pop();
 
+              await setRepositoryAndBloc();
 
 
                 Navigator.pushReplacementNamed(context, '/home');
@@ -55,8 +55,16 @@ class OTPLoginView extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SizedBox(
-                            height: height * .08,
+                            height: MediaQuery.of(context).size.width * .25,
                           ),
+                          Align(
+                            alignment: Alignment.center,
+                            child: Image.asset('images/logo_with_name.png',
+                                width: MediaQuery.of(context).size.width * .6,
+                                fit: BoxFit.contain),
+                          ),
+                          Spacer(),
+                          SizedBox(height: 30,),
                           BlocBuilder<OTPLoginBloc, OTPLoginState>(
                               builder: (context, state) {
                             return Text(
@@ -171,6 +179,41 @@ class OTPLoginView extends StatelessWidget {
                                       }
                                     });
                           }),
+                          SizedBox(
+                            height: 32,
+                          ),
+                          Center(
+                            child: CustomTextButton2(
+                              text: 'LOGIN WITH PASSWORD',
+                              textColor: AppColors.PrimaryColor,
+                              action: () {
+                                Navigator.pushNamed(context, '/login');
+                              },
+                            ),
+                          ),
+                          Spacer(),
+                          SizedBox(height: 130,),
+                          Align(
+                            alignment: Alignment.center,
+                            child: Column(
+                              children: [
+                                Text(
+                                  "Don't have account?",
+                                  style: TextStyles.bodyTextSecondary,
+                                ),
+                                SizedBox(
+                                  height: 4,
+                                ),
+                                InkWell(
+                                  child: Text("SIGN UP",
+                                      style: TextStyles.buttonPrimary),
+                                  onTap: () {
+                                    Navigator.pushNamed(context, '/signUp');
+                                  },
+                                )
+                              ],
+                            ),
+                          )
                         ],
                       ),
                     ),

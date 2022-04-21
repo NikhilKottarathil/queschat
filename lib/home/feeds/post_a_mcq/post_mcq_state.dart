@@ -9,6 +9,7 @@ class PostMcqState {
   String question;
   List<File> questionImages;
   bool isImageOptions;
+  int numberOfOption=2;
 
   String get questionValidationText {
     if (question.trim().length == 0) {

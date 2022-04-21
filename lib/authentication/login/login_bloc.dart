@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/authentication/app_data.dart';
-import 'package:queschat/repository/auth_repo.dart';
 import 'package:queschat/authentication/form_submitting_status.dart';
 import 'package:queschat/authentication/login/login_events.dart';
 import 'package:queschat/authentication/login/login_state.dart';
+import 'package:queschat/repository/auth_repo.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final AuthRepository authRepo;

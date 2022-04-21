@@ -1,15 +1,11 @@
-import 'dart:convert';
-
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:queschat/authentication/app_data.dart';
 import 'package:queschat/constants/strings_and_urls.dart';
-import 'package:queschat/constants/styles.dart';
 import 'package:queschat/function/some_function.dart';
 import 'package:queschat/home/home/home_events.dart';
 import 'package:queschat/main.dart';
@@ -151,7 +147,7 @@ Future<void> displayMessage(RemoteMessage message) async {
 
             if(data['sender_id']!=AppData().userId) {
               UserContactModel userContactModel = await authRepository
-                  .getDetailsOfSelectedUser(data['sender_id'], 'any');
+                  .getDetailsOfUserNameElseNumber(data['sender_id'], 'any');
 
               AwesomeNotifications().createNotification(
                 content: NotificationContent(
@@ -175,7 +171,7 @@ Future<void> displayMessage(RemoteMessage message) async {
           } else {
             DatabaseReference reference = FirebaseDatabase.instance.reference();
             UserContactModel userContactModel = await authRepository
-                .getDetailsOfSelectedUser(data['sender_id'], 'any');
+                .getDetailsOfUserNameElseNumber(data['sender_id'], 'any');
             reference
                 .child(data['message_room_type'] == 'channel'
                     ? 'ChannelRooms'
@@ -196,9 +192,8 @@ Future<void> displayMessage(RemoteMessage message) async {
                     body: data['body_message'],
                     roundedLargeIcon: true,
                     payload: data,
-                    largeIcon:data['icon_url']!=null? Urls().serverAddress+data['icon_url']:'',
-                    // largeIcon:
-                    //     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiB88zjt7Xh0zNX6WIi_LBVjklAhUBzhRZtg&usqp=CAU',
+                    largeIcon:data['icon_url']!=null? Urls().serverAddress+data['icon_url']:'assets/user_profile.png',
+
                     notificationLayout: NotificationLayout.MessagingGroup,
                     category: NotificationCategory.Message),
               );
@@ -218,8 +213,7 @@ Future<void> displayMessage(RemoteMessage message) async {
               payload: data,
               roundedLargeIcon: true,
               // largeIcon: chatRoomModel.imageUrl,
-              largeIcon:
-                  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiB88zjt7Xh0zNX6WIi_LBVjklAhUBzhRZtg&usqp=CAU',
+
               notificationLayout: NotificationLayout.Default,
               category: NotificationCategory.Social),
         );
@@ -232,11 +226,10 @@ notificationAction(Map<String, dynamic> messageData, int delay) async {
   if (messageData != null && messageData['type'] != null) {
     String messageType = messageData['type'];
     if (messageType == 'message_room') {
-      homeBloc.add(ChangeTab(0));
       if (messageData['messageRoomType'] == 'channel') {
-        messageHomeBloc.add(ChangeTab(1));
+        homeBloc.add(ChangeTab(0));
       } else {
-        messageHomeBloc.add(ChangeTab(1));
+        homeBloc.add(ChangeTab(1));
       }
       Navigator.pushNamed(
         MyApp.navigatorKey.currentContext,
@@ -255,7 +248,7 @@ notificationAction(Map<String, dynamic> messageData, int delay) async {
         '/feedSingleView',
         arguments: {
           'parentPage': 'notification',
-          'feedID': messageData['feed_id']
+          'feedId': messageData['feed_id']
         },
       );
       if (messageType == 'comment') {

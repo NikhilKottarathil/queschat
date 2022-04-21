@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:queschat/home/message/message_room_list/message_room_list_bloc.dart';
 import 'package:queschat/home/message/message_room_list/message_room_list_view.dart';
 import 'package:queschat/uicomponents/appbars.dart';
 

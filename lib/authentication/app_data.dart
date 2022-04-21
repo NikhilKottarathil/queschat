@@ -1,6 +1,4 @@
-import 'package:firebase_database/firebase_database.dart';
 import 'package:queschat/repository/auth_repo.dart';
-import 'package:queschat/constants/strings_and_urls.dart';
 
 class AppDataModel {
   String userName;
@@ -38,7 +36,7 @@ class AppData {
     // userId='21082700001';
   }
   Future<void> setUserDetails() async {
-    var user = await authRepositoryTemp.getUserDetails();
+    var user = await authRepositoryTemp.getMyDetails();
     appDataModel.userName = user['name'] != null ? user['name'] : '';
     appDataModel.phoneNumber = user['mobile'] != null ? user['mobile'] : '';
     appDataModel.userId = user['id'] != null ? user['id'].toString() : '';

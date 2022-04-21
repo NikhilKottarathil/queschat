@@ -49,20 +49,20 @@ String getTimeDifferenceFromNowString(String date) {
   }
 }
 
-String getCurrentDayNode() {
-  final dayNodeFormat = new DateFormat('yyyy/MM/dd');
-
-  String dayNode = dayNodeFormat.format(DateTime.now());
-
-  return dayNode;
-}
-String getDayNode(DateTime dateTime) {
-  final dayNodeFormat = new DateFormat('yyyy/MM/dd');
-
-  String dayNode = dayNodeFormat.format(dateTime);
-
-  return dayNode;
-}
+// String getCurrentDayNode() {
+//   final dayNodeFormat = new DateFormat('yyyy-MM-dd');
+//
+//   String dayNode = dayNodeFormat.format(DateTime.now());
+//
+//   return dayNode;
+// }
+// String getDayNode(DateTime dateTime) {
+//   final dayNodeFormat = new DateFormat('yyyy-MM-dd');
+//
+//   String dayNode = dayNodeFormat.format(dateTime);
+//
+//   return dayNode;
+// }
 String getDisplayDate(DateTime dateTime) {
  if( dateTime.difference(DateTime.now()).inDays==0){
    return 'Today';

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:queschat/constants/strings_and_urls.dart';
 import 'package:queschat/function/api_calls.dart';
@@ -217,6 +218,96 @@ class FeedRepository {
     }
   }
 
+  Future<String> postPollWithText(
+      {String question,
+      List<File> questionImages,
+      String optionA,
+      String optionB,
+     String  optionC,
+      String optionD,
+      String feedLevel}) async {
+    try {
+      Map<String, String> myBody = {
+        'name': question,
+        'feed_type': 'poll',
+        'option_a': optionA,
+        'option_b': optionB,
+        'option_type': 'text',
+      };
+      if(optionC!=null && optionC.toString().trim().isNotEmpty){
+        myBody.addAll({'option_c': optionC,});
+      } if(optionD!=null && optionD.trim().isNotEmpty){
+        myBody.addAll({'option_d': optionD,});
+
+      }
+      print(myBody);
+
+      if (feedLevel != null) {
+        myBody.addAll({'feed_level': feedLevel});
+      }
+
+      print(myBody);
+      var body;
+
+      SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
+      String token = sharedPreferences.getString('token');
+      Map<String, String> headers = {};
+      headers['x-access-token'] = token;
+      print('in pbobst inage');
+      print(myBody);
+      try {
+        if (await checkInternetIsConnected()) {
+          print('net connectuin');
+
+          var request = http.MultipartRequest(
+              'POST', Uri.parse('https://api.queschat.com/api/feed'));
+          request.headers.addAll(headers);
+          request.fields.addAll(myBody);
+
+          List<http.MultipartFile> newList = [];
+          for (int i = 0; i < questionImages.length; i++) {
+            http.MultipartFile multipartFile = http.MultipartFile(
+                'images',
+                questionImages[i].readAsBytes().asStream(),
+                questionImages[i].lengthSync(),
+                filename: questionImages[i].path.split("/").last);
+            newList.add(multipartFile);
+          }
+          request.files.addAll(newList);
+
+          print('listing ok');
+          try {
+            http.Response response =
+                await http.Response.fromStream(await request.send());
+            body = json.decode(response.body);
+          } catch (e) {
+            print('fgdf');
+            print(e);
+          }
+        } else {
+          body = {'message': 'noInternet'};
+        }
+      } catch (e) {
+        print(e);
+      }
+
+      if (body['message'] != null) {
+        if (body['message'] == 'Successfully Created') {
+          return body['id'].toString();
+        } else {
+          throw Exception('Please retry');
+        }
+      } else {
+        throw Exception('Please retry');
+      }
+    } catch (e) {
+      print('eeeeeeeeeeeeeeeeee');
+      print(e);
+      throw e;
+    }
+  }
+
   Future<String> postQuiz(
       {String heading,
       content,
@@ -288,19 +379,31 @@ class FeedRepository {
     }
   }
 
-  Future<String> postBlog({String heading, content, var media}) async {
+  Future<String> postBlog(
+      {String heading,
+      content,
+      var media,
+      String messageRoomId,
+      String mediaIds}) async {
     try {
       Map<String, String> myBody = {
         'description': content,
-        'feed_type': 'blog'
+        'feed_type': 'blog',
+        'channel_id': messageRoomId,
       };
+      if (mediaIds != '') {
+        myBody.addAll({'media_id': mediaIds});
+      }
 
-      var body = await postImageListDataRequest(
-          myBody: myBody,
-          address: 'feed',
-          imageFiles: media,
-          imageAddress: 'images');
-      print(body);
+      print('post blog $myBody');
+
+      var body = await postDataRequest(address: 'feed', myBody: myBody);
+      // var body = await postImageListDataRequest(
+      //     myBody: myBody,
+      //     address: 'feed',
+      //     imageFiles: media,
+      //     imageAddress: 'images');
+      // print(body);
       if (body['message'] != null) {
         if (body['message'] == 'Successfully Created') {
           return body['id'].toString();
@@ -317,12 +420,16 @@ class FeedRepository {
     }
   }
 
-  Future<void> editBlog({String heading, content, feedId}) async {
+  Future<void> editBlog(
+      {String heading, content, feedId, String mediaIds}) async {
     try {
       Map<String, String> myBody = {
         'description': content,
-        'feed_type': 'blog'
+        'feed_type': 'blog',
       };
+      if (mediaIds != '') {
+        myBody.addAll({'media_id': mediaIds});
+      }
       if (heading != null) {
         myBody.addAll({'name': heading});
       }
@@ -344,7 +451,11 @@ class FeedRepository {
     }
   }
 
-  Future<List> getFeeds(int page, rowsPerPage, parentPage) async {
+  Future<List> getFeeds(
+      {@required int page,
+      @required int rowsPerPage,
+      @required String parentPage,
+      String userId}) async {
     try {
       print('page $page rowsPerPage $rowsPerPage');
       // var body = await getDataRequest( address: 'feed/list');
@@ -353,6 +464,15 @@ class FeedRepository {
         body = await getDataRequest(
             address:
                 'feed/list?rows_per_page=$rowsPerPage&page=$page&feed_type=blog');
+        if (body['Feeds'] != null) {
+          return body['Feeds'];
+        } else {
+          throw Exception('Please retry');
+        }
+      } else if (parentPage == 'userProfileFeed') {
+        body = await getDataRequest(
+            address:
+                'feed/by_creator/$userId?rows_per_page=$rowsPerPage&page=$page');
         if (body['Feeds'] != null) {
           return body['Feeds'];
         } else {
@@ -489,8 +609,9 @@ class FeedRepository {
         body['leader_board'].forEach((element) {
           models.add(LeaderBoardModel(
             userId: element['user_id'].toString(),
-            profilePic:
-                element['profile_pic'] != null ? Urls().serverAddress+element['profile_pic'] : null,
+            profilePic: element['profile_pic'] != null
+                ? Urls().serverAddress + element['profile_pic']
+                : null,
             userName:
                 element['user_name'] != null ? element['user_name'] : null,
             completedTime: element['completion_time'] != null

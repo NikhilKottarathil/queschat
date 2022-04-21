@@ -53,7 +53,20 @@ class _FeedsViewState extends State<FeedsView> {
         child: BlocBuilder<FeedsBloc, FeedsState>(builder: (context, state) {
           print(state.feedModelList.length);
 
-          return Column(
+          return state.isLoading?ListView.separated(
+            padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
+            shrinkWrap: true,
+            itemCount: 10,
+            itemBuilder: (BuildContext context, int index) {
+              return BlocProvider.value(value: context.read<FeedsBloc>(),child: FeedAdapterDummy());
+            },
+            separatorBuilder: (BuildContext context, int index) {
+              return SizedBox(
+                height: 20,
+              );
+            },
+
+          ): Column(
             children: [
               Expanded(
                 child: state.feedModelList.length==0?Center(child: Text('No Post to Show',style: TextStyles.mediumMediumTextTertiary,),): ListView.separated(
@@ -71,7 +84,7 @@ class _FeedsViewState extends State<FeedsView> {
                   },
                 ),
               ),
-              state.isLoading ? Padding(
+              state.isLoadMore ? Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: CustomProgressIndicator(),
               ) : Container(),

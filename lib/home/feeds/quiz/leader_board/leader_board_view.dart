@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/components/custom_progress_indicator.dart';
-import 'package:queschat/components/user_contact_views.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/home/feeds/quiz/leader_board/leader_board_adapter.dart';
 import 'package:queschat/home/feeds/quiz/leader_board/leader_board_cubit.dart';
 import 'package:queschat/home/feeds/quiz/leader_board/leader_board_state.dart';
-
-import 'package:queschat/router/app_router.dart';
 import 'package:queschat/uicomponents/appbars.dart';
-import 'package:queschat/uicomponents/custom_ui_widgets.dart';
 
 class LeaderBoardView extends StatelessWidget {
   @override

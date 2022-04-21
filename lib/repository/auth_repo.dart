@@ -1,28 +1,28 @@
+import 'dart:convert';
 import 'dart:io';
 
 // import 'package:contacts_service/contacts_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:queschat/authentication/app_data.dart';
 import 'package:queschat/authentication/auth_credentials.dart';
 import 'package:queschat/awsome_notifications.dart';
 import 'package:queschat/constants/strings_and_urls.dart';
 import 'package:queschat/function/api_calls.dart';
-import 'package:queschat/models/chat_room_model.dart';
 import 'package:queschat/models/user_contact_model.dart';
-import 'package:queschat/queschat_notifications.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthRepository {
   List<Contact> contactsOnPhone = [];
+  List<UserContactModel> queschatUsers = [];
+  List<String> queschatUsersMobileNumbers = [];
+  List<UserContactModel> nonQueschatUsers= [];
 
-  AuthRepository() {
-    readContactsFromPhone();
+
+  initRepository() async{
+    await readContactsFromPhone();
   }
 
   Future<String> attemptAutoLogin() async {
@@ -224,9 +224,25 @@ class AuthRepository {
     }
   }
 
-  Future<Map<String, dynamic>> getUserDetails() async {
+  Future<Map<String, dynamic>> getMyDetails() async {
     try {
       var body = await getDataRequest(address: 'user/profile');
+      if (body['User'] != null) {
+        return body['User'];
+      } else {
+        if (body['message'] != null) {
+          throw Exception(body['message']);
+        } else {
+          throw Exception('Please retry');
+        }
+      }
+    } catch (e) {
+      throw Exception('Please retry');
+    }
+  }
+  Future<Map<String, dynamic>> getUserDetails(String userId) async {
+    try {
+      var body = await getDataRequest(address: 'user/profile/$userId');
       if (body['User'] != null) {
         return body['User'];
       } else {
@@ -330,146 +346,130 @@ class AuthRepository {
 //   }
 // }
 
-  Future<void> readContactsFromPhone() async {
+  Future readContactsFromPhone() async {
     if (await Permission.contacts.isGranted) {
-      // contactsOnPhone = await ContactsService.getContacts();
       contactsOnPhone = await FlutterContacts.getContacts(withProperties: true);
 
-      // print('contactsOnPhone.length');
-      // print(contactsOnPhone.length);
+
+      List<String> mobileNumbers = [];
+      print('=====getAllRegisteredUsersIcContactList========');
+
+      if (contactsOnPhone.isEmpty) {
+        await readContactsFromPhone();
+      }
+      contactsOnPhone.forEach((contact) {
+        contact.phones.forEach((element) {
+          try {
+            String number=element.number.replaceAll(' ', '').trim();
+            if (number.length > 10) {
+
+              element.number = number
+                  .substring(number.length - 10, number.length);
+
+              mobileNumbers.add(number);
+            } else {
+              mobileNumbers.add(number);
+            }
+          } catch (e) {
+            // print('getUserOnQuesChat mobil $e');
+          }
+        });
+      });
+
+
+      try {
+        dynamic myBody = {
+          'mobile_numbers': mobileNumbers,
+        };
+
+        var body =
+        await postDataRequest(address: 'contact/users', myBody: myBody);
+
+        if (body['Users'] != null) {
+          try {
+            body['Users'].forEach((user) {
+              String id = user['id'].toString();
+              String mobile = user['mobile'].toString();
+              String name=user['name'];
+              // String name = user['name'].toString();
+              String bio;
+
+              String profilePic;
+              if (user['profile_pic'] != null) {
+                profilePic = Urls().serverAddress + user['profile_pic'];
+              }
+              if (user['about_me'] != null) {
+                bio = user['about_me'];
+              }
+
+              try {
+                contactsOnPhone.forEach((contact) {
+                  contact.phones.forEach((element) {
+                    if (element.number.toString().trim() == mobile.trim()) {
+                      name = contact.displayName;
+                      queschatUsersMobileNumbers.add(element.number);
+                    }
+                  });
+                });
+              } catch (e) {
+
+              }
+              if (name == null) {
+                name = mobile;
+              }
+              name = id == AppData().userId ? 'You' : name;
+
+              queschatUsers.add(UserContactModel(
+                  id: id,
+                  bio: bio,
+                  phoneNumbers: [mobile],
+                  name: name,
+                  profilePic: profilePic,
+                  isSelected: false,
+                  isUser: true));
+            });
+            contactsOnPhone.forEach((contact) {
+              List<String> contactMobileNumbers = [];
+              contact.phones.forEach((element) {
+                if (!queschatUsersMobileNumbers.contains(element.number.trim())) {
+                  if (!contactMobileNumbers.contains(element.number.trim())) {
+                    contactMobileNumbers.add(element.number.trim());
+
+
+                    nonQueschatUsers.add(UserContactModel(
+                        isUser: false,
+                        name: contact.displayName,
+                        phoneNumbers: contactMobileNumbers,
+                        isSelected: false));
+                  }
+                }
+              });
+            });
+
+          } catch (e) {}
+
+        } else {
+          if (body['message'] != null) {
+            throw Exception(body['message']);
+          } else {
+            throw Exception('Please retry');
+          }
+        }
+      } catch (e) {
+        throw Exception('Please retry');
+      }
     }
   }
 
   Future<List<UserContactModel>> getAllRegisteredUsersIcContactList(
       bool isAllUsers) async {
-    List<String> mobileNumbers = [];
-    List<String> registeredMobileNumber = [];
-    print('=====getAllRegisteredUsersIcContactList========');
 
-    if (contactsOnPhone.isEmpty) {
-      await readContactsFromPhone();
+    if (isAllUsers) {
+     List allUser=queschatUsers+nonQueschatUsers;
+      return  allUser;
     }
-    contactsOnPhone.forEach((contact) {
-      contact.phones.forEach((element) {
-        try {
-          if (element.number.length > 10) {
-            element.number = element.number
-                .substring(element.number.length - 10, element.number.length);
-
-            mobileNumbers.add(element.number);
-          } else {
-            mobileNumbers.add(element.number);
-          }
-        } catch (e) {
-          // print('getUserOnQuesChat mobil $e');
-        }
-      });
-    });
-    // print('getUserOnQuesChat ${contactsOnPhone.length}');
-    // print('getUserOnQuesChat ${mobileNumbers.length}');
-
-    try {
-      dynamic myBody = {
-        'mobile_numbers': mobileNumbers,
-      };
-      // print('getUserOnQuesChat ${mobileNumbers.length}');
-      // print('getUserOnQuesChat $mobileNumbers');
-      var body =
-          await postDataRequest(address: 'contact/users', myBody: myBody);
-      List<UserContactModel> userContactModels = [];
-
-      if (body['Users'] != null) {
-        try {
-          body['Users'].forEach((user) {
-            String id = user['id'].toString();
-            String mobile = user['mobile'].toString();
-            String name;
-            // String name = user['name'].toString();
-            String bio;
-
-            String profilePic;
-            if (user['profile_pic'] != null) {
-              profilePic = Urls().serverAddress + user['profile_pic'];
-            }
-            if (user['about_me'] != null) {
-              bio = user['about_me'];
-            }
-
-            try {
-              contactsOnPhone.forEach((contact) {
-                // print('getUserOnQuesChat ${contact.phones.length}');
-                // print('getUserOnQuesChat ${contact.displayName}');
-                contact.phones.forEach((element) {
-                  if (element.number.toString().trim() == mobile.trim()) {
-                    name = contact.displayName;
-                    registeredMobileNumber
-                        .add(element.number.toString().trim());
-                  }
-                });
-
-                // print('getUserOnQuesChat  del ${contact.phones.length}');
-
-                // contact.phones.forEach((element) {
-                //   print('getUserOnQuesChat ${contact.phones.length}');
-                //   print('getUserOnQuesChat ${contact.displayName}');
-                //
-                //   if (element.number.toString() == mobile) {
-                //     // contact.phones.removeAt(0);
-                //
-                //
-                //   }
-                // });
-              });
-            } catch (e) {
-              // print('getUserOnQuesChat $e');
-            }
-            if (name == null) {
-              name = mobile;
-            }
-            userContactModels.add(UserContactModel(
-                id: id,
-                bio: bio,
-                phoneNumbers: [mobile],
-                name: name,
-                profilePic: profilePic,
-                isSelected: false,
-                isUser: true));
-          });
-        } catch (e) {}
-        if (isAllUsers) {
-          contactsOnPhone.forEach((contact) {
-            List<String> contactMobileNumbers = [];
-            contact.phones.forEach((element) {
-              if (!registeredMobileNumber.contains(element.number.trim())) {
-                if (!contactMobileNumbers.contains(element.number.trim())) {
-                  // print('getUserOnQuesChat 00 ${contact.displayName}');
-                  contactMobileNumbers.add(element.number.trim());
-
-                  // List<String> phones = [];
-                  // contact.phones.forEach((element) {
-                  //   phones.add(element.number);
-                  // });
-                  userContactModels.add(UserContactModel(
-                      isUser: false,
-                      name: contact.displayName,
-                      phoneNumbers: contactMobileNumbers,
-                      isSelected: false));
-                }
-              }
-            });
-          });
-        }
-        // print('getUserOnQuesChat ${userContactModels.length}');
-        return userContactModels;
-      } else {
-        if (body['message'] != null) {
-          throw Exception(body['message']);
-        } else {
-          throw Exception('Please retry');
-        }
-      }
-    } catch (e) {
-      throw Exception('Please retry');
+    else{
+      return queschatUsers;
     }
   }
 
@@ -522,45 +522,28 @@ class AuthRepository {
   //   }
   // }
 
-  Future<UserContactModel> getDetailsOfSelectedUser(
+  Future<UserContactModel> getDetailsOfUserNameElseNumber(
       String userId, String userType) async {
-    if (contactsOnPhone.isEmpty) {
-      await readContactsFromPhone();
-    }
-    List<Contact> contacts = [];
-    contacts.addAll(contactsOnPhone);
-    print('=====getDetailsOfSelectedUser========');
 
-    try {
+    if(queschatUsers.any((element) => element.id==userId)){
+      UserContactModel userContactModel= queschatUsers.singleWhere((element) => element.id==userId);
+      userContactModel.userType=userType;
+      return userContactModel;
+    }else{
       var body = await getDataRequest(address: 'user/profile/$userId');
-
       if (body['User'] != null) {
-        String name;
+        String name= body['User']['name'];
         String profilePic = body['User']['profile_pic']['url'] != null
             ? Urls().serverAddress + body['User']['profile_pic']['url']
             : null;
         String mobile = body['User']['mobile'].toString();
-        contacts.forEach((contact) {
-          contact.phones.forEach((element) {
-            if (element.number.length > 10) {
-              element.number = element.number
-                  .substring(element.number.length - 10, element.number.length);
-              if (element.number.toString() == mobile) {
-                name = contact.displayName;
-              }
-            } else {
-              if (element.number.toString() == mobile) {
-                name = contact.displayName;
-              }
-            }
-          });
-        });
 
-        name = userId == AppData().userId ? 'You' : name;
+        // name = userId == AppData().userId ? 'You' : name;
         return UserContactModel(
             profilePic: profilePic,
             userType: userType,
             id: userId,
+            isUser: true,
             name: name != null ? name : mobile,
             phoneNumbers: [mobile]);
       } else {
@@ -570,9 +553,8 @@ class AuthRepository {
           throw Exception('Please retry');
         }
       }
-    } catch (e) {
-      throw Exception('Please retry');
     }
+
   }
 
   // getNameOfSelectedUserByContact(String userId) async {

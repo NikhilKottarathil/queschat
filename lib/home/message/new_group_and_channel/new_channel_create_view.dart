@@ -5,8 +5,6 @@ import 'package:queschat/components/custom_progress_indicator.dart';
 import 'package:queschat/components/user_contact_views.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/function/show_snack_bar.dart';
-import 'package:queschat/home/message/message_room/message_room_cubit.dart';
-import 'package:queschat/home/message/message_room/message_room_view.dart';
 import 'package:queschat/home/message/new_group_and_channel/new_group_cubit.dart';
 import 'package:queschat/models/chat_room_model.dart';
 import 'package:queschat/models/user_contact_model.dart';

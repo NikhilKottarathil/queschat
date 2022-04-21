@@ -9,7 +9,6 @@ import 'package:queschat/authentication/profile/saved_feeds.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/main.dart';
 import 'package:queschat/router/app_router.dart';
-import 'package:queschat/uicomponents/appbars.dart';
 
 class ProfileView extends StatelessWidget {
   @override
@@ -110,27 +109,18 @@ class ProfileView extends StatelessWidget {
                   child: Container(
                     padding:
                         const EdgeInsets.only(left: 20, right: 20, top: 14.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          state.name,
-                          style: TextStyles.subTitle1TextPrimary,
-                        ),
-                        // Text(
-                        //   state.phoneNumber,
-                        //   style: TextStyles.bodyTextSecondary,
-                        // ),
-                      ],
+                    child: Text(
+                      state.name,
+                      style: TextStyles.subTitle1TextPrimary,
                     ),
                   ),
                 ),
-                Visibility(
-                  visible: state.bio != null,
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        left: 20, right: 20, top: 8.0, bottom: 4),
-                    child: Flexible(
+                Flexible(
+                  child: Visibility(
+                    visible: state.bio != null,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 20, right: 20, top: 8.0, bottom: 4),
                       child: Text(
                         state.bio != null ? state.bio : '',
                         style: TextStyles.bodyTextSecondary,
@@ -166,344 +156,118 @@ class ProfileView extends StatelessWidget {
                         ),
                       )),
                 ),
-                // Visibility(
-                //   visible: state.bio != null ||
-                //       state.facebookLink != null ||
-                //       state.instagramLink != null ||
-                //       state.linkedinLink != null ||
-                //       state.birthDate != null,
-                //   child: Container(
-                //     padding: const EdgeInsets.only(
-                //         left: 20, right: 20, top: 20.0, bottom: 20),
-                //     color: AppColors.White,
-                //     width: width,
-                //     child: Column(
-                //       crossAxisAlignment: CrossAxisAlignment.start,
-                //       children: [
-                //         Visibility(
-                //           visible: state.bio != null,
-                //           child: Row(
-                //             crossAxisAlignment: CrossAxisAlignment.start,
-                //             children: [
-                //               Text(
-                //                 'About me :  ',
-                //                 style: TextStyles.smallRegularTextTertiary,
-                //               ),
-                //               Flexible(
-                //                 child: Text(
-                //                   state.bio != null ? state.bio : '',
-                //                   style: TextStyles.smallRegularTextSecondary,
-                //                   textAlign: TextAlign.start,
-                //                 ),
-                //               ),
-                //             ],
-                //           ),
-                //         ),
-                //         Visibility(
-                //           visible: state.birthDate != null,
-                //           child: Row(
-                //             crossAxisAlignment: CrossAxisAlignment.start,
-                //             children: [
-                //               Text(
-                //                 'DOB :  ',
-                //                 style: TextStyles.smallRegularTextTertiary,
-                //               ),
-                //               Text(
-                //                 // state.name,
-                //                 state.birthDate != null
-                //                     ? getDisplayDate(state.birthDate)
-                //                     : '',
-                //                 style: TextStyles.smallRegularTextSecondary,
-                //                 textAlign: TextAlign.start,
-                //               ),
-                //             ],
-                //           ),
-                //         ),
-                //         // Visibility(
-                //         //   visible: state.facebookLink != null,
-                //         //   child: Column(
-                //         //     children: [
-                //         //       SizedBox(
-                //         //         height: 10,
-                //         //       ),
-                //         //       Row(
-                //         //         crossAxisAlignment: CrossAxisAlignment.center,
-                //         //         children: [
-                //         //           Image.asset(
-                //         //             'images/facebook_logo.png',
-                //         //             width: 18,
-                //         //             height: 18,
-                //         //             fit: BoxFit.contain,
-                //         //           ),
-                //         //           SizedBox(
-                //         //             width: 6,
-                //         //           ),
-                //         //           Flexible(
-                //         //             child: Text(
-                //         //               state.facebookLink != null
-                //         //                   ? state.facebookLink
-                //         //                   : '',
-                //         //               style: TextStyles.smallRegularTextTertiary,
-                //         //               textAlign: TextAlign.center,
-                //         //               maxLines: 1,
-                //         //               overflow: TextOverflow.ellipsis,
-                //         //             ),
-                //         //           ),
-                //         //           SizedBox(
-                //         //             width: 4,
-                //         //           ),
-                //         //           GestureDetector(
-                //         //             child: Icon(
-                //         //               Icons.copy,
-                //         //               size: 14,
-                //         //               color: AppColors.IconColor,
-                //         //             ),
-                //         //             onTap: () {
-                //         //               copyTextFromField(state.facebookLink);
-                //         //             },
-                //         //           )
-                //         //         ],
-                //         //       ),
-                //         //     ],
-                //         //   ),
-                //         // ),
-                //         // Visibility(
-                //         //   visible: state.instagramLink != null,
-                //         //   child: Column(
-                //         //     children: [
-                //         //       SizedBox(
-                //         //         height: 10,
-                //         //       ),
-                //         //       Row(
-                //         //         crossAxisAlignment: CrossAxisAlignment.center,
-                //         //         children: [
-                //         //           Image.asset(
-                //         //             'images/instagram_logo.png',
-                //         //             width: 18,
-                //         //             height: 18,
-                //         //             fit: BoxFit.contain,
-                //         //           ),
-                //         //           SizedBox(
-                //         //             width: 6,
-                //         //           ),
-                //         //           Flexible(
-                //         //             child: Text(
-                //         //               state.instagramLink != null
-                //         //                   ? state.instagramLink
-                //         //                   : '',
-                //         //               style: TextStyles.smallRegularTextTertiary,
-                //         //               textAlign: TextAlign.center,
-                //         //               maxLines: 1,
-                //         //               overflow: TextOverflow.ellipsis,
-                //         //             ),
-                //         //           ),
-                //         //           SizedBox(
-                //         //             width: 4,
-                //         //           ),
-                //         //           GestureDetector(
-                //         //             child: Icon(
-                //         //               Icons.copy,
-                //         //               size: 14,
-                //         //               color: AppColors.IconColor,
-                //         //             ),
-                //         //             onTap: () {
-                //         //               copyTextFromField(state.instagramLink);
-                //         //             },
-                //         //           )
-                //         //         ],
-                //         //       ),
-                //         //     ],
-                //         //   ),
-                //         // ),
-                //         // Visibility(
-                //         //   visible: state.linkedinLink != null,
-                //         //   child: Column(
-                //         //     children: [
-                //         //       SizedBox(
-                //         //         height: 10,
-                //         //       ),
-                //         //       Row(
-                //         //         crossAxisAlignment: CrossAxisAlignment.center,
-                //         //         children: [
-                //         //           Image.asset(
-                //         //             'images/linkedin_logo.png',
-                //         //             width: 18,
-                //         //             height: 18,
-                //         //             fit: BoxFit.contain,
-                //         //           ),
-                //         //           SizedBox(
-                //         //             width: 6,
-                //         //           ),
-                //         //           Flexible(
-                //         //             child: Text(
-                //         //               state.linkedinLink != null
-                //         //                   ? state.linkedinLink
-                //         //                   : '',
-                //         //               style: TextStyles.smallRegularTextTertiary,
-                //         //               textAlign: TextAlign.center,
-                //         //               maxLines: 1,
-                //         //               overflow: TextOverflow.ellipsis,
-                //         //             ),
-                //         //           ),
-                //         //           SizedBox(
-                //         //             width: 4,
-                //         //           ),
-                //         //           GestureDetector(
-                //         //             child: Icon(
-                //         //               Icons.copy,
-                //         //               size: 14,
-                //         //               color: AppColors.IconColor,
-                //         //             ),
-                //         //             onTap: () {
-                //         //               copyTextFromField(state.linkedinLink);
-                //         //             },
-                //         //           )
-                //         //         ],
-                //         //       ),
-                //         //     ],
-                //         //   ),
-                //         // ),
-                //       ],
-                //     ),
-                //   ),
-                // ),
-                SizedBox(height: 10,),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    dividerDefault,
 
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        primary: Colors.white,
-                        padding: const EdgeInsets.all(20.0),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                SizedBox(height: 10,),
+                dividerDefault,
+
+                TextButton(
+                  style: TextButton.styleFrom(
+                    primary: Colors.white,
+                    padding: const EdgeInsets.all(20.0),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
                         children: [
-                          Row(
-                            children: [
-                              Image.asset(
-                                'images/feed_nav_icon.png',
-                                width: 24,
-                                height: 24,
-                                color: AppColors.IconColor,
-                              ),
-                              SizedBox(
-                                width: 22,
-                              ),
-                              Text(
-                                'My Feeds',
-                                style: TextStyles.smallMediumTextSecondary,
-                              ),
-                            ],
-                          ),
-                          Icon(
-                            Icons.arrow_forward,
+                          Image.asset(
+                            'images/feed_nav_icon.png',
+                            width: 24,
+                            height: 24,
                             color: AppColors.IconColor,
-                          )
+                          ),
+                          SizedBox(
+                            width: 22,
+                          ),
+                          Text(
+                            'My Feeds',
+                            style: TextStyles.smallMediumTextSecondary,
+                          ),
                         ],
                       ),
-                      onPressed: () {
-                        Navigator.of(MyApp.navigatorKey.currentContext).push(
-                          MaterialPageRoute(builder: (_) => MyFeeds()),
-                        );
-                      },
-                    ),
-                    dividerDefault,
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        primary: Colors.white,
-                        padding: const EdgeInsets.all(20.0),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Icon(
+                        Icons.arrow_forward,
+                        color: AppColors.IconColor,
+                      )
+                    ],
+                  ),
+                  onPressed: () {
+                    Navigator.of(MyApp.navigatorKey.currentContext).push(
+                      MaterialPageRoute(builder: (_) => MyFeeds()),
+                    );
+                  },
+                ),
+                dividerDefault,
+                TextButton(
+                  style: TextButton.styleFrom(
+                    primary: Colors.white,
+                    padding: const EdgeInsets.all(20.0),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
                         children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.bookmark,
-                                color: AppColors.IconColor,
-                              ),
-                              SizedBox(
-                                width: 22,
-                              ),
-                              Text(
-                                'Saved Feeds',
-                                style: TextStyles.smallMediumTextSecondary,
-                              ),
-                            ],
-                          ),
                           Icon(
-                            Icons.arrow_forward,
+                            Icons.bookmark,
                             color: AppColors.IconColor,
-                          )
+                          ),
+                          SizedBox(
+                            width: 22,
+                          ),
+                          Text(
+                            'Saved Feeds',
+                            style: TextStyles.smallMediumTextSecondary,
+                          ),
                         ],
                       ),
-                      onPressed: () {
-                        Navigator.of(MyApp.navigatorKey.currentContext).push(
-                          MaterialPageRoute(builder: (_) => SavedFeeds()),
-                        );
-                      },
-                    ),
-                    dividerDefault,
-                    // TextButton(
-                    //   style: TextButton.styleFrom(
-                    //     primary: Colors.white,
-                    //   ),
-                    //   child: Row(
-                    //     children: [
-                    //       Icon(
-                    //         Icons.bookmark_outline_sharp,
-                    //         color: AppColors.IconColor,
-                    //       ),
-                    //       SizedBox(
-                    //         width: 22,
-                    //       ),
-                    //       Text(
-                    //         'Subscribed Channels',
-                    //         style: TextStyles.smallMediumTextSecondary,
-                    //       ),
-                    //     ],
-                    //   ),
-                    //   onPressed: () {},
-                    // ),
-                    // dividerDefault,
-                    TextButton(
-                      style: TextButton.styleFrom(
-                          primary: Colors.white, padding: EdgeInsets.all(20)),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Icon(
+                        Icons.arrow_forward,
+                        color: AppColors.IconColor,
+                      )
+                    ],
+                  ),
+                  onPressed: () {
+                    Navigator.of(MyApp.navigatorKey.currentContext).push(
+                      MaterialPageRoute(builder: (_) => SavedFeeds()),
+                    );
+                  },
+                ),
+                dividerDefault,
+
+                TextButton(
+                  style: TextButton.styleFrom(
+                      primary: Colors.white, padding: EdgeInsets.all(20)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
                         children: [
-                          Row(
-                            children: [
-                              Image.asset(
-                                'images/reward.png',
-                                width: 22,
-                                height: 22,
-                                color: AppColors.IconColor,
-                              ),
-                              SizedBox(
-                                width: 22,
-                              ),
-                              Text(
-                                'Rewards & Points',
-                                style: TextStyles.smallMediumTextSecondary,
-                              ),
-                            ],
-                          ),
-                          Icon(
-                            Icons.arrow_forward,
+                          Image.asset(
+                            'images/reward.png',
+                            width: 22,
+                            height: 22,
                             color: AppColors.IconColor,
-                          )
+                          ),
+                          SizedBox(
+                            width: 22,
+                          ),
+                          Text(
+                            'Rewards & Points',
+                            style: TextStyles.smallMediumTextSecondary,
+                          ),
                         ],
                       ),
-                      onPressed: () {},
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                  ],
+                      Icon(
+                        Icons.arrow_forward,
+                        color: AppColors.IconColor,
+                      )
+                    ],
+                  ),
+                  onPressed: () {},
+                ),
+                SizedBox(
+                  height: 5,
                 ),
               ],
             );

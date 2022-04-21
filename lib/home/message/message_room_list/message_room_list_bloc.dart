@@ -26,17 +26,19 @@ class MessageRoomListBloc
   MessageRoomListBloc({
     @required this.parentPage,
   }) : super(MessageRoomListState(
-            models: [], ids: [], displayModels: [], isLoading: true)) {
+            models: [], ids: [], displayModels: [], isLoading: true));
+
+  Future initMessageRoomList() async {
     state.parentPage = parentPage;
     if (parentPage == 'exploreChannel') {
       detailsNode = 'ChannelRooms';
       getAllChannelRooms();
     } else if (parentPage == 'channel') {
       detailsNode = 'ChannelRooms';
-      getInitialChatRooms();
+      await getInitialChatRooms();
     } else {
       detailsNode = 'ChatRooms';
-      getInitialChatRooms();
+      await getInitialChatRooms();
     }
     textEditingController.addListener(() {
       print('listning texxt controller');
@@ -46,25 +48,30 @@ class MessageRoomListBloc
   }
 
   getAllChannelRooms() {
-    reference
-        .child(detailsNode)
+    reference.child(detailsNode).once().then((value) {
+      if (value.value != null) {
+        print('allChannels');
+        if (value.value != null) {
+          Map<dynamic, dynamic> allChannels = value.value;
 
-
-        .once()
-        .then((value) {
-      Map<dynamic, dynamic> allChannels = value.value;
-      print('allChannels');
-      print(allChannels);
-      if (allChannels != null && allChannels.isNotEmpty) {
-        for (var mapEntry in allChannels.entries) {
-          _covertDataToModel(
-              messageRoomId: mapEntry.key, messageRoomMap: mapEntry.value);
+          for (var mapEntry in allChannels.entries) {
+            if (!channelMessageRoomListBloc.state.models
+                .map((e) => e.id)
+                .toList()
+                .contains(mapEntry.key)) {
+              _covertDataToModel(
+                  messageRoomId: mapEntry.key, messageRoomMap: mapEntry.value);
+            }
+          }
         }
+      } else {
+        add(UpdateList());
       }
     });
   }
 
-  getInitialChatRooms() async {
+  Future getInitialChatRooms() async {
+    print('userid ${AppData().userId}');
     print(AppData().userId);
     reference
         .child('Users')
@@ -76,40 +83,54 @@ class MessageRoomListBloc
       state.models.clear();
       state.displayModels.clear();
       state.page = 1;
-      Map<dynamic, dynamic> chatRoomIDs = event.snapshot.value;
-      print(chatRoomIDs);
+      print('chatRoomIds befor');
 
-      for (var mapEntry in chatRoomIDs.entries) {
-        try {
-          reference
-              .child(detailsNode)
-              .child(mapEntry.key)
-              .onValue
-              .listen((event) async {
-            Map<dynamic, dynamic> messageRoomMap = event.snapshot.value;
+      if (event.snapshot.value != null) {
+        Map<dynamic, dynamic> chatRoomIDs = event.snapshot.value;
+        print(chatRoomIDs);
 
-            _covertDataToModel(
-                messageRoomId: mapEntry.key, messageRoomMap: messageRoomMap);
-          });
-        } catch (e) {
-          print('Error messageRoom List  ${mapEntry.key} ');
-        }
+        print('chatRoomIds inside');
+
+       await Future.forEach(chatRoomIDs.entries, (mapEntry)  {
+          try {
+            reference
+                .child(detailsNode)
+                .child(mapEntry.key)
+                .onValue
+                .listen((event) async {
+                  if(event.snapshot.value!=null) {
+                    Map<dynamic, dynamic> messageRoomMap = event.snapshot.value;
+
+                    _covertDataToModel(
+                        messageRoomId: mapEntry.key,
+                        messageRoomMap: messageRoomMap);
+                  }
+            });
+          } catch (e) {
+            print('Error messageRoom List  ${mapEntry.key} ');
+          }
+        });
+       add(UpdateList());
+
+      } else {
+        print('chatRoomIds else');
+
+        add(UpdateList());
       }
     });
   }
 
   sortChartRoomData(ChatRoomModel chatRoomModel) async {
-
     if (state.models.any((element) => element.id == chatRoomModel.id)) {
       state.models[state.models
               .indexWhere((element) => element.id == chatRoomModel.id)] =
           chatRoomModel;
-      if(parentPage=='exploreChannel') {
+      if (parentPage == 'exploreChannel') {
         state.models.sort((l1, l2) {
           return l2.lastMessageTime.compareTo(l1.lastMessageTime);
         });
         add(UpdateList());
-      }else{
+      } else {
         state.models.sort((l1, l2) {
           return l2.lastMessageTime.compareTo(l1.lastMessageTime);
         });
@@ -162,9 +183,12 @@ class MessageRoomListBloc
 
   void _covertDataToModel(
       {@required messageRoomId, Map<dynamic, dynamic> messageRoomMap}) async {
-    String messengerId = messageRoomMap['info']['messenger_id'];
     int unSeenMessageCount = 0;
 
+    print('_covertDataToModel');
+    print(detailsNode);
+    print(messageRoomId);
+    print(messageRoomMap);
     if (messageRoomMap['un_seen_message_count'] != null) {
       messageRoomMap['un_seen_message_count'].forEach((id, idValue) {
         if (id == AppData().userId) {
@@ -187,41 +211,43 @@ class MessageRoomListBloc
             messageType = MessageType.video;
           } else if (value['message_type'] == 'audio') {
             messageType = MessageType.audio;
-          } else if (value['message_type'] == 'voice_note') {
+          } else if (value['message_type'] == 'forwarded') {
+            messageType = MessageType.forward;
+          }  else if (value['message_type'] == 'voice_note') {
             messageType = MessageType.voice_note;
           } else if (value['message_type'] == 'deleted') {
             messageType = MessageType.deleted;
           }
-          List<SeenStatus> seenStatuses = [];
-          MessageStatus seenStatus = MessageStatus.sent;
-
-          value['seen_status'].forEach((userId, status) {
-            MessageStatus messageStatus = MessageStatus.sent;
-            if (status == 'sent') {
-              messageStatus = MessageStatus.sent;
-            } else if (status == 'delivered') {
-              messageStatus = MessageStatus.delivered;
-            } else if (status == 'seen') {
-              messageStatus = MessageStatus.seen;
-            } else if (status == 'sending') {
-              messageStatus = MessageStatus.sending;
-            } else if (status == 'error') {
-              messageStatus = MessageStatus.error;
-            }
-            seenStatus = messageStatus;
-            seenStatuses
-                .add(SeenStatus(userId: userId, messageStatus: messageStatus));
-          });
+          // List<SeenStatus> seenStatuses = [];
+          // MessageStatus seenStatus = MessageStatus.sent;
+          //
+          // value['seen_status'].forEach((userId, status) {
+          //   MessageStatus messageStatus = MessageStatus.sent;
+          //   if (status == 'sent') {
+          //     messageStatus = MessageStatus.sent;
+          //   } else if (status == 'delivered') {
+          //     messageStatus = MessageStatus.delivered;
+          //   } else if (status == 'seen') {
+          //     messageStatus = MessageStatus.seen;
+          //   } else if (status == 'sending') {
+          //     messageStatus = MessageStatus.sending;
+          //   } else if (status == 'error') {
+          //     messageStatus = MessageStatus.error;
+          //   }
+          //   seenStatus = messageStatus;
+          //   seenStatuses
+          //       .add(SeenStatus(userId: userId, messageStatus: messageStatus));
+          // });
 
           lastMessageModel = new MessageModel(
               senderID: value['sender_id'].toString(),
               messageType: messageType,
               messageMediaType: value['message_type'].toString(),
-              message: value['message'],
+              message: value['message']!=null?value['message']:'',
               mediaUrl: value['media'] != null ? value['media'] : null,
               id: value['id'].toString(),
-              seenStatues: seenStatuses,
-              messageStatus: seenStatus,
+              // seenStatues: seenStatuses,
+              // messageStatus: seenStatus,
               isSingleMessage: true,
               createdAt:
                   DateTime.fromMillisecondsSinceEpoch(value['created_at']));
@@ -234,9 +260,20 @@ class MessageRoomListBloc
         messageRoomMap['info']['is_single_chat'].toString() == 'True'
             ? true
             : false;
+    List<String> members=[];
+    messageRoomMap['members'].forEach((key,value){
+      members.add(key);
+    });
     if (isSingleChat) {
+
+      members.remove(AppData().userId);
+
+
+      // chat to same number
+      String messengerId = members.isNotEmpty?members[0]:AppData().userId;
+
       UserContactModel userContactModel =
-          await authRepository.getDetailsOfSelectedUser(messengerId, 'any');
+          await authRepository.getDetailsOfUserNameElseNumber(messengerId, 'any');
       ChatRoomModel chatRoomModel = new ChatRoomModel(
         id: messageRoomId,
         name: userContactModel.name,
@@ -248,6 +285,7 @@ class MessageRoomListBloc
             messageRoomMap['info']['created_time']),
         isSingleChat: isSingleChat,
         unreadMessageCount: unSeenMessageCount,
+        membersCount: members.length,
         lastMessageTime: lastMessageModel != null
             ? lastMessageModel.createdAt
             : DateTime.fromMillisecondsSinceEpoch(
@@ -278,6 +316,8 @@ class MessageRoomListBloc
         isSingleChat: isSingleChat,
         messageRoomType: messageRoomMap['info']['message_room_type'],
         unreadMessageCount: unSeenMessageCount,
+        membersCount: members.length,
+
         lastMessageTime: lastMessageModel != null
             ? lastMessageModel.createdAt
             : DateTime.fromMillisecondsSinceEpoch(

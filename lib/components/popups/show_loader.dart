@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:queschat/components/custom_progress_indicator.dart';
 
 
-void showLoader(BuildContext buildContext) {
+void showLoader(BuildContext buildContext,double opacity) {
   showGeneralDialog(
     barrierLabel: "Barrier",
     barrierDismissible: true,
-    barrierColor: Colors.black.withOpacity(0.9),
+    barrierColor: Colors.black.withOpacity(opacity),
     transitionDuration: Duration(milliseconds: 500),
     context: buildContext,
     pageBuilder: (context, __, ___) {

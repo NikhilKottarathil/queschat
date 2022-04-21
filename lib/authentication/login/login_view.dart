@@ -9,8 +9,8 @@ import 'package:queschat/authentication/login/login_state.dart';
 import 'package:queschat/components/custom_progress_indicator.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/function/show_snack_bar.dart';
+import 'package:queschat/router/app_router.dart';
 import 'package:queschat/uicomponents/custom_button.dart';
-import 'package:queschat/uicomponents/custom_button_2.dart';
 import 'package:queschat/uicomponents/custom_text_field.dart';
 
 class LoginView extends StatelessWidget {
@@ -21,11 +21,14 @@ class LoginView extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.White,
       body: BlocListener<LoginBloc, LoginState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           final formStatus = state.formStatus;
           if (formStatus is SubmissionFailed) {
             showSnackBar(context, formStatus.exception);
           } else if (formStatus is SubmissionSuccess) {
+            await setRepositoryAndBloc();
+
+            Navigator.pop(context);
             Navigator.pushReplacementNamed(context, '/home');
           }
         },
@@ -131,38 +134,39 @@ class LoginView extends StatelessWidget {
                         SizedBox(
                           height: 32,
                         ),
-                        Center(
-                          child: CustomTextButton2(
-                            text: 'LOGIN WITH OTP',
-                            textColor: AppColors.PrimaryColor,
-                            action: () {
-                              Navigator.pushNamed(context, '/otpLogin');
-                            },
-                          ),
-                        ),
+                        // Center(
+                        //   child: CustomTextButton2(
+                        //     text: 'LOGIN WITH OTP',
+                        //     textColor: AppColors.PrimaryColor,
+                        //     action: () {
+                        //       Navigator.pushNamed(context, '/otpLogin');
+                        //     },
+                        //   ),
+                        // ),
                         Spacer(),
-                        SizedBox(height: 70,),
-                        Align(
-                          alignment: Alignment.center,
-                          child: Column(
-                            children: [
-                              Text(
-                                "Don't have account?",
-                                style: TextStyles.bodyTextSecondary,
-                              ),
-                              SizedBox(
-                                height: 4,
-                              ),
-                              InkWell(
-                                child: Text("SIGN UP",
-                                    style: TextStyles.buttonPrimary),
-                                onTap: () {
-                                  Navigator.pushNamed(context, '/signUp');
-                                },
-                              )
-                            ],
-                          ),
-                        )
+                        SizedBox(height: 150,),
+                        // SizedBox(height: 70,),
+                        // Align(
+                        //   alignment: Alignment.center,
+                        //   child: Column(
+                        //     children: [
+                        //       Text(
+                        //         "Don't have account?",
+                        //         style: TextStyles.bodyTextSecondary,
+                        //       ),
+                        //       SizedBox(
+                        //         height: 4,
+                        //       ),
+                        //       InkWell(
+                        //         child: Text("SIGN UP",
+                        //             style: TextStyles.buttonPrimary),
+                        //         onTap: () {
+                        //           Navigator.pushNamed(context, '/signUp');
+                        //         },
+                        //       )
+                        //     ],
+                        //   ),
+                        // )
                       ],
                     ),
                   ),

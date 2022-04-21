@@ -1,16 +1,9 @@
-import 'dart:io';
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fuzzy/fuzzy.dart';
-import 'package:queschat/authentication/app_data.dart';
-import 'package:queschat/constants/strings_and_urls.dart';
-import 'package:queschat/function/api_calls.dart';
-import 'package:queschat/function/select_image.dart';
 import 'package:queschat/home/message/message_room/add_members/add_members_to_message_room_state.dart';
 import 'package:queschat/models/user_contact_model.dart';
-import 'package:queschat/repository/auth_repo.dart';
 import 'package:queschat/router/app_router.dart';
 
 class AddMembersToMessageRoomCubit extends Cubit<AddMembersToMessageRoomState> {
@@ -93,7 +86,7 @@ class AddMembersToMessageRoomCubit extends Cubit<AddMembersToMessageRoomState> {
           memberMap.addAll({
             element.id: {
               'user_type': 'user',
-              'joining_date': DateTime.now().millisecondsSinceEpoch,
+              'joining_date': ServerValue.timestamp,
               'status': 'active'
             }
           });

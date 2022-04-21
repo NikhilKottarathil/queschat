@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/authentication/app_data.dart';
 import 'package:queschat/components/popups/show_custom_bottom_sheet.dart';
 import 'package:queschat/components/shimmer_widget.dart';
-import 'package:queschat/components/user_contact_views.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/firebase_dynamic_link.dart';
 import 'package:queschat/function/show_snack_bar.dart';
@@ -17,7 +16,6 @@ import 'package:queschat/home/message/message_room/message_room_edit_view.dart';
 import 'package:queschat/home/message/message_room/message_room_icon_view.dart';
 import 'package:queschat/home/message/message_room/message_room_member_contact_view.dart';
 import 'package:queschat/home/message/message_room/message_room_state.dart';
-import 'package:share_plus/share_plus.dart';
 
 class MessageRoomInfoView extends StatelessWidget {
   DatabaseReference reference = FirebaseDatabase.instance.reference();
@@ -27,16 +25,14 @@ class MessageRoomInfoView extends StatelessWidget {
     context.read<MessageRoomCubit>().reloadStates();
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.PrimaryColorLight,
         elevation: .5,
         centerTitle: true,
-        iconTheme: IconThemeData(color: AppColors.IconColor),
+        iconTheme: IconThemeData(color: AppColors.White),
         actions: [
           if (context.read<MessageRoomCubit>().userRole != 'user')
-            IconButton(
-              splashColor: Colors.transparent,
-              icon: Icon(Icons.person_add,color: AppColors.IconColor,),
-              onPressed: () {
+            GestureDetector(
+              onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -56,6 +52,30 @@ class MessageRoomInfoView extends StatelessWidget {
                   ),
                 );
               },
+              child: Container(
+                margin:
+                    EdgeInsets.only(top: 12, right: 10, left: 0, bottom: 12),
+                padding: EdgeInsets.only(right: 16, left: 10),
+                decoration: BoxDecoration(
+                    color: AppColors.White,
+                    borderRadius: BorderRadius.circular(32)),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.person_add,
+                      color: AppColors.PrimaryColorLight,
+                      size: 18,
+                    ),
+                    SizedBox(
+                      width: 8,
+                    ),
+                    Text(
+                      'Add Members',
+                      style: TextStyles.subBodyPrimaryColorLight,
+                    ),
+                  ],
+                ),
+              ),
             )
         ],
       ),
@@ -65,17 +85,17 @@ class MessageRoomInfoView extends StatelessWidget {
             showSnackBar(context, state.e);
           }
         },
-        child: Padding(
-          padding: EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              messageRoomInfo(),
-              SizedBox(
-                height: 20,
-              ),
-              Flexible(
-                child: BlocBuilder<MessageRoomCubit, MessageRoomState>(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                messageRoomInfo(),
+                SizedBox(
+                  height: 20,
+                ),
+                BlocBuilder<MessageRoomCubit, MessageRoomState>(
                     buildWhen: (prevState, state) {
                   return state is MembersState;
                 }, builder: (context, state) {
@@ -84,27 +104,76 @@ class MessageRoomInfoView extends StatelessWidget {
                         ? Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                context
-                                        .read<MessageRoomCubit>()
-                                        .userContactModels
-                                        .length
-                                        .toString() +
-                                    '\tMembers ',
-                                style: TextStyles.subTitle1TextPrimary,
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    context
+                                            .read<MessageRoomCubit>()
+                                            .userContactModels
+                                            .length
+                                            .toString() +
+                                        '\tMembers ',
+                                    style: TextStyles.subTitle1TextPrimary,
+                                  ),
+                                ],
                               ),
-                              Flexible(
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  padding: EdgeInsets.only(top: 10, bottom: 10),
-                                  itemCount: state.userContactModels.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    return MessageRoomMemberContactView(
-                                        state.userContactModels[index],
-                                        context);
+                              SizedBox(
+                                height: 4,
+                              ),
+                              Visibility(
+                                visible: context
+                                            .read<MessageRoomCubit>()
+                                            .messageRoomStatus ==
+                                        MessageRoomStatus.Active &&
+                                    context
+                                            .read<MessageRoomCubit>()
+                                            .messageRoomUserStatus ==
+                                        MessageRoomUserStatus.Active &&
+                                    context.read<MessageRoomCubit>().userRole !=
+                                        'user',
+                                child: ListTile(
+                                  contentPadding: EdgeInsets.only(top: 8),
+                                  leading: CircleAvatar(
+                                    radius: 24,
+                                    child: Icon(
+                                      Icons.attachment_outlined,
+                                      color: AppColors.PrimaryColorDark,
+                                    ),
+                                    backgroundColor:
+                                        AppColors.PrimaryIconBackground,
+                                  ),
+                                  title: Text(
+                                    'Invite via link',
+                                    style: TextStyles.subTitle2TextSecondary,
+                                  ),
+                                  onTap: () async {
+                                    await generateMessageRoomDynamicLink(
+                                        messageRoomType: context
+                                            .read<MessageRoomCubit>()
+                                            .chatRoomModel
+                                            .messageRoomType,
+                                        id: context
+                                            .read<MessageRoomCubit>()
+                                            .chatRoomModel
+                                            .id);
                                   },
                                 ),
+                              ),
+                              ListView.builder(
+                                shrinkWrap: true,
+
+                                padding: EdgeInsets.only(top: 8, bottom: 10),
+                                itemCount: state.userContactModels.length,
+
+                                itemBuilder:
+                                    (BuildContext context, int index) {
+                                  return MessageRoomMemberContactView(
+                                      state.userContactModels[index],
+                                      context);
+                                },
+                                physics: NeverScrollableScrollPhysics(),
                               ),
                             ],
                           )
@@ -124,21 +193,21 @@ class MessageRoomInfoView extends StatelessWidget {
                         height: 10,
                         width: 100,
                       ),
-                      Flexible(
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          padding: EdgeInsets.only(top: 10, bottom: 10),
-                          itemCount: 20,
-                          itemBuilder: (BuildContext context, int index) {
-                            return MessageRoomMemberContactViewDummy();
-                          },
-                        ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+
+                        padding: EdgeInsets.only(top: 10, bottom: 10),
+                        itemCount: 20,
+                        itemBuilder: (BuildContext context, int index) {
+                          return MessageRoomMemberContactViewDummy();
+                        },
                       ),
                     ],
                   );
                 }),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -148,51 +217,22 @@ class MessageRoomInfoView extends StatelessWidget {
 
   bottomNavigationBar() {
     return PreferredSize(
-      preferredSize: Size.fromHeight(50.0), // here the desired height
+      preferredSize: Size.fromHeight(50.0), 
+      // here the desired height
       child: BlocBuilder<MessageRoomCubit, MessageRoomState>(
         buildWhen: (prevState, state) {
           return state is TextMessageState;
         },
         builder: (context, state) {
           return Padding(
-            padding: const EdgeInsets.only(top: 10,bottom: 10),
+            padding: const EdgeInsets.only(top: 0, bottom: 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Visibility(
-                  visible: context.read<MessageRoomCubit>().messageRoomStatus ==
-                          MessageRoomStatus.Active &&
-                      context.read<MessageRoomCubit>().messageRoomUserStatus ==
-                          MessageRoomUserStatus.Active &&
-                      context.read<MessageRoomCubit>().userRole != 'user',
-                  child: InkWell(
-                    onTap: () async {
-                    await generateMessageRoomDynamicLink(
-                          messageRoomType: context
-                              .read<MessageRoomCubit>()
-                              .chatRoomModel
-                              .messageRoomType,
-                          id: context.read<MessageRoomCubit>().chatRoomModel.id);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 10),
-                      child: Container(
-                        color: AppColors.PrimaryColor,
-                        child: SizedBox(
-                            width: double.infinity,
-                            height: 40,
-                            child: Center(
-                                child: Text(
-                              'Invite via link',
-                              style: TextStyles.buttonWhite,
-                            ))),
-                      ),
-                    ),
-                  ),
-                ),
-                Visibility(
-                  visible: context.read<MessageRoomCubit>().userRole != 'owner' &&
+                  visible: context.read<MessageRoomCubit>().userRole !=
+                          'owner' &&
                       context.read<MessageRoomCubit>().messageRoomUserStatus ==
                           MessageRoomUserStatus.Active,
                   child: InkWell(
@@ -217,24 +257,27 @@ class MessageRoomInfoView extends StatelessWidget {
                               'Exit From ${context.read<MessageRoomCubit>().chatRoomModel.name} ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Group' : 'Channel'}');
                     },
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
                       child: Container(
-                        color: AppColors.PrimaryColor,
+                        decoration: BoxDecoration(
+                            color: AppColors.PrimaryColorLight,
+                            borderRadius: BorderRadius.circular(12)),
                         child: SizedBox(
                             width: double.infinity,
-                            height: 40,
+                            height: 50,
                             child: Center(
                                 child: Text(
-                                  '${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Exit from Group' : 'Leave Channel'}',
-                                  style: TextStyles.buttonWhite,
-                                ))),
+                              '${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Exit from Group' : 'Leave Channel'}',
+                              style: TextStyles.buttonWhite,
+                            ))),
                       ),
                     ),
-
                   ),
                 ),
                 Visibility(
-                  visible: context.read<MessageRoomCubit>().userRole != 'owner' &&
+                  visible: context.read<MessageRoomCubit>().userRole !=
+                          'owner' &&
                       context.read<MessageRoomCubit>().messageRoomUserStatus ==
                           MessageRoomUserStatus.Removed,
                   child: InkWell(
@@ -252,13 +295,16 @@ class MessageRoomInfoView extends StatelessWidget {
                           content:
                               'Delete ${context.read<MessageRoomCubit>().chatRoomModel.name} ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Group' : 'Channel'}');
                     },
-                   child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 10),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
                       child: Container(
-                        color: AppColors.PrimaryColor,
+                        decoration: BoxDecoration(
+                            color: AppColors.PrimaryColorLight,
+                            borderRadius: BorderRadius.circular(12)),
                         child: SizedBox(
                             width: double.infinity,
-                            height: 40,
+                            height: 50,
                             child: Center(
                                 child: Text(
                               'Delete ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Group' : 'Channel'}',
@@ -276,7 +322,9 @@ class MessageRoomInfoView extends StatelessWidget {
                           context: context,
                           positiveText: 'DELETE',
                           positiveAction: () {
-                            context.read<MessageRoomCubit>().deleteMessageRoom();
+                            context
+                                .read<MessageRoomCubit>()
+                                .deleteMessageRoom();
                             Navigator.of(context).pop();
                             Navigator.of(context).pop();
                           },
@@ -286,12 +334,15 @@ class MessageRoomInfoView extends StatelessWidget {
                               'Delete ${context.read<MessageRoomCubit>().chatRoomModel.name} ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Group' : 'Channel'}');
                     },
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
                       child: Container(
-                        color: AppColors.PrimaryColor,
+                        decoration: BoxDecoration(
+                            color: AppColors.PrimaryColorLight,
+                            borderRadius: BorderRadius.circular(12)),
                         child: SizedBox(
                             width: double.infinity,
-                            height: 40,
+                            height: 50,
                             child: Center(
                                 child: Text(
                               'Delete ${context.read<MessageRoomCubit>().chatRoomModel.messageRoomType == 'group' ? 'Group' : 'Channel'}',

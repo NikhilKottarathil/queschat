@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/components/alert_grid.dart';
-import 'package:queschat/home/feeds/post_a_mcq/post_mcq_bloc.dart';
-import 'package:queschat/home/feeds/post_a_mcq/post_mcq_view.dart';
+import 'package:queschat/home/feeds/poll/post_poll/post_poll_bloc.dart';
+import 'package:queschat/home/feeds/poll/post_poll/post_poll_view.dart';
 import 'package:queschat/home/feeds/post_blog/post_blog_bloc.dart';
 import 'package:queschat/home/feeds/post_blog/post_blog_view.dart';
 import 'package:queschat/home/feeds/quiz/create_quiz_view.dart';
@@ -48,16 +48,33 @@ void showNewFeedAlert(BuildContext buildContext) {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (_) => BlocProvider(
-                                create: (context) => PostMcqBloc(
+                                create: (context) => PostPollBloc(
                                     parentPage: 'messageRoomView',
                                     messageRoomCubit:
-                                        buildContext.read<MessageRoomCubit>(),
+                                    buildContext.read<MessageRoomCubit>(),
                                     feedRepo: feedRepository),
-                                child: PostAMCQView(),
+                                child: PostPollView(),
                               ),
                             ),
                           );
                         }),
+                    // AlertGrid(
+                    //     heading: "Post A Poll",
+                    //     description: "Create a multi choice question",
+                    //     action: () {
+                    //       Navigator.of(context).push(
+                    //         MaterialPageRoute(
+                    //           builder: (_) => BlocProvider(
+                    //             create: (context) => PostMcqBloc(
+                    //                 parentPage: 'messageRoomView',
+                    //                 messageRoomCubit:
+                    //                     buildContext.read<MessageRoomCubit>(),
+                    //                 feedRepo: feedRepository),
+                    //             child: PostAMCQView(),
+                    //           ),
+                    //         ),
+                    //       );
+                    //     }),
                     AlertGrid(
                         heading: "Post A Quiz",
                         description: "Create a quiz with multiple questions",

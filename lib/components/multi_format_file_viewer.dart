@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:queschat/components/custom_web_view.dart';
 import 'package:queschat/components/video_player.dart';
 import 'package:queschat/constants/styles.dart';
-
 import 'package:queschat/models/message_model.dart';
 
 class MultiFormatFileViewer extends StatefulWidget {

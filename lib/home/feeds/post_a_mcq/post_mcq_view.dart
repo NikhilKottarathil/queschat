@@ -5,7 +5,6 @@ import 'package:queschat/components/custom_progress_indicator.dart';
 import 'package:queschat/components/custom_radio_button.dart';
 import 'package:queschat/components/multi_file_view.dart';
 import 'package:queschat/components/option_text_field.dart';
-import 'package:queschat/components/text_editor.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/function/show_snack_bar.dart';
 import 'package:queschat/home/feeds/feeds_repo.dart';

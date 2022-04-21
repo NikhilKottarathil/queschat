@@ -1,13 +1,9 @@
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/authentication/app_data.dart';
+import 'package:queschat/constants/strings_and_urls.dart';
 import 'package:queschat/home/in_app_notification/in_app_notification_model.dart';
 import 'package:queschat/home/in_app_notification/in_app_notification_state.dart';
-import 'package:queschat/models/user_contact_model.dart';
-
-import 'package:queschat/repository/auth_repo.dart';
-import 'package:queschat/router/app_router.dart';
 
 class InAppNotificationCubit extends Cubit<InAppNotificationState> {
   List<InAppNotificationModel> models = [];
@@ -22,6 +18,7 @@ class InAppNotificationCubit extends Cubit<InAppNotificationState> {
   int newNotificationCount = 0;
 
   InAppNotificationCubit() : super(InitialState()) {
+    print('inap init');
     getInitialData();
     // setData();
     getNotificationCount();
@@ -29,14 +26,16 @@ class InAppNotificationCubit extends Cubit<InAppNotificationState> {
 
   Future<void> getNotificationCount() async {
     reference
-        .child('Notification')
+        .child('Connection')
         .child(AppData().userId)
         .child('count')
         .onValue
         .listen((event) {
       print('NewNotificationCount ${event.snapshot.value}');
-      if (event.snapshot != null && event.snapshot.value != null) {
+      if ( event.snapshot.value != null) {
         newNotificationCount = event.snapshot.value;
+        emit(NewNotificationCount(newNotificationCount));
+
       }
       emit(NewNotificationCount(newNotificationCount));
     });
@@ -44,9 +43,9 @@ class InAppNotificationCubit extends Cubit<InAppNotificationState> {
 
   Future<void> getLiveNotifications() async {
     reference
-        .child('Notification')
+        .child('Connection')
         .child(AppData().userId)
-        .child('Data')
+        .child('data')
         .onChildAdded
         .listen((event) async {
       Map<dynamic, dynamic> map = event.snapshot.value;
@@ -58,19 +57,21 @@ class InAppNotificationCubit extends Cubit<InAppNotificationState> {
   }
 
   Future<void> getInitialData() async {
+    print('getInitialData 0  ${models.length}');
+
     reference
-        .child('Notification')
+        .child('Connection')
         .child(AppData().userId)
-        .child('Data')
-        .orderByChild('created_time')
+        .child('data')
+        .orderByChild('create_date')
         .limitToLast(initialCountLimit)
         .once()
         .then((value) async {
       Map<dynamic, dynamic> map = value.value;
-      if(map!=null) {
+      if (map != null) {
         await convertDataIntoModel(map);
         updateList();
-      }else{
+      } else {
         updateList();
       }
       print('getInitialData  ${models.length}');
@@ -93,18 +94,20 @@ class InAppNotificationCubit extends Cubit<InAppNotificationState> {
 
   Future<void> getMoreDate() async {
     reference
-        .child('Notification')
+        .child('Connection')
         .child(AppData().userId)
-        .child('Data')
-        .orderByChild('created_time')
-        .endAt(models.isEmpty?DateTime.now().millisecondsSinceEpoch:models.last.createdTime.millisecondsSinceEpoch)
+        .child('data')
+        .orderByChild('create_date')
+        .endAt(models.isEmpty
+            ? ServerValue.timestamp
+            : models.last.createdTime.millisecondsSinceEpoch)
         .limitToLast(loadMoreLimit)
         .once()
         .then((value) async {
       Map<dynamic, dynamic> map = value.value;
 
       if (map != null) {
-        print('getLoadMoreData map length is  ${map.entries.length }');
+        print('getLoadMoreData map length is  ${map.entries.length}');
 
         if (map.entries.length != 1) {
           print('getLoadMoreData $map');
@@ -116,13 +119,9 @@ class InAppNotificationCubit extends Cubit<InAppNotificationState> {
           if (newlyLoadedDataCount < loadMoreLimit - 1) {
             getMoreDate();
           }
-
-        }else{
-
+        } else {
           print('getLoadMoreData map length is  1 ');
           updateList();
-
-
         }
       } else {
         print('getLoadMoreData map null');
@@ -142,82 +141,84 @@ class InAppNotificationCubit extends Cubit<InAppNotificationState> {
   Future<void> convertDataIntoModel(Map map) async {
     for (var mapEntry in map.entries) {
       if (!ids.contains(mapEntry.key)) {
-      UserContactModel userContactModel = await authRepository
-          .getDetailsOfSelectedUser(mapEntry.value['sender_id'], 'any');
+        print('prevous $prevNotificationModel');
 
-      print('prevous $prevNotificationModel');
-
-      if (prevNotificationModel != null) {
-        print('prevous ${prevNotificationModel.associateId} == ${mapEntry.value['associated_id']}');
-        if (prevNotificationModel.associateId ==
-            mapEntry.value['associated_id']) {
+        if (prevNotificationModel != null &&
+            prevNotificationModel.associateId == mapEntry.value['feed_id'] &&
+            prevNotificationModel.connectionType ==
+                mapEntry.value['connection_type']) {
+          print(
+              'prevous ${prevNotificationModel.associateId} == ${mapEntry.value['feed_id'].toString()}');
           print('inside prev');
-          models.last.userNames.add(userContactModel.name);
-          models.last.userProfilePics.add(userContactModel.profilePic);
-          models.last.userIds.add(userContactModel.id);
-          DateTime newCreatedTime=DateTime.fromMillisecondsSinceEpoch(mapEntry.value['created_time']);
-          if(newCreatedTime.compareTo(models.last.createdTime).isNegative){
-            models.last.createdTime=newCreatedTime;
-            models.last.id=mapEntry.key;
+          models.last.userNames.add(mapEntry.value['user_name']);
+          models.last.userProfilePics.add(mapEntry.value['profile_pic'] != null
+              ? Urls().serverAddress + mapEntry.value['profile_pic']
+              : null);
+          models.last.userIds.add(mapEntry.value['user_id'].toString());
+          DateTime newCreatedTime = DateTime.fromMillisecondsSinceEpoch(
+              mapEntry.value['create_date']);
+          if (newCreatedTime.compareTo(models.last.createdTime).isNegative) {
+            models.last.createdTime = newCreatedTime;
+            models.last.id = mapEntry.key;
           }
+        } else {
+          InAppNotificationModel model = InAppNotificationModel(
+            id: mapEntry.key,
+            associateId: mapEntry.value['feed_id'].toString(),
+            associateType: mapEntry.value['feed_type'],
+            connectionId: mapEntry.value['id'].toString(),
+            connectionType: mapEntry.value['connection_type'],
+            createdTime: DateTime.fromMillisecondsSinceEpoch(
+                mapEntry.value['create_date']),
+            userIds: [mapEntry.value['user_id'].toString()],
+            userNames: [mapEntry.value['user_name']],
+            userProfilePics: [
+              mapEntry.value['profile_pic'] != null
+                  ? Urls().serverAddress + mapEntry.value['profile_pic']
+                  : null
+            ],
+          );
+          models.add(model);
+          newlyLoadedDataCount = newlyLoadedDataCount + 1;
         }
-      }
-      else
-      {
-        InAppNotificationModel model = InAppNotificationModel(
-          id: mapEntry.key,
-          content: mapEntry.value['content'],
-          associateId: mapEntry.value['associated_id'],
-          associateType: mapEntry.value['associated_type'],
-          connectionId: mapEntry.value['connection_id'],
-          connectionType: mapEntry.value['connection_type'],
-          createdTime: DateTime.fromMillisecondsSinceEpoch(
-              mapEntry.value['created_time']),
-          userIds: [userContactModel.id],
-          userNames: [userContactModel.name],
-          userProfilePics: [userContactModel.profilePic],
-        );
-        models.add(model);
-        newlyLoadedDataCount = newlyLoadedDataCount + 1;
-      }
-      prevNotificationModel = models.last;
+        prevNotificationModel = models.last;
       }
 
       ids.add(mapEntry.key);
     }
   }
 
-  Future<void> setData() async {
-    for (int i = 0; i < 100; i++) {
-      String key = reference.push().key;
-      await Future.delayed(Duration(milliseconds: 1));
-      Map<String, dynamic> map = {
-        'id': key,
-        'associated_id': '22021600172',
-        'associated_type': 'blog',
-        'connection_type': 'like',
-        'sender_id': AppData().userId,
-        'content': '$i liked your photo',
-        'created_time': DateTime.now().millisecondsSinceEpoch
-      };
-      reference
-          .child('Notification')
-          .child(AppData().userId)
-          .child('Data')
-          .child(key)
-          .set(map);
-      reference
-          .child('Notification')
-          .child(AppData().userId)
-          .child('count')
-          .once()
-          .then((value) {
-        reference
-            .child('Notification')
-            .child(AppData().userId)
-            .child('count')
-            .set(value.value + 1);
-      });
-    }
-  }
+// Future<void> setData() async {
+//   for (int i = 0; i < 100; i++) {
+//     String key = reference.push().key;
+//     await Future.delayed(Duration(milliseconds: 1));
+//     Map<String, dynamic> map = {
+//       'id': key,
+//       'associated_id': '22021600172',
+//       'associated_type': 'blog',
+//       'connection_type': 'like',
+//       'sender_id': AppData().userId,
+//       'content': '$i liked your photo',
+//       'create_date': ServerValue.timestamp
+//     };
+//     reference
+//         .child('Connection')
+//         .child(AppData().userId)
+//         .child('data')
+//         .child(key)
+//         .set(map);
+//     reference
+//         .child('Connection')
+//         .child(AppData().userId)
+//         .child('count')
+//         .once()
+//         .then((value) {
+//       reference
+//           .child('Connection')
+//           .child(AppData().userId)
+//           .child('count')
+//           .set(value.value + 1);
+//     });
+//   }
+// }
 }

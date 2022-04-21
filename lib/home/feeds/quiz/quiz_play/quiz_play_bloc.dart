@@ -3,11 +3,12 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/authentication/form_submitting_status.dart';
-import 'package:queschat/constants/strings_and_urls.dart';
+import 'package:queschat/components/popups/show_loader.dart';
 import 'package:queschat/function/time_conversions.dart';
 import 'package:queschat/home/feeds/feeds_repo.dart';
 import 'package:queschat/home/feeds/quiz/quiz_play/quiz_play_event.dart';
 import 'package:queschat/home/feeds/quiz/quiz_play/quiz_play_state.dart';
+import 'package:queschat/main.dart';
 import 'package:queschat/models/feed_model.dart';
 import 'package:queschat/models/mcq_model.dart';
 
@@ -175,6 +176,8 @@ class QuizPlayBloc extends Bloc<QuizPlayEvent, QuizPlayState> {
   @override
   Stream<QuizPlayState> mapEventToState(QuizPlayEvent event) async* {
     if (event is McqAnswered) {
+
+      showLoader(MyApp.navigatorKey.currentContext, .5);
       try {
 
       String answerStatus='wrong';
@@ -192,6 +195,7 @@ class QuizPlayBloc extends Bloc<QuizPlayEvent, QuizPlayState> {
 
         yield state.copyWith();
       } catch (e) {}
+     Navigator.pop( MyApp.navigatorKey.currentContext);
     }else if(event is ShowNextMCQ){
       state.currentIndex=state.currentIndex+1;
       yield state.copyWith( );

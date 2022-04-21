@@ -4,15 +4,12 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mime/mime.dart';
+import 'package:path/path.dart' as path;
 import 'package:queschat/components/popups/show_loader.dart';
 import 'package:queschat/components/video_player.dart';
 import 'package:queschat/constants/styles.dart';
-import 'package:path/path.dart' as path;
 import 'package:queschat/function/file_types.dart';
-
 import 'package:queschat/home/message/message_room/message_room_cubit.dart';
-
 import 'package:queschat/models/message_model.dart';
 import 'package:queschat/uicomponents/appbars.dart';
 import 'package:queschat/uicomponents/custom_button.dart';
@@ -21,7 +18,7 @@ Future<void> multipleMultiFormatFilePicker(
     {@required BuildContext buildContext, @required String roomName}) async {
   try {
     List<File> files = [];
-    showLoader(buildContext);
+    showLoader(buildContext,0.9);
 
     FilePickerResult result = await FilePicker.platform.pickFiles(
       type: FileType.any,

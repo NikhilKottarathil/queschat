@@ -16,28 +16,42 @@ class NotificationCountWidget extends StatelessWidget {
         child: Row(
           children: [
             BlocBuilder<InAppNotificationCubit, InAppNotificationState>(
+              buildWhen: (prevState,state){
+                return state is NewNotificationCount;
+              },
                 builder: (context, state) {
               if (state is NewNotificationCount) {
                 return state.count == 0
                     ? notificationIcon(context)
                     : SizedBox(
                         height: 40,
-                        width: 55,
+                        width: 30,
                         child: Stack(
                           children: [
-                            Align(
-                                alignment: Alignment.center,
-                                child: notificationIcon(context)),
                             Positioned(
-                              top: 0,
-                              left: 33,
-                              child: Text(
-                                state.count > 99
-                                    ? '99+'
-                                    : state.count.toString(),
-                                style: TextStyles.smallBoldTextFourth,
+                              top: 8,
+                              left: 0,
+                              child: notificationIcon(context),
+                            ),
+                            Positioned(
+                              top: 6,
+                              left: 22,
+                              child:FaIcon(
+                                FontAwesomeIcons.solidCircle,
+                                size: 8,
+                                color: AppColors.White,
                               ),
-                            )
+                            ),
+                            // Positioned(
+                            //   top: 0,
+                            //   left: 26,
+                            //   child: Text(
+                            //     state.count > 99
+                            //         ? '99+'
+                            //         : state.count.toString(),
+                            //     style: TextStyles.smallBoldTextFourth,
+                            //   ),
+                            // )
                           ],
                         ),
                       );
@@ -54,7 +68,27 @@ class NotificationCountWidget extends StatelessWidget {
   Widget notificationIcon(BuildContext context) {
     return IconButton(
       constraints: BoxConstraints(),
-      iconSize: 28,
+      padding: EdgeInsets.all(0),
+      onPressed: () {
+        Navigator.pushNamed(context, '/inAppNotifications');
+      },
+      icon: FaIcon(
+        FontAwesomeIcons.bell,
+        size: 24,
+        color: AppColors.White,
+      ),
+      //   icon: Image.asset(
+      //   "images/notifications.png",
+      //   height: 24,
+      //   width: 24,
+      //   color: AppColors.IconColor,
+      // ),
+    );
+  }
+  Widget notificationBadgeIcon(BuildContext context) {
+    return IconButton(
+      constraints: BoxConstraints(),
+      padding: EdgeInsets.all(0),
       onPressed: () {
         Navigator.pushNamed(context, '/inAppNotifications');
       },

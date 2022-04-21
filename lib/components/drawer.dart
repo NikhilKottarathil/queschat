@@ -1,18 +1,12 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:queschat/authentication/profile/profile_bloc.dart';
+import 'package:queschat/authentication/profile/profile_state.dart';
+import 'package:queschat/constants/styles.dart';
 import 'package:queschat/home/message/new_group_and_channel/new_group_cubit.dart';
 import 'package:queschat/home/message/new_group_and_channel/new_group_view_select_users.dart';
 import 'package:queschat/repository/auth_repo.dart';
-import 'package:queschat/authentication/profile/edit_profile_options_view.dart';
-import 'package:queschat/authentication/profile/profile_bloc.dart';
-import 'package:queschat/authentication/profile/profile_events.dart';
-import 'package:queschat/authentication/profile/profile_state.dart';
-import 'package:queschat/authentication/profile/profile_view.dart';
-import 'package:queschat/home/feeds/feeds_bloc.dart';
-import 'package:queschat/constants/styles.dart';
 import 'package:queschat/router/app_router.dart';
 import 'package:queschat/uicomponents/custom_ui_widgets.dart';
 

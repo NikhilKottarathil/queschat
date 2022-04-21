@@ -2,12 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/authentication/auth_credentials.dart';
-import 'package:queschat/authentication/verfiy_sign_up/verify_signup_bloc.dart';
-import 'package:queschat/authentication/verfiy_sign_up/verify_signup_view.dart';
 import 'package:queschat/authentication/form_submitting_status.dart';
 import 'package:queschat/authentication/sign_up/sign_up_bloc.dart';
 import 'package:queschat/authentication/sign_up/sign_up_events.dart';
 import 'package:queschat/authentication/sign_up/sign_up_state.dart';
+import 'package:queschat/authentication/verfiy_sign_up/verify_signup_bloc.dart';
+import 'package:queschat/authentication/verfiy_sign_up/verify_signup_view.dart';
 import 'package:queschat/components/custom_progress_indicator.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/function/show_snack_bar.dart';
@@ -183,7 +183,7 @@ class SignUpView extends StatelessWidget {
                                           .buttonPrimary),
                                   onTap: () {
 
-                                    Navigator.pushNamed(context, '/login');
+                                    Navigator.pushNamed(context, '/otpLogin');
                                     },
                                 ),
                               )

@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:queschat/home/home/home_events.dart';
-import 'package:queschat/main.dart';
 import 'package:queschat/models/chat_room_model.dart';
 import 'package:queschat/router/app_router.dart';
 import 'package:share_plus/share_plus.dart';
@@ -58,11 +57,10 @@ listenDynamicLink(BuildContext context) async {
     print('DynamicLinks data  ${dynamicLinkData.link.queryParameters}');
     Map<String, String> queryParameters = dynamicLinkData.link.queryParameters;
     if (queryParameters['linkType'] == 'messageRoom') {
-      homeBloc.add(ChangeTab(0));
       if (queryParameters['messageRoomType'] == 'channel') {
-        messageHomeBloc.add(ChangeTab(1));
+        homeBloc.add(ChangeTab(0));
       } else {
-        messageHomeBloc.add(ChangeTab(1));
+        homeBloc.add(ChangeTab(1));
       }
       Navigator.pushNamed(
         context,

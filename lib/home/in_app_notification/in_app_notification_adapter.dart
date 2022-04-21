@@ -34,7 +34,8 @@ class InAppNotificationAdapter extends StatelessWidget {
             ),
             child: CircleAvatar(
               radius: 21,
-              backgroundImage: NetworkImage(model.userProfilePics.first),
+              backgroundImage: model.userProfilePics.first!=null?NetworkImage(model.userProfilePics.first):null,
+              child: model.userProfilePics.first==null?Image.asset('assets/user_profile.png'):null,
               backgroundColor: Colors.transparent,
             ),
           ),
@@ -51,7 +52,8 @@ class InAppNotificationAdapter extends StatelessWidget {
               ),
               child: CircleAvatar(
                 radius: 21,
-                backgroundImage: NetworkImage(model.userProfilePics[1]),
+                backgroundImage: model.userProfilePics[1]!=null?NetworkImage(model.userProfilePics[1]):null,
+                child: model.userProfilePics[1]==null?Image.asset('assets/user_profile.png'):null,
                 backgroundColor: Colors.green,
               ),
             ),
@@ -69,7 +71,8 @@ class InAppNotificationAdapter extends StatelessWidget {
               ),
               child: CircleAvatar(
                 radius: 21,
-                backgroundImage: NetworkImage(model.userProfilePics.last),
+                backgroundImage: model.userProfilePics.last!=null?NetworkImage(model.userProfilePics.last):null,
+                child: model.userProfilePics.last==null?Image.asset('assets/user_profile.png'):null,
                 backgroundColor: Colors.red,
               ),
             ),
@@ -83,24 +86,50 @@ class InAppNotificationAdapter extends StatelessWidget {
     String names = model.userNames.length == 1
         ? model.userNames.first
         : model.userNames.length == 2
-        ? model.userNames.first + ' and ' + model.userNames[1]
-        : model.userNames.first +
-        ', ' +
-        model.userNames[1] +
-        ' and ' +
-        (model.userNames.length - 2).toString() +
-        ' others';
+            ? model.userNames.first + ' and ' + model.userNames[1]
+            : model.userNames.first +
+                ', ' +
+                model.userNames[1] +
+                ' and ' +
+                (model.userNames.length - 2).toString() +
+                ' others';
 
-    title = names + ' ' + model.content;
+    title = names + ' ';
+    String content = getContent(model.connectionType, model.associateType);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: TextStyles.smallRegularTextSecondary),
+        RichText(
+          text: TextSpan(children: [
+            TextSpan(text: names, style: TextStyles.smallBoldTextSecondary),
+            TextSpan(
+                text: content, style: TextStyles.smallRegularTextSecondary),
+          ]),
+        ),
         Align(
             alignment: Alignment.bottomLeft,
             child: Text(getDisplayDateOrTime(model.createdTime),
                 style: TextStyles.tinyRegularTextTertiary)),
       ],
     );
+  }
+
+  getContent(String connectionType, String associateType) {
+    String subject;
+    String object;
+    if (connectionType == 'comment') {
+      subject =  'commented on your';
+    } else if (connectionType == 'answer') {
+      subject = 'attended your';
+    } else {
+      subject = connectionType + 'ed  your';
+    }
+    if(associateType=='mcq'){
+      object='poll';
+    }else{
+      object=associateType;
+    }
+
+    return subject+' '+object;
   }
 }

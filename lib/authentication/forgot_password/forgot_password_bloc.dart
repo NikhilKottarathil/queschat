@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:queschat/repository/auth_repo.dart';
 import 'package:queschat/authentication/forgot_password/forgot_password_event.dart';
 import 'package:queschat/authentication/forgot_password/forgot_password_state.dart';
 import 'package:queschat/authentication/forgot_password/forgot_password_status.dart';
+import 'package:queschat/repository/auth_repo.dart';
 
 class ForgotPasswordBloc
     extends Bloc<ForgotPasswordEvent, ForgotPasswordState> {

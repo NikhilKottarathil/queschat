@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:queschat/repository/auth_repo.dart';
 import 'package:queschat/authentication/form_submitting_status.dart';
 import 'package:queschat/authentication/sign_up/sign_up_events.dart';
 import 'package:queschat/authentication/sign_up/sign_up_state.dart';
+import 'package:queschat/repository/auth_repo.dart';
 
 
 class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {

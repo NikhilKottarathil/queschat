@@ -8,6 +8,7 @@ class MCQOptionAdapter extends StatelessWidget {
   String option;
   Function function;
   double answeredPercentage;
+  String feedType;
 
   MCQOptionAdapter(
       {this.isSelected,
@@ -15,6 +16,7 @@ class MCQOptionAdapter extends StatelessWidget {
       this.optionKey,
       this.function,
       this.isAnswerCorrect,
+      this.feedType,
       this.option});
 
   @override
@@ -42,10 +44,9 @@ class MCQOptionAdapter extends StatelessWidget {
                         ],
                       stops: [
                           0.0,
-                        answeredPercentage,
-                        answeredPercentage,
-                        ]
-                  ),
+                          answeredPercentage,
+                          answeredPercentage,
+                        ]),
             ),
             child: Row(
               children: [
@@ -62,13 +63,17 @@ class MCQOptionAdapter extends StatelessWidget {
                             : TextStyles.smallMediumWhite,
                       ),
                     ),
-                    backgroundColor: isAnswerCorrect != null
-                        ? isAnswerCorrect
-                            ? AppColors.GreenPrimary
-                            : AppColors.RedPrimary
-                        : isSelected
-                            ? AppColors.IconColor
-                            : AppColors.White,
+                    backgroundColor: feedType == 'poll'
+                        ? isSelected
+                            ? AppColors.PrimaryColorLight
+                            : AppColors.White
+                        : isAnswerCorrect != null
+                            ? isAnswerCorrect
+                                ? AppColors.GreenPrimary
+                                : AppColors.RedPrimary
+                            : isSelected
+                                ? AppColors.IconColor
+                                : AppColors.White,
                   ),
                 ),
                 SizedBox(
@@ -100,7 +105,8 @@ class MCQOptionImagedAdapter extends StatelessWidget {
   MCQOptionImagedAdapter(
       {this.isSelected,
       this.optionKey,
-      this.function,this.answeredPercentage,
+      this.function,
+      this.answeredPercentage,
       this.isAnswerCorrect,
       this.option});
 
@@ -114,22 +120,21 @@ class MCQOptionImagedAdapter extends StatelessWidget {
         padding: const EdgeInsets.all(5.0),
         decoration: BoxDecoration(
             color: Colors.white,
-              gradient: isAnswerCorrect == null
-                  ? LinearGradient(colors: [AppColors.StatusBar], stops: [0.0])
-                  : LinearGradient(
-                  begin: FractionalOffset.centerLeft,
-                  end: FractionalOffset.centerRight,
-                  colors: [
-                    Colors.black45,
-                    Colors.black45,
-                    Colors.transparent
-                  ],
-                  stops: [
-                    0.0,
-                    answeredPercentage,
-                    answeredPercentage,
-                  ]
-              ),
+            gradient: isAnswerCorrect == null
+                ? LinearGradient(colors: [AppColors.StatusBar], stops: [0.0])
+                : LinearGradient(
+                    begin: FractionalOffset.centerLeft,
+                    end: FractionalOffset.centerRight,
+                    colors: [
+                        Colors.black45,
+                        Colors.black45,
+                        Colors.transparent
+                      ],
+                    stops: [
+                        0.0,
+                        answeredPercentage,
+                        answeredPercentage,
+                      ]),
             borderRadius: BorderRadius.circular(5),
             border: Border.all(
               width: 2,

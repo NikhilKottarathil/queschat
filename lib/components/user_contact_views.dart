@@ -1,20 +1,12 @@
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/src/provider.dart';
-import 'package:queschat/authentication/app_data.dart';
-import 'package:queschat/components/custom_alert_dialoug.dart';
 import 'package:queschat/constants/styles.dart';
+import 'package:queschat/function/check_ready_message_to_user.dart';
 import 'package:queschat/home/message/message_room/add_members/add_members_to_message_room_cubit.dart';
-
-import 'package:queschat/home/message/message_room/message_room_cubit.dart';
-import 'package:queschat/home/message/message_room/message_room_view.dart';
-import 'package:queschat/home/message/new_chat/new_chat_cubit.dart';
 import 'package:queschat/home/message/new_group_and_channel/new_group_cubit.dart';
-import 'package:queschat/models/chat_room_model.dart';
 import 'package:queschat/models/user_contact_model.dart';
-import 'package:queschat/router/app_router.dart';
 
 Widget userContactViewSelectable(
     UserContactModel contact, BuildContext context) {
@@ -103,38 +95,7 @@ Widget userContactView(UserContactModel contact, BuildContext context) {
   return ListTile(
     onTap: () {
       if (contact.isUser) {
-        if (allChatMessageRoomListBloc.state.models.any((element) =>
-            element.messengerId == contact.id && element.isSingleChat)) {
-
-
-          Navigator.pushReplacementNamed(
-            context,
-            '/messageRoom',
-            arguments: {
-              'parentPage': 'newChatExisting',
-              'chatRoomModel': ChatRoomModel(
-                  id:allChatMessageRoomListBloc.state.models
-                      .singleWhere((element) =>
-                          element.messengerId == contact.id &&
-                          element.isSingleChat)
-                      .id),
-            },
-          );
-        } else {
-          Navigator.pushReplacementNamed(
-            context,
-            '/messageRoom',
-            arguments: {
-              'parentPage': 'newChat',
-              'chatRoomModel': ChatRoomModel(
-                  name: contact.name,
-                  imageUrl: contact.profilePic,
-                  messageRoomType: 'chat',
-                  isSingleChat: true,
-                  messengerId: contact.id),
-            },
-          );
-        }
+        checkAlreadyMessagedToUser(context:context,id:contact.id,name:contact.name,profilePic: contact.profilePic);
       }
     },
     leading: CircleAvatar(

@@ -96,45 +96,9 @@ class MessageRoomMemberContactView extends StatelessWidget {
                         'Message ${contact.name}',
                         style: TextStyles.bodyTextSecondary,
                       ),
-                      onTap: () {
-                        print('message pressed');
-                        if (allChatMessageRoomListBloc.state.models.any(
-                            (element) =>
-                                element.messengerId == contact.id &&
-                                element.isSingleChat)) {
-                          print('message exit');
+                      enabled: true,
+                      value: 'message',
 
-                          try {
-                            Navigator.pushNamed(
-                              context,
-                              '/messageRoom',
-                              arguments: {
-                                'parentPage': 'newChatExisting',
-                                'chatRoomModel':
-                                    ChatRoomModel(id: 'fjkghkfdjgh'),
-                              },
-                            );
-                          } catch (e) {
-                            print(e);
-                          }
-                        } else {
-                          print('message new');
-
-                          Navigator.pushNamed(
-                            context,
-                            '/messageRoom',
-                            arguments: {
-                              'parentPage': 'newChat',
-                              'chatRoomModel': ChatRoomModel(
-                                  name: contact.name,
-                                  imageUrl: contact.profilePic,
-                                  messageRoomType: 'chat',
-                                  isSingleChat: true,
-                                  messengerId: contact.id),
-                            },
-                          );
-                        }
-                      },
                     ),
                   );
                   if (context.read<MessageRoomCubit>().userRole == 'admin' ||
@@ -144,19 +108,8 @@ class MessageRoomMemberContactView extends StatelessWidget {
                         'Remove ${contact.name}',
                         style: TextStyles.bodyTextSecondary,
                       ),
-                      onTap: () {
-                        print('pressed');
-                        customAlertDialog(
-                            context: context,
-                            heading:
-                                'Remove ${contact.name} from ${context.read<MessageRoomCubit>().chatRoomModel.name}',
-                            positiveText: 'Yes',
-                            positiveAction: () {
-                              context
-                                  .read<MessageRoomCubit>()
-                                  .removeUserFromMessageRoom(contact.id);
-                            });
-                      },
+                      value: 'remove',
+
                     ));
                   if (context.read<MessageRoomCubit>().userRole == 'owner') {
                     contact.userType == 'user'
@@ -187,6 +140,65 @@ class MessageRoomMemberContactView extends StatelessWidget {
                   return menuItems;
                 },
                 elevation: 2,
+                onSelected: (value){
+                  if(value=='message'){
+                    if (allChatMessageRoomListBloc.state.models.any(
+                            (element) =>
+                        element.messengerId == contact.id &&
+                            element.isSingleChat)) {
+                      print('message exit');
+
+                      try {
+                        Navigator.pushNamed(
+                          context,
+                          '/messageRoom',
+                          arguments: {
+                            'parentPage': 'newChatExisting',
+                            'chatRoomModel':
+                            ChatRoomModel(id: allChatMessageRoomListBloc.state.models
+                            .singleWhere((element) =>
+                        element.messengerId == contact.id &&
+                        element.isSingleChat)
+                            .id),
+                          },
+                        );
+                      } catch (e) {
+                        print(e);
+                      }
+                    } else {
+                      print('message new');
+
+                      Navigator.pushNamed(
+                        context,
+                        '/messageRoom',
+                        arguments: {
+                          'parentPage': 'newChat',
+                          'chatRoomModel': ChatRoomModel(
+                              name: contact.name,
+                              imageUrl: contact.profilePic,
+                              messageRoomType: 'chat',
+                              isSingleChat: true,
+                              messengerId: contact.id),
+                        },
+                      );
+                    }
+                  }
+                  if(value=='remove'){
+
+                      customAlertDialog(
+                          context: context,
+                          heading:'Are you  sure',
+                          // 'Remove ${contact.name} from ${context.read<MessageRoomCubit>().chatRoomModel.name}',
+                          positiveText: 'Yes',
+                          positiveAction: () {
+                            context
+                                .read<MessageRoomCubit>()
+                                .removeUserFromMessageRoom(contact.id);
+                            Navigator.of(context).pop();
+                          });
+
+                  }
+                },
               ),
             ),
           ],

@@ -58,7 +58,7 @@ class _CustomButtonState extends State<CustomButton> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: 30),
+      // margin: EdgeInsets.only(top: 30),
       height: MediaQuery.of(context).size.height * .07,
       width: MediaQuery.of(context).size.width,
       child: RaisedButton(

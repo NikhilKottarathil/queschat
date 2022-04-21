@@ -1,7 +1,6 @@
 import 'package:queschat/models/chat_room_model.dart';
 import 'package:queschat/models/message_model.dart';
 import 'package:queschat/models/user_contact_model.dart';
-import 'package:queschat/models/value_model.dart';
 enum MessageRoomStatus { NotCreated, Active, Deleted, NotExist }
 enum MessageRoomUserStatus {NotJoined,Active, Removed,UnKnown}
 
@@ -61,18 +60,18 @@ class LoadList extends MessageRoomState {
   List<Object> get props => [messageModels];
 }
 class TypingUserState extends MessageRoomState {
-  final List<ValueModel> valueModels;
+  final List<String> typingUsers;
 
-  TypingUserState({this.valueModels});
+  TypingUserState({this.typingUsers});
 
   TypingUserState copyWith({
-    List<ValueModel> valueModels,
+    List<String> typingUsers,
   }) {
     return TypingUserState(
-      valueModels: valueModels ?? this.valueModels,
+      typingUsers: typingUsers ?? this.typingUsers,
     );
   }
 
   @override
-  List<Object> get props => [valueModels];
+  List<Object> get props => [typingUsers];
 }

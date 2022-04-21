@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:queschat/components/audio/globals.dart';
-import 'package:queschat/constants/styles.dart';
 
 class AudioBubble extends StatefulWidget {
   const AudioBubble({Key key, @required this.filepath}) : super(key: key);

@@ -26,7 +26,6 @@ class _HomeView2State extends State<HomeView2>
     with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   List<Widget> _buildScreens() {
     return [
-
       BlocProvider(
         create: (context) => channelMessageRoomListBloc,
         child: MessageRoomListView(),
@@ -35,7 +34,10 @@ class _HomeView2State extends State<HomeView2>
         create: (context) => allChatMessageRoomListBloc,
         child: MessageRoomListView(),
       ),
-      FeedsView(),
+      BlocProvider(
+        create: (context) => homeFeedBloc,
+        child: FeedsView(),
+      ),
       // FeedsView(),
       ProfileView(),
     ];
@@ -44,42 +46,47 @@ class _HomeView2State extends State<HomeView2>
   List<PersistentBottomNavBarItem> _navBarsItems() {
     return [
       PersistentBottomNavBarItem(
-        icon:FaIcon(FontAwesomeIcons.chromecast,size: 22,),
-
+        icon: FaIcon(
+          FontAwesomeIcons.chromecast,
+          size: 22,
+        ),
         title: ("Channels"),
         activeColorSecondary: AppColors.White,
         textStyle: TextStyles.bodyWhite,
-
         activeColorPrimary: AppColors.PrimaryColorLight,
         inactiveColorPrimary: AppColors.IconColor,
       ),
       PersistentBottomNavBarItem(
-        icon:FaIcon(FontAwesomeIcons.message,size: 22,),
-
+        icon: FaIcon(
+          FontAwesomeIcons.message,
+          size: 22,
+        ),
         title: ("All Chats"),
         activeColorSecondary: AppColors.White,
         textStyle: TextStyles.bodyWhite,
-
         activeColorPrimary: AppColors.PrimaryColorLight,
         inactiveColorPrimary: AppColors.IconColor,
       ),
       PersistentBottomNavBarItem(
-        icon:FaIcon(FontAwesomeIcons.rectangleList,size: 22,),
-
+        icon: FaIcon(
+          FontAwesomeIcons.rectangleList,
+          size: 22,
+        ),
         title: ("Feeds"),
         activeColorSecondary: AppColors.White,
         textStyle: TextStyles.bodyWhite,
-
         activeColorPrimary: AppColors.PrimaryColorLight,
         inactiveColorPrimary: AppColors.IconColor,
       ),
       PersistentBottomNavBarItem(
-       icon:FaIcon(FontAwesomeIcons.user,size: 22,),
+        icon: FaIcon(
+          FontAwesomeIcons.user,
+          size: 22,
+        ),
         title: ("Profile"),
         textStyle: TextStyles.bodyWhite,
-
         activeColorSecondary: AppColors.White,
-              activeColorPrimary: AppColors.PrimaryColorLight,
+        activeColorPrimary: AppColors.PrimaryColorLight,
         inactiveColorPrimary: AppColors.IconColor,
       ),
     ];
@@ -150,7 +157,7 @@ class _HomeView2State extends State<HomeView2>
               decoration: NavBarDecoration(
                   borderRadius: BorderRadius.circular(0.0),
                   colorBehindNavBar: Colors.white,
-                  boxShadow:appShadow),
+                  boxShadow: appShadow),
 
               popAllScreensOnTapOfSelectedTab: true,
               popActionScreens: PopActionScreensType.all,

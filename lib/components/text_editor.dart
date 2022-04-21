@@ -75,27 +75,22 @@
 
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:queschat/constants/styles.dart';
-import 'package:queschat/home/feeds/post_blog/post_blog_bloc.dart';
-import 'package:queschat/uicomponents/appbars.dart';
 import 'package:tuple/tuple.dart';
-
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 
 class TextEditor extends StatefulWidget {
   QuillController controller;
-  TextEditor({this.controller});
+  BuildContext postBlogBlocContext;
+  TextEditor({this.controller,this.postBlogBlocContext});
 
   @override
   _TextEditorState createState() => _TextEditorState();
@@ -114,8 +109,10 @@ class _TextEditorState extends State<TextEditor> {
   @override
   Widget build(BuildContext context) {
     if (widget.controller == null) {
+
       return const Scaffold(body: Center(child: Text('Loading...')));
     }
+
     return RawKeyboardListener(
       focusNode: FocusNode(),
       onKey: (event) {
@@ -130,6 +127,7 @@ class _TextEditorState extends State<TextEditor> {
           } else {
             widget.controller.formatSelection(Attribute.bold);
           }
+
         }
       },
       child: _buildWelcomeEditor(context),
@@ -139,11 +137,14 @@ class _TextEditorState extends State<TextEditor> {
 
   Widget _buildWelcomeEditor(BuildContext context) {
     var quillEditor = QuillEditor(
+
+      
         controller: widget.controller,
         scrollController: ScrollController(),
         scrollable: true,
         focusNode: _focusNode,
         autoFocus: false,
+
         readOnly: false,
         placeholder: 'Enter your content',
         expands: false,
@@ -165,13 +166,22 @@ class _TextEditorState extends State<TextEditor> {
 
     var toolbar = QuillToolbar.basic(
       controller: widget.controller,
+
       // provide a callback to enable picking images from device.
       // if omit, "image" button only allows adding images from url.
       // same goes for videos.
       onImagePickCallback: _onImagePickCallback,
+
+
+      showCameraButton: false,
+      // showVideoButton: false,
+
+      showVideoButton: true,
+
+
       onVideoPickCallback: _onVideoPickCallback,
       // uncomment to provide a custom "pick from" dialog.
-      // mediaPickSettingSelector: _selectMediaPickSetting,
+      mediaPickSettingSelector: _selectMediaPickSetting,
       showAlignmentButtons: true,
     );
     if (kIsWeb) {
@@ -194,7 +204,7 @@ class _TextEditorState extends State<TextEditor> {
                 const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
                 child: toolbar,
               ))
-              : Container(child: toolbar, padding:
+              : Container(child: toolbar,color: AppColors.PrimaryColorLight, padding:
           const EdgeInsets.symmetric(vertical: 8, horizontal: 4),),
           Expanded(
             flex: 15,
@@ -218,11 +228,14 @@ class _TextEditorState extends State<TextEditor> {
   // You can also upload the picked image to any server (eg : AWS s3
   // or Firebase) and then return the uploaded image URL.
   Future<String> _onImagePickCallback(File file) async {
-    // Copies the picked file from temporary cache to applications directory
+    // // Copies the picked file from temporary cache to applications directory
     final appDocDir = await getApplicationDocumentsDirectory();
     final copiedFile =
     await file.copy('${appDocDir.path}/${basename(file.path)}');
-    return copiedFile.path.toString();
+    return file.path.toString();
+
+
+
   }
 
   Future<String> _webImagePickImpl(
@@ -251,30 +264,34 @@ class _TextEditorState extends State<TextEditor> {
   }
 
   // ignore: unused_element
-  Future<MediaPickSetting> _selectMediaPickSetting(BuildContext context) =>
-      showDialog<MediaPickSetting>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          contentPadding: EdgeInsets.zero,
-          backgroundColor: AppColors.White,
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextButton.icon(
-                icon: const Icon(Icons.collections),
-                label: const Text('Gallery'),
-                onPressed: () => Navigator.pop(ctx, MediaPickSetting.Gallery),
-              ),
-              TextButton.icon(
-                icon: const Icon(Icons.link),
-                label: const Text('Link'),
-                onPressed: () => Navigator.pop(ctx, MediaPickSetting.Link),
-              )
-            ],
-          ),
-        ),
-      );
+  Future<MediaPickSetting> _selectMediaPickSetting(BuildContext context) async {
+    return await MediaPickSetting.Gallery;
+  }
+      // showDialog<MediaPickSetting>(
+      //   context: context,
+        // builder: (ctx) => AlertDialog(
+        //   contentPadding: EdgeInsets.all(10),
+        //   backgroundColor: AppColors.White,
+        //   content: Column(
+        //     mainAxisSize: MainAxisSize.min,
+        //     crossAxisAlignment: CrossAxisAlignment.start,
+        //     children: [
+        //       TextButton.icon(
+        //         icon: const Icon(Icons.collections),
+        //         label: const Text('Gallery'),
+        //
+        //         style: TextButton.styleFrom(backgroundColor: AppColors.White),
+        //         onPressed: () => Navigator.pop(ctx, MediaPickSetting.Gallery),
+        //       ),
+        //       TextButton.icon(
+        //         icon: const Icon(Icons.link),
+        //         label: const Text('Link'),
+        //         onPressed: () => Navigator.pop(ctx, MediaPickSetting.Link),
+        //       )
+        //     ],
+        //   ),
+        // ),
+      // );
 
   Widget _buildMenuBar(BuildContext context) {
     final size = MediaQuery.of(context).size;

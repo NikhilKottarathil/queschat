@@ -90,15 +90,20 @@ class _OptionTextFieldState extends State<OptionTextField> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 20),
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: AppColors.BorderColor),
+        borderRadius: BorderRadius.circular(8)
+
+      ),
+      // padding: EdgeInsets.only(bottom: 10,top: 10),
+      padding: EdgeInsets.symmetric(horizontal: 10,vertical: 4),
+      margin: EdgeInsets.only(bottom: 16),
       child: new TextFormField(
         controller: controller,
         keyboardType: widget.textInputType,
         style: TextStyles.smallRegularTextSecondary,
         validator: widget.validator,
-
-
         obscureText:
         widget.textInputType == TextInputType.visiblePassword ? true : false,
         enableSuggestions:
@@ -125,8 +130,10 @@ class _OptionTextFieldState extends State<OptionTextField> {
               ),
             ),
           ),
-          contentPadding: EdgeInsets.all(17),
+          contentPadding: EdgeInsets.all(0),
           hintText: widget.hint,
+          // filled: true,
+          // fillColor: AppColors.RedSecondary,
 
           hintStyle: TextStyles.smallRegularTextTertiary,
           errorText: widget.errorText==''?null:widget.errorText,

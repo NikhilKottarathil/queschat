@@ -1,4 +1,4 @@
-import 'package:queschat/models/chat_room_model.dart';
+
 
 class MessageRoomListEvent {}
 

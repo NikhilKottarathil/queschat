@@ -2,9 +2,7 @@ import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:mime/mime.dart';
 import 'package:path/path.dart' as path;
-import 'package:queschat/components/custom_web_view.dart';
 import 'package:queschat/components/video_player.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/function/file_types.dart';

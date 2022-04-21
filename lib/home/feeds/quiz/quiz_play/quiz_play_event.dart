@@ -5,6 +5,7 @@ class McqAnswered extends QuizPlayEvent {
   String option;
   String answer;
 
+
   McqAnswered({this.feedIndex, this.option,this.answer});
 }
 class ShowPreviousMCQ extends QuizPlayEvent {}

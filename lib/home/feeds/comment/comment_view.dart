@@ -43,126 +43,120 @@ class _CommentViewState extends State<CommentView> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        return false;
-      },
-      child: Scaffold(
-        appBar: appBarWithBackButton(
-          context: context,
-          titleString: 'Comments',
-        ),
-        body: BlocListener<CommentBloc, CommentState>(
-          listener: (context, state) async {
-            if (state.pageScrollStatus is ScrollToTop) {
-              SchedulerBinding.instance?.addPostFrameCallback((_) {
-                scrollController.animateTo(
-                    scrollController.position.minScrollExtent,
-                    duration: const Duration(milliseconds: 400),
-                    curve: Curves.fastOutSlowIn);
-              });
-            }
+    return Scaffold(
+      appBar: appBarWithBackButton(
+        context: context,
+        titleString: 'Comments',
+      ),
+      body: BlocListener<CommentBloc, CommentState>(
+        listener: (context, state) async {
+          if (state.pageScrollStatus is ScrollToTop) {
+            SchedulerBinding.instance?.addPostFrameCallback((_) {
+              scrollController.animateTo(
+                  scrollController.position.minScrollExtent,
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.fastOutSlowIn);
+            });
+          }
 
-            if (state.indexOfSelectedCommentForDelete != null &&
-                state.indexOfSelectedCommentForDelete != -1) {
-              if(state.indexOfSelectedCReplayForDelete==null  || state.indexOfSelectedCReplayForDelete==-1) {
-                //comment
-                if(state.commentModelList[state.indexOfSelectedCommentForDelete].userId==AppData().userId) {
-                  showDeleteAlert(context);
-                }else {
-                  showReportAlert(buildContext: context,
-                      reportedModel: 'Connection',
-                      reportedModelId: state.commentModelList[state.indexOfSelectedCommentForDelete].id);
-                }
-              }else{
-                // replay
-                print(state.commentModelList[state.indexOfSelectedCommentForDelete].replays[state.indexOfSelectedCReplayForDelete].userId);
-                print(AppData().userId);
-                if(state.commentModelList[state.indexOfSelectedCommentForDelete].replays[state.indexOfSelectedCReplayForDelete].userId==AppData().userId) {
-                  showDeleteAlert(context);
-                }else {
-                  showReportAlert(buildContext: context,
-                      reportedModel: 'Connection',
-                      reportedModelId: state.commentModelList[state.indexOfSelectedCommentForDelete].replays[state.indexOfSelectedCReplayForDelete].id);
-                  context.read<CommentBloc>().add(
-                      ShowDeleteAndReport(replayIndex: -1, commentIndex: -1));
-                }
-
+          if (state.indexOfSelectedCommentForDelete != null &&
+              state.indexOfSelectedCommentForDelete != -1) {
+            if(state.indexOfSelectedCReplayForDelete==null  || state.indexOfSelectedCReplayForDelete==-1) {
+              //comment
+              if(state.commentModelList[state.indexOfSelectedCommentForDelete].userId==AppData().userId) {
+                showDeleteAlert(context);
+              }else {
+                showReportAlert(buildContext: context,
+                    reportedModel: 'Connection',
+                    reportedModelId: state.commentModelList[state.indexOfSelectedCommentForDelete].id);
               }
-            }
-          },
-          child:
-              BlocBuilder<CommentBloc, CommentState>(builder: (context, state) {
-            print(state.commentModelList.length);
-            if (state.comment == '') {
-              controller.text = state.comment;
-            }
-            return Column(
-              children: [
-                // FeedAdapter(widget.index),
-                Expanded(
-                  child: ListView.separated(
-                    padding: EdgeInsets.all(20),
-                    controller: scrollController,
-                    shrinkWrap: true,
-                    itemCount: state.commentModelList.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return CommentAdapter(index);
-                    },
-                    separatorBuilder: (BuildContext context, int index) {
-                      return SizedBox(
-                        height: 10,
-                      );
-                    },
-                  ),
-                ),
-                state.isLoading
-                    ? Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: CustomProgressIndicator(),
-                      )
-                    : Container(),
-                _replayFloating(),
-                BlocBuilder<CommentBloc, CommentState>(
-                    builder: (context, state) {
-                  return Container(
-                    decoration: BoxDecoration(
-                        color: AppColors.White,
+            }else{
+              // replay
+              print(state.commentModelList[state.indexOfSelectedCommentForDelete].replays[state.indexOfSelectedCReplayForDelete].userId);
+              print(AppData().userId);
+              if(state.commentModelList[state.indexOfSelectedCommentForDelete].replays[state.indexOfSelectedCReplayForDelete].userId==AppData().userId) {
+                showDeleteAlert(context);
+              }else {
+                showReportAlert(buildContext: context,
+                    reportedModel: 'Connection',
+                    reportedModelId: state.commentModelList[state.indexOfSelectedCommentForDelete].replays[state.indexOfSelectedCReplayForDelete].id);
+                context.read<CommentBloc>().add(
+                    ShowDeleteAndReport(replayIndex: -1, commentIndex: -1));
+              }
 
-                        boxShadow: appShadow
-                    ),
-                    padding: EdgeInsets.all(20),
-                    child: TextFormField(
-                      controller: controller,
-                      validator: (value) {
-                        return state.commentValidationText;
-                      },
-                      onChanged: (value) {
-                        context.read<CommentBloc>().add(
-                              CommentChanged(comment: value),
-                            );
-                      },
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: "Write your comment…",
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              context.read<CommentBloc>().add(
-                                    AddNewComment(),
-                                  );
-                            },
-                            icon: Icon(
-                              Icons.send,
-                              color:state.comment.isNotEmpty? AppColors.PrimaryColor:AppColors.IconColor,
-                            ),
-                          )),
-                    ),
-                  );
-                })
-              ],
-            );
-          }),
-        ),
+            }
+          }
+        },
+        child:
+            BlocBuilder<CommentBloc, CommentState>(builder: (context, state) {
+          print(state.commentModelList.length);
+          if (state.comment == '') {
+            controller.text = state.comment;
+          }
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.separated(
+                  padding: EdgeInsets.all(20),
+                  controller: scrollController,
+                  shrinkWrap: true,
+                  itemCount: state.commentModelList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return CommentAdapter(index);
+                  },
+                  separatorBuilder: (BuildContext context, int index) {
+                    return SizedBox(
+                      height: 10,
+                    );
+                  },
+                ),
+              ),
+              state.isLoading
+                  ? Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: CustomProgressIndicator(),
+                    )
+                  : Container(),
+              _replayFloating(),
+              BlocBuilder<CommentBloc, CommentState>(
+                  builder: (context, state) {
+                return Container(
+                  decoration: BoxDecoration(
+                      color: AppColors.White,
+
+                      boxShadow: appShadow
+                  ),
+                  padding: EdgeInsets.all(20),
+                  child: TextFormField(
+                    controller: controller,
+                    validator: (value) {
+                      return state.commentValidationText;
+                    },
+                    onChanged: (value) {
+                      context.read<CommentBloc>().add(
+                            CommentChanged(comment: value),
+                          );
+                    },
+                    decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: "Write your comment…",
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            context.read<CommentBloc>().add(
+                                  AddNewComment(),
+                                );
+                          },
+                          icon: Icon(
+                            Icons.send,
+                            color:state.comment!=null? AppColors.PrimaryColor:AppColors.IconColor,
+                          ),
+                        )),
+                  ),
+                );
+              })
+            ],
+          );
+        }),
       ),
     );
   }

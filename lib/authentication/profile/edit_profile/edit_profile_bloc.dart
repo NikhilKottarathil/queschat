@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:queschat/repository/auth_repo.dart';
 import 'package:queschat/authentication/form_submitting_status.dart';
 import 'package:queschat/authentication/profile/edit_profile/edit_profile_event.dart';
 import 'package:queschat/authentication/profile/edit_profile/edit_profile_state.dart';
 import 'package:queschat/authentication/profile/profile_events.dart';
+import 'package:queschat/repository/auth_repo.dart';
 import 'package:queschat/router/app_router.dart';
 
 

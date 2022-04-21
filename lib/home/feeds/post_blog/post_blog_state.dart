@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter_quill/flutter_quill.dart';
 import 'package:queschat/authentication/form_submitting_status.dart';
 
 class PostBlogState {

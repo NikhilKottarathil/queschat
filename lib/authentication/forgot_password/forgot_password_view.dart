@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:queschat/repository/auth_repo.dart';
 import 'package:queschat/authentication/forgot_password/forgot_password_bloc.dart';
 import 'package:queschat/authentication/forgot_password/forgot_password_event.dart';
 import 'package:queschat/authentication/forgot_password/forgot_password_state.dart';

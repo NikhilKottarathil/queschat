@@ -1,11 +1,11 @@
 import 'dart:math';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:queschat/constants/strings_and_urls.dart';
 import 'package:queschat/function/time_conversions.dart';
 import 'package:queschat/home/feeds/comment/comment_event.dart';
 import 'package:queschat/home/feeds/comment/comment_model.dart';
 import 'package:queschat/home/feeds/comment/connection_repo.dart';
+import 'package:queschat/home/feeds/feed_actions.dart';
 import 'package:queschat/home/feeds/feeds_status.dart';
 
 import 'comment_state.dart';
@@ -156,7 +156,16 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
       yield state.copyWith(isLoading: true);
       await getMoreData();
       yield state.copyWith(isLoading: false);
+    }  else if (event is CommentChanged) {
+      yield state.copyWith(comment: event.comment);
+    } else if (event is CommentSelectedForReplay) {
+      print(event.index);
+      yield state.copyWith(
+          indexOfSelectedComment: event.index != null ? event.index : -1,
+          comment: '');
     } else if (event is AddNewComment) {
+      yield state.copyWith(
+        isLoading: true,);
       if (state.indexOfSelectedComment == null) {
         // comment
         var id = await connectionRepository.AddNewComment(
@@ -176,14 +185,8 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
         yield state.copyWith(
             isLoading: false, pageScrollStatus: InitialStatus(),comment: '');
       }
-    } else if (event is CommentChanged) {
-      yield state.copyWith(comment: event.comment);
-    } else if (event is CommentSelectedForReplay) {
-      print(event.index);
-      yield state.copyWith(
-          indexOfSelectedComment: event.index != null ? event.index : -1,
-          comment: '');
-    } else if (event is ConfirmDelete) {
+      updateFeedInAll(feedId);
+    }else if (event is ConfirmDelete) {
       print('confirm delete');
       //delete comment
       print(state.indexOfSelectedCommentForDelete);
@@ -203,6 +206,8 @@ class CommentBloc extends Bloc<CommentEvent, CommentState> {
             .removeAt(state.indexOfSelectedCReplayForDelete);
         yield state.copyWith(isShowDeleteAndReportAlert: false,indexOfSelectedCommentForDelete: -1,indexOfSelectedCReplayForDelete: -1);
       }
+      updateFeedInAll(feedId);
+
     } else if (event is ShowAndHideReplays) {
       await showAndHideReplays(event.index);
       yield state.copyWith();

@@ -1,21 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:queschat/function/time_conversions.dart';
-import 'package:queschat/repository/auth_repo.dart';
 import 'package:queschat/authentication/form_submitting_status.dart';
 import 'package:queschat/authentication/profile/edit_profile/edit_profile_bloc.dart';
 import 'package:queschat/authentication/profile/edit_profile/edit_profile_event.dart';
 import 'package:queschat/authentication/profile/edit_profile/edit_profile_state.dart';
-import 'package:queschat/authentication/profile/profile_bloc.dart';
-
 import 'package:queschat/components/custom_progress_indicator.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/function/show_snack_bar.dart';
+import 'package:queschat/function/time_conversions.dart';
 import 'package:queschat/router/app_router.dart';
 import 'package:queschat/uicomponents/appbars.dart';
 import 'package:queschat/uicomponents/custom_button.dart';
-import 'package:queschat/uicomponents/custom_text_field.dart';
 import 'package:queschat/uicomponents/custom_text_field_3.dart';
 
 class EditProfileView extends StatelessWidget {

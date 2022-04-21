@@ -14,51 +14,62 @@ import 'package:queschat/authentication/sign_up/sign_up_bloc.dart';
 import 'package:queschat/authentication/sign_up/sign_up_view.dart';
 import 'package:queschat/authentication/splash_screen/session_cubit.dart';
 import 'package:queschat/authentication/splash_screen/splash_screen.dart';
+import 'package:queschat/authentication/user_profile/user_profile_bloc.dart';
+import 'package:queschat/authentication/user_profile/user_profile_view.dart';
 import 'package:queschat/home/feeds/feed_single_view.dart';
 import 'package:queschat/home/feeds/feeds_bloc.dart';
 import 'package:queschat/home/feeds/feeds_repo.dart';
-import 'package:queschat/home/feeds/post_a_mcq/post_mcq_bloc.dart';
-import 'package:queschat/home/feeds/post_blog/post_blog_bloc.dart';
-import 'package:queschat/home/feeds/post_blog/post_blog_view.dart';
 import 'package:queschat/home/feeds/quiz/leader_board/leader_board_cubit.dart';
 import 'package:queschat/home/feeds/quiz/leader_board/leader_board_view.dart';
-import 'package:queschat/home/feeds/quiz/post_quiz_bloc.dart';
 import 'package:queschat/home/home/home_bloc.dart';
-import 'package:queschat/home/home/home_view.dart';
 import 'package:queschat/home/home/home_view_2.dart';
-import 'package:queschat/home/home/home_view_3.dart';
 import 'package:queschat/home/in_app_notification/in_app_notification_cubit.dart';
 import 'package:queschat/home/in_app_notification/in_app_notification_view.dart';
-import 'package:queschat/home/message/message_home/message_home_bloc.dart';
 import 'package:queschat/home/message/message_room/message_room_cubit.dart';
 import 'package:queschat/home/message/message_room/message_room_view.dart';
 import 'package:queschat/home/message/message_room_list/expore_channels_views.dart';
 import 'package:queschat/home/message/message_room_list/message_room_list_bloc.dart';
-import 'package:queschat/home/message/message_room_list/message_room_list_view.dart';
-
 import 'package:queschat/repository/auth_repo.dart';
+
 
 AuthRepository authRepository = AuthRepository();
 FeedRepository feedRepository = FeedRepository();
+HomeBloc homeBloc;
 
-MessageRoomListBloc allChatMessageRoomListBloc =
-    MessageRoomListBloc(parentPage: 'allChat');
-MessageRoomListBloc channelMessageRoomListBloc =
-    MessageRoomListBloc(parentPage: 'channel');
-FeedsBloc homeFeedBloc =
-    FeedsBloc(feedRepository: feedRepository, parentPage: 'homeView');
-FeedsBloc myFeedsBloc =
-    FeedsBloc(feedRepository: feedRepository, parentPage: 'myFeeds');
-FeedsBloc savedFeedBloc =
-    FeedsBloc(feedRepository: feedRepository, parentPage: 'savedFeeds');
-ProfileBloc profileBloc = ProfileBloc(authRepo: authRepository);
-HomeBloc homeBloc = HomeBloc();
+MessageRoomListBloc allChatMessageRoomListBloc;
 
-MessageHomeBloc messageHomeBloc = MessageHomeBloc();
+MessageRoomListBloc channelMessageRoomListBloc;
 
-InAppNotificationCubit inAppNotificationCubit = InAppNotificationCubit();
+FeedsBloc homeFeedBloc;
+FeedsBloc myFeedsBloc;
+FeedsBloc savedFeedBloc;
 
-void resetRepositoryAndBloc() {
+ProfileBloc profileBloc;
+
+InAppNotificationCubit inAppNotificationCubit;
+
+Future<void> setRepositoryAndBloc() async {
+  await authRepository.initRepository();
+  allChatMessageRoomListBloc = MessageRoomListBloc(parentPage: 'allChat');
+  channelMessageRoomListBloc = MessageRoomListBloc(parentPage: 'channel');
+  await allChatMessageRoomListBloc.initMessageRoomList();
+  await channelMessageRoomListBloc.initMessageRoomList();
+
+  homeFeedBloc =
+      FeedsBloc(feedRepository: feedRepository, parentPage: 'home');
+  homeBloc = HomeBloc();
+  myFeedsBloc =
+      FeedsBloc(feedRepository: feedRepository, parentPage: 'myFeeds');
+  savedFeedBloc =
+      FeedsBloc(feedRepository: feedRepository, parentPage: 'savedFeeds');
+  inAppNotificationCubit = InAppNotificationCubit();
+  profileBloc = ProfileBloc(authRepo: authRepository);
+}
+
+Future<void> resetRepositoryAndBloc() async {
+  await authRepository.initRepository();
+  profileBloc = ProfileBloc(authRepo: authRepository);
+
   allChatMessageRoomListBloc = MessageRoomListBloc(parentPage: 'allChat');
   channelMessageRoomListBloc = MessageRoomListBloc(parentPage: 'channel');
 }
@@ -107,7 +118,14 @@ class AppRouter {
           builder: (_) => ProfileView(),
         );
 
-      case '/forgotPassword':
+      case '/userProfile':
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (context) => UserProfileBloc(userId: arguments['userId']),
+            child: UserProfileView(),
+          ),
+        );
+        case '/forgotPassword':
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
             create: (context) => ForgotPasswordBloc(authRepo: authRepository),
@@ -131,17 +149,19 @@ class AppRouter {
           ),
         );
       case '/exploreChannels':
-        return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (context) =>
-                MessageRoomListBloc(parentPage: 'exploreChannel'),
+        return MaterialPageRoute(builder: (_) {
+          MessageRoomListBloc messageRoomListBloc =
+              MessageRoomListBloc(parentPage: 'exploreChannel');
+          messageRoomListBloc.initMessageRoomList();
+          return BlocProvider(
+            create: (context) => messageRoomListBloc,
             child: ExploreChannelsView(),
-          ),
-        );
+          );
+        });
       case '/feedSingleView':
         return MaterialPageRoute(
           builder: (_) => FeedSingleView(
-              parentPage: arguments['parentPage'], feedId: arguments['feedId']),
+              parentPage: arguments['parentPage'],parentFeedBloc: arguments['parentFeedBloc'], feedId: arguments['feedId']),
         );
       case '/leaderBoard':
         return MaterialPageRoute(
@@ -160,28 +180,13 @@ class AppRouter {
 
       case '/home':
         return MaterialPageRoute(
-          builder: (_) => MultiBlocProvider(
-            providers: [
-              BlocProvider(create: (context) => homeBloc),
-              BlocProvider(
-                create: (context) => FeedsBloc(
-                    feedRepository: feedRepository, parentPage: 'home'),
-              ),
-              BlocProvider(
-                create: (context) => PostMcqBloc(feedRepo: feedRepository),
-              ),
-              BlocProvider(
-                create: (BuildContext context) =>
-                    PostQuizBloc(feedRepo: feedRepository),
-              ),
-              BlocProvider(
-                create: (context) =>
-                    PostBlogBloc(feedRepo: feedRepository, parentPage: 'home'),
-              ),
-            ],
+          builder: (_) => BlocProvider(
+            create: (context) => homeBloc,
             child: HomeView2(),
           ),
         );
+
+
 
       default:
         return null;

@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fuzzy/fuzzy.dart';
 import 'package:queschat/home/message/new_chat/new_chat_state.dart';
-import 'package:queschat/models/chat_room_model.dart';
 import 'package:queschat/models/user_contact_model.dart';
 import 'package:queschat/repository/auth_repo.dart';
 

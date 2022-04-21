@@ -1,9 +1,10 @@
 import 'dart:math';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:queschat/constants/strings_and_urls.dart';
 import 'package:queschat/function/time_conversions.dart';
+import 'package:queschat/home/feeds/feed_actions.dart';
 import 'package:queschat/home/feeds/feeds_event.dart';
 import 'package:queschat/home/feeds/feeds_repo.dart';
 import 'package:queschat/home/feeds/feeds_state.dart';
@@ -18,15 +19,28 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
   String parentPage;
 
   String feedId;
+  String userProfileId;
+  FeedsBloc parentFeedBloc;
+  DatabaseReference reference = FirebaseDatabase.instance.reference();
 
   FeedsBloc(
-      {@required this.feedRepository, @required this.parentPage, this.feedId})
+      {@required this.feedRepository,
+      @required this.parentPage,
+      this.feedId,
+      this.parentFeedBloc,
+      this.userProfileId})
       : super(FeedsState(feedModelList: [], feedIds: [])) {
     state.parentPage = parentPage;
-    if (parentPage == 'home' || parentPage=='myFeeds' || parentPage=='savedFeeds') {
+    print('parent feed Bloc ${parentFeedBloc!=null}');
+    if (parentPage == 'home' ||
+        parentPage == 'myFeeds' ||
+        parentPage == 'savedFeeds' ||
+        parentPage == 'userProfileFeed') {
       getInitialFeeds();
-    } else if (parentPage == 'messageRoomView' || parentPage== 'dynamicLink' || parentPage=='feedAdapter') {
-
+    } else if (parentPage == 'messageRoomView' ||
+        parentPage == 'dynamicLink' ||
+        parentPage == 'feedAdapter' ||
+        parentPage == 'notification') {
       print('messageRoomView feed bloc $feedId');
 
       getInitialSingleFeeds(feedId);
@@ -38,31 +52,35 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
     state.feedIds.clear();
     state.page = 1;
     try {
-       var element = await feedRepository.getSingleFeedDetails(feedId);
-       List feeds = [element];
-       // print('inital $feeds');
+      var element = await feedRepository.getSingleFeedDetails(feedId);
+      List feeds = [element];
 
-       convertFeeds(feeds);
-    }catch(e){
+      convertFeeds(feeds);
+    } catch (e) {
       add(UpdateFeeds());
     }
-
   }
 
   getInitialFeeds() async {
     state.feedModelList.clear();
     state.feedIds.clear();
     state.page = 1;
-    var feeds = await feedRepository.getFeeds(state.page, 10, parentPage);
-    // print('inital $feeds');
+    var feeds = await feedRepository.getFeeds(
+        page: state.page,
+        rowsPerPage: 10,
+        parentPage: parentPage,
+        userId: userProfileId);
 
     convertFeeds(feeds);
   }
 
   getMoreFeeds() async {
     state.page = state.page + 1;
-    var feeds = await feedRepository.getFeeds(state.page, 10, parentPage);
-    // print('norw $feeds');
+    var feeds = await feedRepository.getFeeds(
+        page: state.page,
+        rowsPerPage: 10,
+        parentPage: parentPage,
+        userId: userProfileId);
 
     convertFeeds(feeds);
   }
@@ -71,108 +89,190 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
     String id,
   ) async {
     var element = await feedRepository.getSingleFeedDetails(id);
-    var contentModel = await getContentModel(element);
 
-    state.feedModelList.insert(
-        0,
-        FeedModel(
-            userName: element['user'],
-            userId: element['user_id'].toString(),
-            id: element['id'].toString(),
-            feedType: element['feed_type'],
-            savedId: element['saved_feed_id'] != null
-                ? element['saved_feed_id'].toString()
-                : null,
-            commentCount: element['comment_count'] != null
-                ? element['comment_count']
-                : '0',
-            likeCount:
-                element['like_count'] != null ? element['like_count'] : '0',
-            profilePicUrl: element['profile_pic'] != null
-                ? 'https://api.queschat.com/' + element['profile_pic']
-                : null,
-            uploadedTime:
-                getTimeDifferenceFromNowString(element['create_date']),
-            contentModel: contentModel));
+    state.feedModelList.insert(0, await convertDataInToFeedModel(element));
 
-    // var tempFeedIDs=state.feedIds;
     state.feedIds.insert(0, element['id'].toString());
-    emit(state);
+
+    add(UpdateFeeds());
   }
 
   updateSingleFeedData(
     String id,
   ) async {
     var element = await feedRepository.getSingleFeedDetails(id);
-    var contentModel = await getContentModel(element);
 
-    state.feedModelList[state.feedIds.indexOf(id)] = FeedModel(
-        userName: element['user'],
-        userId: element['user_id'].toString(),
-        id: element['id'].toString(),
-        feedType: element['feed_type'],
-        savedId: element['saved_feed_id'] != null
-            ? element['saved_feed_id'].toString()
-            : null,
-        commentCount:
-            element['comment_count'] != null ? element['comment_count'] : '0',
-        likeCount: element['like_count'] != null ? element['like_count'] : '0',
-        profilePicUrl: element['profile_pic'] != null
-            ? 'https://api.queschat.com/' + element['profile_pic']
-            : null,
-        uploadedTime: getTimeDifferenceFromNowString(element['create_date']),
-        contentModel: contentModel);
-    emit(state);
+    state.feedModelList[state.feedIds.indexOf(id)] =
+        await convertDataInToFeedModel(element);
+    add(UpdateFeeds());
   }
 
   convertFeeds(var feeds) async {
-    try {
-      // print('conver feed');
-      feeds.forEach((element) async {
-        // print('fedd $element');
-        if (!state.feedIds.contains(element['id'])) {
-          var contentModel = await getContentModel(element);
+    await Future.forEach(feeds, (element) async {
+      if (!state.feedIds.contains(element['id'])) {
+        state.feedModelList.add(await convertDataInToFeedModel(element));
+        state.feedIds.add(element['id'].toString());
+      }
+    });
 
-          state.feedModelList.add(FeedModel(
-              userName: element['user'],
-              userId: element['user_id'].toString(),
-              id: element['id'].toString(),
-              feedType: element['feed_type'],
-              savedId: element['saved_feed_id'] != null
-                  ? element['saved_feed_id'].toString()
-                  : null,
-              commentCount: element['comment_count'] != null
-                  ? element['comment_count'].toString()
-                  : '0',
-              isLiked: element['like'] != null,
-              likeId: element['like'] != null
-                  ? element['like']['id'].toString()
-                  : null,
-              likeCount: element['like_count'] != null
-                  ? element['like_count'].toString()
-                  : '0',
-              profilePicUrl: element['profile_pic'] != null
-                  ? 'https://api.queschat.com/' + element['profile_pic']
-                  : null,
-              uploadedTime:
-                  getTimeDifferenceFromNowString(element['create_date']),
-              contentModel: contentModel));
-          state.feedIds.add(element['id'].toString());
-          // for(int i=0;i<1;i++){
-          //   deleteDataRequest(address: 'feed/${state.feedIds[i]}');
-          //   deleteDataRequest(address: 'feed/${state.feedIds[state.feedIds.length-1]}');
-          // }
-        }
+    add(UpdateFeeds());
+  }
+
+  Future<FeedModel> convertDataInToFeedModel(var element) async {
+    String channelName, channelImageUrl;
+    var contentModel = await getContentModel(element);
+
+    FeedModel feedModel;
+    if (element['channel_id'] != null) {
+      await reference
+          .child('ChannelRooms')
+          .child(element['channel_id'])
+          .child('info')
+          .once()
+          .then((value) async {
+        Map<dynamic, dynamic> map = value.value;
+        print('channel in feed $map');
+        channelName = map['name'] ?? null;
+
+        channelImageUrl = map['icon_url'] ?? null;
+
+        feedModel = FeedModel(
+            userName: element['user'],
+            userId: element['user_id'].toString(),
+            id: element['id'].toString(),
+            feedType: element['feed_type'],
+            messageRoomId: element['channel_id'] != null
+                ? element['channel_id'].toString()
+                : null,
+            messageRoomImageUrl: channelImageUrl,
+            messageRoomName: channelName,
+            savedId: element['saved_feed_id'] != null
+                ? element['saved_feed_id'].toString()
+                : null,
+            commentCount: element['comment_count'] != null
+                ? element['comment_count'].toString()
+                : '0',
+            isLiked: element['like'] != null,
+            likeId: element['like'] != null
+                ? element['like']['id'].toString()
+                : null,
+            likeCount: element['like_count'] != null
+                ? element['like_count'].toString()
+                : '0',
+            profilePicUrl: element['profile_pic'] != null
+                ? 'https://api.queschat.com/' + element['profile_pic']
+                : null,
+            uploadedTime:
+                getTimeDifferenceFromNowString(element['create_date']),
+            contentModel: contentModel);
       });
-      emit(state);
-    } catch (e) {
-      print('feed error');
-      print(e);
+    } else {
+      feedModel = FeedModel(
+          userName: element['user'],
+          userId: element['user_id'].toString(),
+          id: element['id'].toString(),
+          feedType: element['feed_type'],
+          messageRoomId: element['channel_id'] != null
+              ? element['channel_id'].toString()
+              : null,
+          savedId: element['saved_feed_id'] != null
+              ? element['saved_feed_id'].toString()
+              : null,
+          commentCount: element['comment_count'] != null
+              ? element['comment_count'].toString()
+              : '0',
+          isLiked: element['like'] != null,
+          likeId:
+              element['like'] != null ? element['like']['id'].toString() : null,
+          likeCount: element['like_count'] != null
+              ? element['like_count'].toString()
+              : '0',
+          profilePicUrl: element['profile_pic'] != null
+              ? 'https://api.queschat.com/' + element['profile_pic']
+              : null,
+          uploadedTime: getTimeDifferenceFromNowString(element['create_date']),
+          contentModel: contentModel);
     }
+    return feedModel;
   }
 
   Future getContentModel(var element) async {
-    if (element['feed_type'] == 'mcq') {
+    if (element['feed_type'] == 'poll') {
+      try {
+        String optionA, optionB, optionC, optionD;
+        int optionACount = 0,
+            optionBCount = 0,
+            optionCCount = 0,
+            optionDCount = 0,
+            allAnswersCount = 0;
+        var selectedAnswer;
+        var myAnswer = element['my_answer'] != null
+            ? element['my_answer']['name'] != null
+                ? element['my_answer']['name']
+                : null
+            : null;
+        // correctAnswer = element['answer'];
+        optionA = element['option_a'];
+        optionB = element['option_b'];
+        optionC = element['option_c'];
+        optionD = element['option_d'];
+        if (myAnswer == optionA) {
+          selectedAnswer = 'A';
+        }
+        if (myAnswer == optionB) {
+          selectedAnswer = 'B';
+        }
+        if (myAnswer == optionC) {
+          selectedAnswer = 'C';
+        }
+        if (myAnswer == optionD) {
+          selectedAnswer = 'D';
+        }
+        List<String> media = [];
+        element['media'].forEach((value) {
+          media.add('https://api.queschat.com/' + value['url']);
+        });
+        if (element['all_answers'] != null) {
+          element['all_answers'].forEach((entry) {
+            if (entry['name'] == optionA) {
+              optionACount = entry['count'];
+            }
+            if (entry['name'] == optionB) {
+              optionBCount = entry['count'];
+            }
+            if (entry['name'] == optionC) {
+              optionCCount = entry['count'];
+            }
+            if (entry['name'] == optionD) {
+              optionDCount = entry['count'];
+            }
+          });
+        }
+        allAnswersCount =
+            optionACount + optionBCount + optionCCount + optionDCount;
+        MCQModel mcqModel = MCQModel(
+          question: element['name'],
+          optionA: optionA,
+          optionB: optionB,
+          optionType: element['option_type'],
+          selectedAnswer: selectedAnswer,
+          optionC: optionC,
+          media: media,
+          optionD: optionD,
+          correctAnswer: 'poll',
+          optionAPercentage:
+              optionACount == 0 ? 0.0 : optionACount / allAnswersCount,
+          optionBPercentage:
+              optionBCount == 0 ? 0.0 : optionBCount / allAnswersCount,
+          optionCPercentage:
+              optionCCount == 0 ? 0.0 : optionCCount / allAnswersCount,
+          optionDPercentage:
+              optionDCount == 0 ? 0.0 : optionDCount / allAnswersCount,
+        );
+
+        return mcqModel;
+      } catch (e) {}
+    } else if (element['feed_type'] == 'mcq') {
       try {
         String optionA, optionB, optionC, optionD, correctAnswer;
         int optionACount = 0,
@@ -235,10 +335,14 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
           media: media,
           optionD: optionD,
           correctAnswer: correctAnswer,
-          optionAPercentage:optionACount==0?0.0:optionACount/allAnswersCount,
-          optionBPercentage:optionBCount==0?0.0: optionBCount/allAnswersCount,
-          optionCPercentage:optionCCount==0?0.0: optionCCount/allAnswersCount,
-          optionDPercentage:optionDCount==0?0.0: optionDCount/allAnswersCount,
+          optionAPercentage:
+              optionACount == 0 ? 0.0 : optionACount / allAnswersCount,
+          optionBPercentage:
+              optionBCount == 0 ? 0.0 : optionBCount / allAnswersCount,
+          optionCPercentage:
+              optionCCount == 0 ? 0.0 : optionCCount / allAnswersCount,
+          optionDPercentage:
+              optionDCount == 0 ? 0.0 : optionDCount / allAnswersCount,
         );
 
         return mcqModel;
@@ -250,6 +354,7 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
       });
       BlogModel blogModel = BlogModel(
           content: element['description'],
+          mediaIds: element['media_ids'] ?? null,
           images: media,
           heading: element['name']);
       return blogModel;
@@ -264,35 +369,42 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
         mcqList = mcq.split(',');
       }
       // print('mcqList$mcqList');
-      QuizModel blogModel = QuizModel(
+      QuizModel quizModel = QuizModel(
           content: element['description'],
-          isQuizAttended:element['is_quiz_attended'],
-          point: element['quiz_point']==null?'0':element['quiz_point'].toString(),
-          duration: element['quiz_time']==null?0:element['quiz_time'],
+          isQuizAttended: element['is_quiz_attended'],
+          point: element['quiz_point'] == null
+              ? '0'
+              : element['quiz_point'].toString(),
+          duration: element['quiz_time'] == null ? 0 : element['quiz_time'],
           images: media,
           mcqIDs: mcqList,
           noOfQuestions: mcqList.length.toString(),
           heading: element['name']);
-      return blogModel;
+      return quizModel;
     }
   }
 
   @override
   Stream<FeedsState> mapEventToState(FeedEvent event) async* {
-    if (event is FetchInitialData) {
-      yield state.copyWith(isLoading: true);
+
+
+    if (event is UpdateFeeds) {
+      yield state.copyWith(isLoadMore: false, isLoading: false);
+    } else if (event is FetchInitialData) {
+      yield state.copyWith(isLoadMore: true);
       await getInitialFeeds();
-      yield state.copyWith(isLoading: false);
+      yield state.copyWith(isLoadMore: false);
     } else if (event is FetchMoreData) {
       // if (parentPage == 'home') {
-        yield state.copyWith(isLoading: true);
-        await getMoreFeeds();
-        yield state.copyWith(isLoading: false);
+      yield state.copyWith(isLoadMore: true);
+      await getMoreFeeds();
+      yield state.copyWith(isLoadMore: false);
       // }
     } else if (event is UserAddedNewFeed) {
       await insertFeedToTop(event.id);
-      yield state.copyWith(isLoading: false, pageScrollStatus: ScrollToTop());
-      yield state.copyWith(isLoading: false, pageScrollStatus: InitialStatus());
+      yield state.copyWith(isLoadMore: false, pageScrollStatus: ScrollToTop());
+      yield state.copyWith(
+          isLoadMore: false, pageScrollStatus: InitialStatus());
     } else if (event is LikeAndUnLikeFeed) {
       try {
         if (!state.feedModelList[event.feedIndex].isLiked) {
@@ -312,6 +424,7 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
                   .toString();
           yield state.copyWith();
         }
+        updateFeedInAll(state.feedModelList[event.feedIndex].id);
       } catch (e) {
         yield state.copyWith();
       }
@@ -325,10 +438,8 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
         yield state.copyWith();
       } catch (e) {}
     } else if (event is DeleteFeed) {
+
       try {
-        await feedRepository.deleteFeed(
-          feedId:event.feedId,
-        );
         state.feedModelList.removeAt(state.feedIds.indexOf(event.feedId));
         state.feedIds.removeAt(state.feedIds.indexOf(event.feedId));
         yield state.copyWith();
@@ -337,7 +448,7 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
         Exception e1 = Exception(['']);
         yield state.copyWith(actionErrorMessage: e1);
       }
-    }  else if (event is SaveAndUnSaveFeed) {
+    } else if (event is SaveAndUnSaveFeed) {
       try {
         if (state.feedModelList[event.feedIndex].savedId == null) {
           var savedId = await feedRepository.saveFeed(
@@ -360,8 +471,14 @@ class FeedsBloc extends Bloc<FeedEvent, FeedsState> {
         yield state.copyWith(actionErrorMessage: e1);
       }
     } else if (event is EditedAFeed) {
+
       await updateSingleFeedData(event.feedId);
+
       yield state.copyWith();
+    }
+
+    if (parentFeedBloc != null) {
+      parentFeedBloc.add(EditedAFeed(feedId: feedId));
     }
   }
 }

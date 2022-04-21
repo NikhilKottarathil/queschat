@@ -12,17 +12,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:queschat/constants/styles.dart';
-import 'package:queschat/home/feeds/post_blog/post_blog_bloc.dart';
-import 'package:queschat/uicomponents/appbars.dart';
 import 'package:tuple/tuple.dart';
-
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 
 class TextEditorView extends StatefulWidget {
-  String incomingJSONText;
-  TextEditorView({this.incomingJSONText});
+  String incomingJSONText;final double maxHeight;
+  final double minHeight;
+
+  TextEditorView({this.incomingJSONText,this.minHeight,this.maxHeight});
 
   @override
   _TextEditorState createState() => _TextEditorState();
@@ -68,6 +65,7 @@ class _TextEditorState extends State<TextEditorView> {
           }
         }
       },
+
       child: _buildWelcomeEditor(context),
     );
 
@@ -77,11 +75,17 @@ class _TextEditorState extends State<TextEditorView> {
     var quillEditor = QuillEditor(
         controller: controller,
         scrollController: ScrollController(),
-        scrollable: true,
+        scrollable: false,
         focusNode: _focusNode,
         autoFocus: false,
         readOnly: true,
+        showCursor: false,
+        maxHeight: widget.maxHeight,
+        minHeight: widget.minHeight,
+
+        scrollPhysics: NeverScrollableScrollPhysics(),
         placeholder: 'Enter your content',
+
         expands: false,
 
         padding: EdgeInsets.zero,

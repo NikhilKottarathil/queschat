@@ -1,10 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:queschat/components/shimmer_widget.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/function/time_conversions.dart';
 import 'package:queschat/home/feeds/quiz/leader_board/leader_board_model.dart';
-import 'package:queschat/home/in_app_notification/in_app_notification_model.dart';
 
 class LeaderBoardAdapter extends StatelessWidget {
   LeaderBoardModel model;

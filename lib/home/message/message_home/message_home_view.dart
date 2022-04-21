@@ -5,7 +5,6 @@ import 'package:queschat/constants/styles.dart';
 import 'package:queschat/home/home/home_state.dart';
 import 'package:queschat/home/message/message_home/message_home_bloc.dart';
 import 'package:queschat/home/message/message_room_list/message_room_list_view.dart';
-
 import 'package:queschat/router/app_router.dart';
 
 class MessageHomeView extends StatefulWidget {

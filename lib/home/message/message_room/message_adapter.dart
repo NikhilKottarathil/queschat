@@ -1,45 +1,44 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/src/provider.dart';
 import 'package:queschat/authentication/app_data.dart';
 import 'package:queschat/components/audio/audio_bubble.dart';
-import 'package:queschat/components/custom_progress_indicator.dart';
 import 'package:queschat/components/custom_web_view.dart';
 import 'package:queschat/components/media_components/image_viewer.dart';
 import 'package:queschat/components/multi_format_file_viewer.dart';
 import 'package:queschat/components/shimmer_widget.dart';
 import 'package:queschat/constants/styles.dart';
+import 'package:queschat/function/check_ready_message_to_user.dart';
 import 'package:queschat/function/time_conversions.dart';
 import 'package:queschat/home/message/message_room/feed_message_view.dart';
 import 'package:queschat/home/message/message_room/message_appbar.dart';
 import 'package:queschat/home/message/message_room/message_room_cubit.dart';
 import 'package:queschat/models/message_model.dart';
-import 'package:queschat/router/app_router.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 class MessageAdapter extends StatefulWidget {
   MessageModel messageModel;
   BuildContext buildContext;
 
-  MessageAdapter({Key key,this.messageModel, this.buildContext});
+  MessageAdapter({Key key, this.messageModel, this.buildContext});
 
   @override
   State<MessageAdapter> createState() => _MessageAdapterState();
 }
 
 class _MessageAdapterState extends State<MessageAdapter>
-    // with AutomaticKeepAliveClientMixin<MessageAdapter>
-{
+    with AutomaticKeepAliveClientMixin<MessageAdapter> {
+  @override
+  bool get wantKeepAlive => true;
+
   bool isSendMessage = false;
 
   bool isLongPressed = false;
-
-  // @override
-  // bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -58,27 +57,30 @@ class _MessageAdapterState extends State<MessageAdapter>
     // print(
     //     'message adapter ${widget.messageModel.messageType} ${widget.messageModel.senderID} ${AppData().userId} $isSendMessage');
 
-
-
-    return InkWell(
+    return GestureDetector(
+      key: ObjectKey(widget.messageModel.id),
       onLongPress: () {
         if (widget.messageModel.messageType != MessageType.deleted &&
                 widget.messageModel.messageType != MessageType.date ||
             widget.messageModel.messageType != MessageType.loading) {
+          context.read<MessageRoomCubit>().selectUnselectMessage(widget.messageModel);
           messageSelectionAppBar(
               messageModel: widget.messageModel,
               buildContext: widget.buildContext);
         }
       },
-      child: widget.messageModel.messageType == MessageType.date
-          ? _displayDate()
-          : widget.messageModel.messageType == MessageType.loading
-              ? _displayLoader(width)
-              : widget.messageModel.messageType == MessageType.deleted
-                  ? _displayDeletedMessage(width)
-                  : isSendMessage
-                      ? _displaySendMessage(width)
-                      : _displayReceivedMessage(width),
+      child: ColoredBox(
+        color: widget.messageModel.isSelected?Colors.grey.shade300:Colors.transparent,
+        child: widget.messageModel.messageType == MessageType.date
+            ? _displayDate()
+            : widget.messageModel.messageType == MessageType.loading
+                ? _displayLoader(width)
+                : widget.messageModel.messageType == MessageType.deleted
+                    ? _displayDeletedMessage(width)
+                    : isSendMessage
+                        ? _displaySendMessage(width)
+                        : _displayReceivedMessage(width),
+      ),
     );
   }
 
@@ -102,6 +104,8 @@ class _MessageAdapterState extends State<MessageAdapter>
           crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (widget.messageModel.forwardMessage != null)
+              _displayForwardName(),
             contentView(context),
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -141,10 +145,12 @@ class _MessageAdapterState extends State<MessageAdapter>
               mainAxisSize: MainAxisSize.min,
               children: [
                 _displaySenderName(),
+                if (widget.messageModel.forwardMessage != null)
+                  _displayForwardName(),
                 contentView(context),
-
                 SizedBox(
                   height: 24,
+                  width: 100,
                 )
               ],
             ),
@@ -161,7 +167,7 @@ class _MessageAdapterState extends State<MessageAdapter>
 
   Widget _displayMessageSendTime() {
     return Padding(
-      padding: EdgeInsets.only(right: 6,left:6,top: 4),
+      padding: EdgeInsets.only(right: 6, left: 6, top: 4),
       child: Text(
         getDisplayTime(widget.messageModel.createdAt),
         style: TextStyles.subBodyTextSecondary,
@@ -171,20 +177,60 @@ class _MessageAdapterState extends State<MessageAdapter>
 
   Widget _displaySenderName() {
     return Padding(
-      padding: EdgeInsets.only(left: 6, top: 5, bottom: 5,right: 6),
-      child: Text(
-          widget.buildContext
-                  .read<MessageRoomCubit>()
-                  .userContactModels
-                  .any((element) => element.id == widget.messageModel.senderID)
-              ? widget.buildContext
-                  .read<MessageRoomCubit>()
-                  .userContactModels
-                  .singleWhere(
-                      (element) => element.id == widget.messageModel.senderID)
-                  .name
-              : 'Unknown User',
-          style: TextStyles.subBodySecondary),
+      padding: EdgeInsets.only(left: 6, top: 5, bottom: 5, right: 6),
+      child: widget.buildContext
+              .read<MessageRoomCubit>()
+              .userContactModels
+              .any((element) => element.id == widget.messageModel.senderID)
+          ? GestureDetector(
+              onTap: () {
+                checkAlreadyMessagedToUser(
+                    id: widget.messageModel.senderID,
+                    name: widget.buildContext
+                        .read<MessageRoomCubit>()
+                        .userContactModels
+                        .singleWhere((element) =>
+                            element.id == widget.messageModel.senderID)
+                        .name,
+                    profilePic: widget.buildContext
+                        .read<MessageRoomCubit>()
+                        .userContactModels
+                        .singleWhere((element) =>
+                            element.id == widget.messageModel.senderID)
+                        .profilePic,
+                    context: context);
+              },
+              child: Text(
+                  widget.buildContext
+                      .read<MessageRoomCubit>()
+                      .userContactModels
+                      .singleWhere((element) =>
+                          element.id == widget.messageModel.senderID)
+                      .name,
+                  style: TextStyles.subBodySecondary),
+            )
+          : Text('Unknown User', style: TextStyles.subBodySecondary),
+    );
+  }
+
+  Widget _displayForwardName() {
+    return Padding(
+      padding: EdgeInsets.only(left: 6, top: 5, bottom: 5, right: 6),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            CupertinoIcons.arrowshape_turn_up_right_fill,
+            size: 16,
+            // FontAwesomeIcons.share,
+            color: AppColors.TextSecondary,
+          ),
+          SizedBox(
+            width: 6,
+          ),
+          Text('Forwarded', style: TextStyles.subBodyTextSecondary),
+        ],
+      ),
     );
   }
 
@@ -230,10 +276,8 @@ class _MessageAdapterState extends State<MessageAdapter>
   Widget _displayDeletedMessage(double width) {
     return Container(
       decoration: BoxDecoration(
-        color: isSendMessage
-            ? AppColors.White
-            : AppColors.TextFifth,
-        border:isSendMessage? Border.all(color: AppColors.BorderColor):null,
+        color: isSendMessage ? AppColors.White : AppColors.TextFifth,
+        border: isSendMessage ? Border.all(color: AppColors.BorderColor) : null,
         borderRadius: BorderRadius.only(
           bottomLeft: !isSendMessage ? Radius.circular(0) : Radius.circular(8),
           bottomRight: isSendMessage ? Radius.circular(0) : Radius.circular(8),
@@ -255,7 +299,8 @@ class _MessageAdapterState extends State<MessageAdapter>
   Widget contentView(BuildContext context) {
     return widget.messageModel.messageType == MessageType.text
         ? Padding(
-            padding: const EdgeInsets.only(left: 6.0,right: 6,bottom: 2,top: 2),
+            padding:
+                const EdgeInsets.only(left: 6.0, right: 6, bottom: 2, top: 2),
             child: Text(
               widget.messageModel.message,
               style: TextStyles.bodyTextPrimary,
@@ -279,7 +324,8 @@ class _MessageAdapterState extends State<MessageAdapter>
                       width: MediaQuery.of(context).size.width * .8,
                       height: MediaQuery.of(context).size.width * .8,
                     ),
-                    errorWidget: (context, url, error) => Icon(Icons.error,color: AppColors.IconColor),
+                    errorWidget: (context, url, error) =>
+                        Icon(Icons.error, color: AppColors.IconColor),
                   ),
                   borderRadius: BorderRadius.all(Radius.circular(12.0)),
                 ),
@@ -380,9 +426,18 @@ class _MessageAdapterState extends State<MessageAdapter>
                                       messageModel: widget.messageModel,
                                     ),
                                   )
-                                : Container(
-                                    child: Text('Not supported'),
-                                  );
+                                : widget.messageModel.messageType ==
+                                        MessageType.forward_deleted
+                                    ? Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 6.0),
+                                        child: Flexible(
+                                            child:
+                                                Text('The message is removed')),
+                                      )
+                                    : Container(
+                                        child: Text('Not supported'),
+                                      );
   }
 }
 
@@ -404,43 +459,33 @@ Future<File> getThumbnail(String videoUrl) async {
 
 Widget sendSeenIcons(MessageModel messageModel) {
   return Padding(
-    padding: EdgeInsets.only(right: 6),
-    child: !messageModel.isSingleMessage
-        ? Icon(
-            Icons.check,
-            size: 18,
-
-            color: AppColors.IconColor,
-          )
-        : messageModel.messageStatus == MessageStatus.sending
-            ? Icon(Icons.access_time_outlined,
-                size: 18, color: AppColors.IconColor)
-            : messageModel.messageStatus == MessageStatus.sent
-                ? Icon(Icons.check, size: 18, color: AppColors.IconColor)
-                : messageModel.messageStatus == MessageStatus.delivered||messageModel.messageStatus == MessageStatus.seen
-                        ? Stack(
-                          children: [
-                            Icon(
-                              Icons.check,
+      padding: EdgeInsets.only(right: 6),
+      child: messageModel.messageStatus == MessageStatus.sending
+          ? Icon(FontAwesomeIcons.clock, size: 18, color: AppColors.IconColor)
+          : messageModel.messageStatus == MessageStatus.sent
+              ? Icon(Icons.done, size: 18, color: AppColors.IconColor)
+              : messageModel.messageStatus == MessageStatus.error
+                  ? Icon(
+                      FontAwesomeIcons.circleExclamation,
+                      size: 18,
+                      color: AppColors.RedPrimary,
+                    )
+                  : !messageModel.isSingleMessage
+                      ? Icon(
+                          Icons.done,
+                          size: 18,
+                          color: AppColors.IconColor,
+                        )
+                      : messageModel.messageStatus == MessageStatus.delivered ||
+                              messageModel.messageStatus == MessageStatus.seen
+                          ? Icon(
+                              Icons.done_all,
                               size: 18,
                               color: AppColors.PrimaryColor,
-                            ),
-                            // Row(
-                            //   children: [
-                            //     SizedBox(width: 6,),
-                            //     Icon(
-                            //       Icons.check_sharp,
-                            //       size: 18,
-                            //       color: AppColors.PrimaryColor,
-                            //     ),
-                            //   ],
-                            // ),
-                          ],
-                        )
-                        : Icon(
-                            Icons.error_outline,
-                            size: 18,
-                            color: AppColors.RedPrimary,
-                          ),
-  );
+                            )
+                          : Icon(
+                              FontAwesomeIcons.circleExclamation,
+                              size: 18,
+                              color: AppColors.PrimaryColor,
+                            ));
 }

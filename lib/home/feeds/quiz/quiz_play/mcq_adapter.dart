@@ -22,7 +22,7 @@ class MCQAdapter extends StatelessWidget {
       print(mcqModel.correctAnswer);
       print(mcqModel.optionA);
       return Container(
-        color: Colors.grey.shade100,
+        color: AppColors.White,
         child: Column(
           children: [
             Padding(

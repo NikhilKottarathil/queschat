@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:queschat/function/time_conversions.dart';
-import 'package:queschat/repository/auth_repo.dart';
 import 'package:queschat/authentication/form_submitting_status.dart';
 import 'package:queschat/authentication/verfiy_sign_up/verify_signup_bloc.dart';
 import 'package:queschat/authentication/verfiy_sign_up/verify_signup_events.dart';
@@ -9,6 +7,8 @@ import 'package:queschat/authentication/verfiy_sign_up/verify_signup_state.dart'
 import 'package:queschat/components/custom_progress_indicator.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/function/show_snack_bar.dart';
+import 'package:queschat/function/time_conversions.dart';
+import 'package:queschat/router/app_router.dart';
 import 'package:queschat/uicomponents/appbars.dart';
 import 'package:queschat/uicomponents/custom_button.dart';
 import 'package:queschat/uicomponents/custom_button_2.dart';
@@ -25,11 +25,13 @@ class VerifySignUpView extends StatelessWidget {
     return Scaffold(
       appBar: appBarWithBackButton(context: context, titleString: 'Register'),
       body: BlocListener<VerifySignUpBloc, VerifySignUpState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           final formStatus = state.formStatus;
           if (formStatus is SubmissionFailed) {
             showSnackBar(context, formStatus.exception);
           } else if (formStatus is SubmissionSuccess) {
+            await setRepositoryAndBloc();
+
             Navigator.pushReplacementNamed(context, '/home');
           }
         },

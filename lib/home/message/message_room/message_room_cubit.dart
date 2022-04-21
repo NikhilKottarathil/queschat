@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,12 +13,12 @@ import 'package:queschat/function/file_types.dart';
 import 'package:queschat/function/select_image.dart';
 import 'package:queschat/function/some_function.dart';
 import 'package:queschat/function/time_conversions.dart';
+import 'package:queschat/home/feeds/feed_actions.dart';
 import 'package:queschat/home/feeds/feeds_event.dart';
 import 'package:queschat/home/message/message_room/message_room_state.dart';
 import 'package:queschat/models/chat_room_model.dart';
 import 'package:queschat/models/message_model.dart';
 import 'package:queschat/models/user_contact_model.dart';
-import 'package:queschat/models/value_model.dart';
 import 'package:queschat/router/app_router.dart';
 
 class MessageRoomCubit extends Cubit<MessageRoomState> {
@@ -29,12 +30,11 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
   DatabaseReference reference = FirebaseDatabase.instance.reference();
   TextEditingController textEditingController = TextEditingController();
 
-  List<String> ids = [];
+
+  // List<String> ids = [];
   List<MessageModel> messageModels = [];
 
-  DateTime todayDateTime = DateTime.now();
-
-  DateTime messageLoadedDateTime = DateTime.now();
+  DateTime messageRoomOpenTime = DateTime.now();
 
   // DateTime joiningDateTime;
   // DateTime removedDateTime;
@@ -50,15 +50,17 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
   String userRole = 'user';
   String messageRoomName = '';
   String description = '';
+  int initialMessageCount = 25;
+  int loadMoreMessageCount = 20;
+  bool isAllMessageLoaded = false;
+  bool emojiShowing = false;
 
   MessageRoomCubit({@required this.parentPage, @required this.chatRoomModel})
       : super(InitialState()) {
-    todayDateTime = DateTime(todayDateTime.year, todayDateTime.month,
-        todayDateTime.day, 0, 0, 0, 0, 0);
-    messageLoadedDateTime = todayDateTime;
     if (parentPage == 'channelRoomsView' ||
         parentPage == 'dynamicLinkChannel' ||
         parentPage == 'newChannelCreateView' ||
+        parentPage == 'channelFeedAdapter' ||
         parentPage == 'exploreChannelRoomsView') {
       dataNode = 'ChannelRoomsData';
       detailsNode = 'ChannelRooms';
@@ -85,228 +87,217 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
     print(AppData().userId);
     isInInitialState = false;
     print('messageDataText LiveChat');
+
+    reference
+        .child(detailsNode)
+        .child(chatRoomModel.id)
+        .child('un_seen_message_count')
+        .child(AppData().userId)
+        .set(0);
     reference
         .child(dataNode)
         .child(chatRoomModel.id)
-        .child(getDayNode(todayDateTime))
-        .orderByChild('createAt')
-        .onValue
-        .listen((event) {
-      reference
-          .child(detailsNode)
-          .child(chatRoomModel.id)
-          .child('un_seen_message_count')
-          .child(AppData().userId)
-          .set(0);
-      Map<dynamic, dynamic> data = event.snapshot.value;
-      if (data != null) {
-        if (!ids.contains(getDisplayDate(todayDateTime))) {
-          messageModels.insert(
-              0,
-              MessageModel(
-                  messageType: MessageType.date,
-                  message: getDisplayDate(todayDateTime),
-                  createdAt: todayDateTime));
-          ids.insert(0, getDisplayDate(todayDateTime));
-          // if (chatRoomModel.messageRoomType == 'group') {
-          //   if (messageRoomUserStatus == MessageRoomUserStatus.Removed) {
-          //     if (todayDateTime.millisecondsSinceEpoch <
-          //         removedDateTime.millisecondsSinceEpoch && todayDateTime.millisecondsSinceEpoch >
-          //         joiningDateTime.millisecondsSinceEpoch) {
-          //       messageModels.insert(
-          //           0,
-          //           MessageModel(
-          //               messageType: MessageType.date,
-          //               message: getDisplayDate(todayDateTime),
-          //               createdAt:todayDateTime ));
-          //       ids.insert(0, getDisplayDate(todayDateTime));
-          //     }
-          //   } else
-          //     if (todayDateTime.millisecondsSinceEpoch >
-          //         joiningDateTime.millisecondsSinceEpoch) {
-          //       messageModels.insert(
-          //           0,
-          //           MessageModel(
-          //               messageType: MessageType.date,
-          //               message: getDisplayDate(todayDateTime),
-          //               createdAt: todayDateTime));
-          //       ids.insert(0, getDisplayDate(todayDateTime));
-          //     }
-          //
-          // } else {
-          //   messageModels.insert(
-          //       0,
-          //       MessageModel(
-          //           messageType: MessageType.date,
-          //           message: getDisplayDate(todayDateTime),
-          //           createdAt:todayDateTime));
-          //   ids.insert(0, getDisplayDate(todayDateTime));
-          // }
+        .onChildChanged
+        .listen((event) async {
+      print('inside change lsitner ${event.snapshot.value}');
+
+      if (event.snapshot.value != null) {
+        Map<dynamic, dynamic> value = event.snapshot.value;
+        String id = value['id'].toString();
+        if (messageModels.map((e) => e.id).toList().contains(id)) {
+          MessageModel messageModel = await convertDataToMessageModel(value);
+
+          messageModels[messageModels.map((e) => e.id).toList().indexOf(id)] =
+              messageModel;
+
+          updateMessageList();
         }
+      }
+    });
+    reference
+        .child(dataNode)
+        .child(chatRoomModel.id)
+        .limitToLast(1)
+        .onChildAdded
+        .listen((event) async {
+      print('inside added lsitner ${event.snapshot.value}');
 
-        data.forEach((id, value) {
-          MessageModel messageModel = convertDataToMessageModel(value);
+      if (event.snapshot.value != null) {
+        Map<dynamic, dynamic> value = event.snapshot.value;
+        DateTime createdAt =
+        DateTime.fromMillisecondsSinceEpoch(value['created_at'] - 1);
+        if (messageRoomOpenTime.millisecondsSinceEpoch <
+            createdAt.millisecondsSinceEpoch) {
+          String id = value['id'].toString();
 
-          if (!ids.contains(id)) {
-            messageModels.insert(0, messageModel);
-            ids.insert(0, id);
+          if (!messageModels
+              .map((e) => e.id)
+              .toList()
+              .contains(getDisplayDate(createdAt))) {
+            messageModels.insert(
+                0,
+                MessageModel(
+                    messageType: MessageType.date,
+                    message: getDisplayDate(createdAt),
+                    id: getDisplayDate(createdAt),
+                    createdAt: createdAt));
+            messageModels
+                .map((e) => e.id)
+                .toList()
+                .add(getDisplayDate(createdAt));
+          }
+          MessageModel messageModel = await convertDataToMessageModel(value);
+
+          if (messageModels.map((e) => e.id).toList().contains(id)) {
+            messageModels[messageModels.map((e) => e.id).toList().indexOf(id)] =
+                messageModel;
           } else {
-            messageModels[ids.indexOf(id)] = messageModel;
+            messageModels.insert(0, messageModel);
           }
 
-          // if (chatRoomModel.messageRoomType == 'group') {
-          //   if (messageRoomUserStatus == MessageRoomUserStatus.Removed) {
-          //     if (messageModel.createdAt.millisecondsSinceEpoch <
-          //             removedDateTime.millisecondsSinceEpoch &&
-          //         todayDateTime.millisecondsSinceEpoch >
-          //             joiningDateTime.millisecondsSinceEpoch) {
-          //       if (!ids.contains(id)) {
-          //         messageModels.insert(0, messageModel);
-          //         ids.insert(0, id);
-          //       } else {
-          //         messageModels[ids.indexOf(id)] = messageModel;
-          //       }
-          //     }
-          //   } else {
-          //     if (messageModel.createdAt.millisecondsSinceEpoch >
-          //         joiningDateTime.millisecondsSinceEpoch) {
-          //       if (!ids.contains(id)) {
-          //         messageModels.insert(0, messageModel);
-          //         ids.insert(0, id);
-          //       } else {
-          //         messageModels[ids.indexOf(id)] = messageModel;
-          //       }
-          //     }
-          //   }
-          // } else {
-          //   //the code here
-          // }
-        });
+          updateMessageList();
+        }
       }
-      updateMessageList();
     });
+    initialMessageData();
   }
 
-  loadMoreMessages() async {
-    messageLoadedDateTime = messageLoadedDateTime.subtract(Duration(days: 1));
-    if (messageLoadedDateTime.millisecondsSinceEpoch >=
-        (chatRoomModel.createdTime.millisecondsSinceEpoch - (86400000 * 1))) {
-      if (ids.length > 25) {
+  initialMessageData() async {
+    print('inside loadMore');
+    // if (messageModels.first.createdAt.millisecondsSinceEpoch >=
+    //     (chatRoomModel.createdTime.millisecondsSinceEpoch - (86400000 * 1)))
+        {
+      if (messageModels.length > 10) {
         emit(LoadMoreState());
       }
+      print('inside created condition');
+// print(messageModels.last.createdAt);
       await reference
           .child(dataNode)
           .child(chatRoomModel.id)
-          .child(getDayNode(messageLoadedDateTime))
-          .orderByChild('createAt')
+          .orderByKey()
+          .limitToLast(20)
           .once()
           .then((DataSnapshot snapshot) {
-        Map<dynamic, dynamic> data = snapshot.value;
-        if (data != null) {
-          List<MessageModel> tempModels = [];
-          data.forEach((id, value) {
-            MessageModel messageModel = convertDataToMessageModel(value);
-            if (!ids.contains(id)) {
-              tempModels.add(messageModel);
-              ids.add(id);
-            } else {
-              tempModels[ids.indexOf(id)] = messageModel;
-            }
-            // if (chatRoomModel.messageRoomType == 'group') {
-            //   if (messageRoomUserStatus == MessageRoomUserStatus.Removed) {
-            //     if (messageModel.createdAt.millisecondsSinceEpoch <
-            //         removedDateTime.millisecondsSinceEpoch &&
-            //         messageModel.createdAt.millisecondsSinceEpoch >
-            //             joiningDateTime.millisecondsSinceEpoch) {
-            //       if (!ids.contains(id)) {
-            //         tempModels.add(messageModel);
-            //         ids.add(id);
-            //       } else {
-            //         tempModels[ids.indexOf(id)] = messageModel;
-            //       }
-            //     }
-            //   } else if (messageModel.createdAt.millisecondsSinceEpoch >
-            //       joiningDateTime.millisecondsSinceEpoch) {
-            //     if (!ids.contains(id)) {
-            //       tempModels.add(messageModel);
-            //       ids.add(id);
-            //     } else {
-            //       tempModels[ids.indexOf(id)] = messageModel;
-            //     }
-            //   }
-            // } else {
-            //
-            // }
+        print('inside reference condition');
 
-            // sortChartData();
-          });
-          // List<MessageModel> models = tempModels.reversed;
-          messageModels.addAll(tempModels.reversed);
+        if (snapshot.value != null) {
+          Map<dynamic, dynamic> data = snapshot.value;
+          print('inside null condition ${data}');
 
-          if (tempModels.isNotEmpty) {
-            if (!ids.contains(getDisplayDate(messageLoadedDateTime))) {
-              messageModels.add(MessageModel(
-                  messageType: MessageType.date,
-                  message: getDisplayDate(messageLoadedDateTime),
-                  createdAt: DateTime(
-                      messageLoadedDateTime.year,
-                      messageLoadedDateTime.month,
-                      messageLoadedDateTime.day,
-                      0,
-                      0,
-                      0,
-                      0,
-                      0)));
-              ids.add(getDisplayDate(messageLoadedDateTime));
-            }
-          }
+          loopMessageData(data);
+        }else{
+          updateMessageList();
+
         }
       });
-      updateMessageList();
     }
+  }
 
-    // if ((messageLoadedDateTime.millisecondsSinceEpoch >=
-    //     (joiningDateTime.millisecondsSinceEpoch - (86400000 * 1)) &&
-    //     chatRoomModel.messageRoomType == 'group') ||
-    //     chatRoomModel.messageRoomType != 'group')
+  loadMoreMessages() async {
+    print('inside loadMore');
+    if (!isAllMessageLoaded) {
+      if (messageModels.length > 10) {
+        emit(LoadMoreState());
+      }
+      print('inside created condition');
+// print(messageModels.last.createdAt);
+      await reference
+          .child(dataNode)
+          .child(chatRoomModel.id)
+          .orderByKey()
+          .endAt(messageModels[messageModels.length - 2].id)
+          .limitToLast(20)
+          .once()
+          .then((DataSnapshot snapshot) {
+        print('inside reference condition');
+
+        if (snapshot.value != null) {
+          Map<dynamic, dynamic> data = snapshot.value;
+          if (data.length <= 1) {
+            isAllMessageLoaded = true;
+          }
+          print('inside null condition ${data.length}');
+
+          loopMessageData(data);
+        }
+        else{
+          updateMessageList();
+
+        }
+      });
+    }
+  }
+
+  loopMessageData(Map<dynamic, dynamic> data) async {
+    for (var mapEntry in data.entries) {
+      String id = mapEntry.key;
+      var value = mapEntry.value;
+      MessageModel messageModel = await convertDataToMessageModel(value);
+
+      if (!messageModels.map((e) => e.id).toList().contains(id)) {
+        messageModels.add(messageModel);
+      } else {
+        messageModels[messageModels.map((e) => e.id).toList().indexOf(id)] =
+            messageModel;
+      }
+      DateTime createdAt =
+      DateTime.fromMillisecondsSinceEpoch(value['created_at'] - 1);
+      if (messageModels
+          .map((e) => e.id)
+          .toList()
+          .contains(getDisplayDate(createdAt))) {
+        int index = messageModels
+            .map((e) => e.id)
+            .toList()
+            .indexOf(getDisplayDate(createdAt));
+        DateTime previousCreatedAt = messageModels[index].createdAt;
+
+        messageModels.removeAt(index);
+
+        messageModels.add(MessageModel(
+            messageType: MessageType.date,
+            id: getDisplayDate(createdAt),
+            message: getDisplayDate(createdAt),
+            createdAt: createdAt.millisecondsSinceEpoch <
+                previousCreatedAt.millisecondsSinceEpoch
+                ? createdAt
+                : previousCreatedAt));
+      } else {
+        messageModels.add(MessageModel(
+            messageType: MessageType.date,
+            id: getDisplayDate(createdAt),
+            message: getDisplayDate(createdAt),
+            createdAt: createdAt));
+      }
+    }
+    updateMessageList();
   }
 
   updateMessageList() {
+    messageModels.sort((l1, l2) {
+      return l2.createdAt.compareTo(l1.createdAt);
+    });
     emit(LoadList().copyWith(messageModels: messageModels));
-    if (ids.length < 25) {
-      print('load messages');
-
-      loadMoreMessages();
-      print('load messages complete');
-    } else {
-      print('ids.length is high');
-    }
+    // if (ids.length < 25) {
+    //   print('load messages');
+    //
+    //   loadMoreMessages();
+    //   print('load messages complete');
+    // } else {
+    //   print('ids.length is high');
+    // }
   }
 
-  MessageModel convertDataToMessageModel(Map<dynamic, dynamic> value) {
-    MessageType messageType = MessageType.unsupported;
-    String feedId;
-    if (value['message_type'] == 'text') {
-      messageType = MessageType.text;
-    } else if (value['message_type'] == 'image') {
-      messageType = MessageType.image;
-    } else if (value['message_type'] == 'video') {
-      messageType = MessageType.video;
-    } else if (value['message_type'] == 'audio') {
-      messageType = MessageType.audio;
-    } else if (value['message_type'] == 'voice_note') {
-      messageType = MessageType.voice_note;
-    } else if (value['message_type'] == 'document') {
-      messageType = MessageType.document;
-    } else if (value['message_type'] == 'feed') {
-      messageType = MessageType.feed;
-      feedId = value['feed_id'];
-    } else if (value['message_type'] == 'deleted') {
-      messageType = MessageType.deleted;
-    }
-
+  Future<MessageModel> convertDataToMessageModel(
+      Map<dynamic, dynamic> value) async {
+    DateTime createdAt =
+    DateTime.fromMillisecondsSinceEpoch(value['created_at']);
+    String senderId = value['sender_id'].toString();
+    String id = value['id'];
     List<SeenStatus> seenStatuses = [];
     MessageStatus seenStatus = MessageStatus.sent;
+    bool isForwardMessage=false;
     if (value['seen_status'] != null) {
       value['seen_status'].forEach((userId, status) {
         MessageStatus messageStatus = MessageStatus.sent;
@@ -317,7 +308,6 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
             reference
                 .child(dataNode)
                 .child(chatRoomModel.id)
-                .child(getDayNode(messageLoadedDateTime))
                 .child(value['id'])
                 .child('seen_status')
                 .child(userId)
@@ -337,19 +327,75 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
             .add(SeenStatus(userId: userId, messageStatus: messageStatus));
       });
     }
+    ForwardMessage forwardMessage;
+    if (value['forward_message'] != null&& value['message_type']!='deleted') {
+      String dataNode;
+      isForwardMessage=true;
+
+      if (value['forward_message']['message_room_type'] == 'channel') {
+        dataNode = 'ChannelRoomsData';
+      } else {
+        dataNode = 'ChatRoomsData';
+      }
+      forwardMessage = ForwardMessage(
+          messageRoomType: value['forward_message']['message_room_type'],
+          messageRoomId: value['forward_message']['message_room_id'],
+          messageId: value['forward_message']['message_id']);
+
+    await reference
+        .child(dataNode)
+        .child(value['forward_message']['message_room_id'])
+        .child(value['forward_message']['message_id'])
+        .once()
+        .then((snapShot) {
+    print('forward message ${snapShot.value}');
+    value = snapShot.value;
+
+    });
+    }
+    MessageType messageType = MessageType.unsupported;
+    String feedId;
+    if (value['message_type'] == 'text') {
+    messageType = MessageType.text;
+    } else if (value['message_type'] == 'image') {
+    messageType = MessageType.image;
+    } else if (value['message_type'] == 'video') {
+    messageType = MessageType.video;
+    } else if (value['message_type'] == 'audio') {
+    messageType = MessageType.audio;
+    } else if (value['message_type'] == 'voice_note') {
+    messageType = MessageType.voice_note;
+    } else if (value['message_type'] == 'document') {
+    messageType = MessageType.document;
+    } else if (value['message_type'] == 'feed') {
+    messageType = MessageType.feed;
+    feedId = value['feed_id'];
+    } else if (value['message_type'] == 'deleted') {
+      if(isForwardMessage) {
+        messageType = MessageType.forward_deleted;
+      }else{
+        messageType = MessageType.deleted;
+
+      }
+    } else if (value['message_type'] == 'forwarded') {
+      messageType = MessageType.forward;
+    }
+
     MessageModel messageModel = new MessageModel(
-        senderID: value['sender_id'].toString(),
-        messageType: messageType,
-        message: value['message'],
-        mediaUrl: value['media'] != null
-            ? Urls().serverAddress + value['media']
-            : null,
-        id: value['id'],
-        feedId: feedId,
-        seenStatues: seenStatuses,
-        messageStatus: seenStatus,
-        isSingleMessage: chatRoomModel.isSingleChat,
-        createdAt: DateTime.fromMillisecondsSinceEpoch(value['created_at']));
+    senderID: senderId,
+    messageType: messageType,
+    message: value['message'],
+    mediaId: value['media_id'].toString(),
+    mediaUrl: value['media'] != null
+    ? Urls().serverAddress + value['media']
+        : null,
+    id: id,
+    feedId: feedId,
+    seenStatues: seenStatuses,
+    messageStatus: seenStatus,
+    isSingleMessage: chatRoomModel.isSingleChat,
+    forwardMessage: forwardMessage,
+    createdAt: createdAt);
     return messageModel;
   }
 
@@ -377,7 +423,10 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
   }
 
   listenUserPresenceStatus(String messengerId) async {
-    reference.child('Presence/$messengerId').onValue.listen((event) async {
+    reference
+        .child('presence/$messengerId')
+        .onValue
+        .listen((event) async {
       print('statusAndLastSeen2');
 
       if (event.snapshot.value != null) {
@@ -387,10 +436,13 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
           emit(StatusAndLastSeenState(statusAndLastSeen: event.snapshot.value));
         } else {
           lastSeenAndStatus =
-              'last seen at ${getDisplayDateOrTime(DateTime.fromMillisecondsSinceEpoch(event.snapshot.value))}';
+          'last seen at ${getDisplayDateOrTime(
+              DateTime.fromMillisecondsSinceEpoch(event.snapshot.value))}';
           emit(StatusAndLastSeenState(
               statusAndLastSeen:
-                  'last seen at ${getDisplayDateOrTime(DateTime.fromMillisecondsSinceEpoch(event.snapshot.value))}'));
+              'last seen at ${getDisplayDateOrTime(
+                  DateTime.fromMillisecondsSinceEpoch(
+                      event.snapshot.value))}'));
         }
       }
     });
@@ -400,33 +452,33 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
   }
 
   listenTypingUsers() async {
-    reference
+    await reference
         .child('TypingListener')
         .child(chatRoomModel.id)
         .child('is_typing')
         .onValue
         .listen((event) {
       Map<dynamic, dynamic> data = event.snapshot.value;
-      List<ValueModel> valueModels = [];
+      List<String> typingUsers = [];
 
       if (data != null) {
         data.forEach((key, value) async {
           if (AppData().userId != key) {
             // {
-            valueModels.add(ValueModel(
-                // key: authRepository.getNameOfSelectedUserByContact(key),
-                key: key,
-                value: value));
+            typingUsers.add(key);
           }
-          print('value models length 00  ${valueModels.length}');
+          print('value models length 00  ${typingUsers.length}');
         });
-        emit(TypingUserState(valueModels: valueModels));
+        emit(TypingUserState(typingUsers: typingUsers));
 
-        print('value models length ${valueModels.length}');
+        print('value models length ${typingUsers.length}');
       } else {
-        emit(TypingUserState(valueModels: valueModels));
+        emit(StatusAndLastSeenState(statusAndLastSeen: lastSeenAndStatus));
       }
     });
+    if (chatRoomModel.messageRoomType == 'chat') {
+      listenUserPresenceStatus(chatRoomModel.messengerId);
+    }
   }
 
   getMembers() {
@@ -457,18 +509,15 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
               messageRoomUserStatus = MessageRoomUserStatus.Active;
             }
             userRole = mapEntry.value['user_type'];
-
-            if (isInInitialState) {
-              getLiveChat();
-            }
           }
           if (mapEntry.value['status'].toString() == 'active') {
             tempUserContactModels.add(
-                await authRepository.getDetailsOfSelectedUser(
+                await authRepository.getDetailsOfUserNameElseNumber(
                     mapEntry.key, mapEntry.value['user_type'].toString()));
           }
         }
         print('user role $userRole ');
+
         emit(TextMessageState(
             message: textEditingController.text,
             messageRoomUserStatus: messageRoomUserStatus,
@@ -480,7 +529,19 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
         userContactModels.sort((l1, l2) {
           return l2.name.compareTo(l1.name);
         });
+        if(chatRoomModel.isSingleChat){
+          tempUserContactModels.removeWhere((element) => element.id==AppData().userId);
+          chatRoomModel.name=tempUserContactModels[0].name;
+          chatRoomModel.messengerId=tempUserContactModels[0].id;
+          chatRoomModel.imageUrl=tempUserContactModels[0].profilePic;
+        }
+        emit(InfoDetails(chatRoomModel: chatRoomModel));
+
         emit(MembersState(userContactModels: userContactModels));
+        if (isInInitialState) {
+          getLiveChat();
+        }
+        listenTypingUsers();
       }
     });
   }
@@ -497,6 +558,9 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
           messageRoomStatus: messageRoomStatus,
           messageRoomUserStatus: messageRoomUserStatus,
           userRole: userRole));
+      updateMessageList();
+
+
     } else {
       reference
           .child(detailsNode)
@@ -512,26 +576,27 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
           } else {
             messageRoomStatus = MessageRoomStatus.Deleted;
           }
-          String messengerId = map['messenger_id'];
+
+          // String messengerId = map['messenger_id'];
           int unSeenMessageCount = 0;
           String imageUrl = map['icon_url'] != null
               ? Urls().serverAddress + map['icon_url'].toString()
               : null;
           String imageId =
-              map['icon_id'] != null ? map['icon_id'].toString() : null;
+          map['icon_id'] != null ? map['icon_id'].toString() : null;
           bool isSingleChat =
-              map['is_single_chat'].toString() == 'True' ? true : false;
+          map['is_single_chat'].toString() == 'True' ? true : false;
           if (isSingleChat) {
-            UserContactModel userContactModel = await authRepository
-                .getDetailsOfSelectedUser(messengerId, 'any');
+            // UserContactModel userContactModel = await authRepository
+            //     .getDetailsOfUserNameElseNumber(messengerId, 'any');
             ChatRoomModel tempChatRoomModel = new ChatRoomModel(
                 id: chatRoomModel.id.toString(),
-                name: userContactModel.name,
-                messengerId: messengerId,
-                imageUrl: userContactModel.profilePic,
+                // name: userContactModel.name,
+                // messengerId: messengerId,
+                // imageUrl: userContactModel.profilePic,
                 messageRoomType: map['message_room_type'],
                 createdTime:
-                    DateTime.fromMillisecondsSinceEpoch(map['created_time']),
+                DateTime.fromMillisecondsSinceEpoch(map['created_time']),
                 isSingleChat: isSingleChat,
                 unreadMessageCount: unSeenMessageCount,
                 lastMessageTime: DateTime.now());
@@ -543,9 +608,9 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
                 imageUrl: imageUrl,
                 imageId: imageId,
                 description:
-                    map['description'] != null ? map['description'] : '',
+                map['description'] != null ? map['description'] : '',
                 createdTime:
-                    DateTime.fromMillisecondsSinceEpoch(map['created_time']),
+                DateTime.fromMillisecondsSinceEpoch(map['created_time']),
                 isSingleChat: isSingleChat,
                 messageRoomType: map['message_room_type'],
                 unreadMessageCount: unSeenMessageCount,
@@ -557,14 +622,8 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
           description = chatRoomModel.description != null
               ? chatRoomModel.description
               : '';
-          emit(InfoDetails(chatRoomModel: chatRoomModel));
-          if (chatRoomModel.messageRoomType == 'chat') {
-            listenUserPresenceStatus(chatRoomModel.messengerId);
-          }
 
           getMembers();
-
-          listenTypingUsers();
         } else {
           messageRoomStatus = MessageRoomStatus.NotExist;
         }
@@ -577,14 +636,18 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
     }
   }
 
-  sendMessage(
-      {MessageType messageType, List<File> files, String feedId}) async {
+  sendMessage({MessageType messageType,
+    List<File> files,
+    String feedId,
+    Map<String, dynamic> forwardBody}) async {
     String message = textEditingController.text;
     Map<String, dynamic> chatRoomMap = {};
     Map<String, String> seenStatus = {};
 
     if (messageRoomStatus == MessageRoomStatus.NotCreated) {
-      String messageRoomId = reference.push().key;
+      String messageRoomId = reference
+          .push()
+          .key;
       chatRoomModel.id = messageRoomId;
 
       Map<String, dynamic> unSeenMessageCountMap = {};
@@ -593,7 +656,7 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
       memberMap.addAll({
         chatRoomModel.messengerId: {
           'user_type': 'owner',
-          'joining_date': DateTime.now().millisecondsSinceEpoch,
+          'joining_date': ServerValue.timestamp,
           'status': 'active'
         }
       });
@@ -603,7 +666,7 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
       memberMap.addAll({
         AppData().userId: {
           'user_type': 'owner',
-          'joining_date': DateTime.now().millisecondsSinceEpoch,
+          'joining_date': ServerValue.timestamp,
           'status': 'active'
         }
       });
@@ -611,7 +674,7 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
       seenStatus.addAll({AppData().userId: 'sent'});
 
       Map<String, dynamic> infoMap = {
-        'created_time': DateTime.now().millisecondsSinceEpoch,
+        'created_time': ServerValue.timestamp,
         'created_by': AppData().userId,
         'is_single_chat': 'True',
         'status': 'active',
@@ -637,14 +700,15 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
 
       await Future.forEach(files, (file) async {
         try {
-          String messageId = reference.push().key;
+          String messageId = reference
+              .push()
+              .key;
           messageModels.insert(
               0,
               MessageModel(
                   id: messageId,
                   createdAt: DateTime.now(),
                   messageType: MessageType.loading));
-          ids.insert(0, messageId);
           updateMessageList();
           Map<String, String> requestBody = {};
           var body = await postImageDataRequest(
@@ -660,20 +724,18 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
               'media': body['url'].toString(),
               'media_id': body['id'].toString(),
               'sender_id': AppData().userId,
-              'created_at': DateTime.now().millisecondsSinceEpoch,
+              'created_at': ServerValue.timestamp,
               'id': messageId,
               'message_type': messageType == MessageType.voice_note
                   ? 'voice_note'
                   : getFileTypeFromPath(file.path),
               'seen_status': seenStatus
             };
-            String dayNode = getCurrentDayNode();
             incrementUnSeenMessageCount();
 
             reference
                 .child(dataNode)
                 .child(chatRoomModel.id)
-                .child(dayNode)
                 .child(messageId)
                 .set(data);
             reference
@@ -700,16 +762,25 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
     } else if (messageType == MessageType.text ||
         messageType == MessageType.feed) {
       try {
-        String messageId = reference.push().key;
+        // int millis = ServerValue.timestamp-(86400000*40);
+
+        // for (int i = 0; i < 200; i++) {
+        String messageId = reference
+            .push()
+            .key;
 
         Map<String, dynamic> data = {
           'sender_id': AppData().userId,
-          'created_at': DateTime.now().millisecondsSinceEpoch,
+          // 'created_at': ServerValue.timestamp,
+          'created_at': ServerValue.timestamp,
+          // 'created_at': millis,
           'id': messageId,
           'seen_status': seenStatus
         };
+        // millis = millis + 10000000;
         if (messageType == MessageType.text) {
           data.addAll({
+            // 'message': i.toString(),
             'message': message,
             'message_type': 'text',
           });
@@ -721,13 +792,11 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
           });
         }
 
-        String dayNode = getCurrentDayNode();
         incrementUnSeenMessageCount();
 
         reference
             .child(dataNode)
             .child(chatRoomModel.id)
-            .child(dayNode)
             .child(messageId)
             .set(data);
         reference
@@ -739,9 +808,9 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
         createMessageRoom(chatRoomMap);
         sendNotificationRequest(
             messageTypeString:
-                messageType == MessageType.text ? 'text' : 'feed',
+            messageType == MessageType.text ? 'text' : 'feed',
             message: textEditingController.text);
-
+        // }
         if (messageType == MessageType.text) {
           textEditingController.text = '';
           emit(TextMessageState(
@@ -753,26 +822,58 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
       } catch (e) {
         emit(ErrorMessageState(e: e));
       }
+    } else if (messageType == MessageType.forward) {
+      try {
+        String messageId = reference
+            .push()
+            .key;
+
+        Map<String, dynamic> data = {
+          'sender_id': AppData().userId,
+          'created_at': ServerValue.timestamp,
+          'forward_message': forwardBody,
+          'message_type':'forwarded',
+          'id': messageId,
+          'seen_status': seenStatus
+        };
+
+        incrementUnSeenMessageCount();
+
+        reference
+            .child(dataNode)
+            .child(chatRoomModel.id)
+            .child(messageId)
+            .set(data);
+        reference
+            .child(detailsNode)
+            .child(chatRoomModel.id)
+            .child('last_message')
+            .set(data);
+
+        createMessageRoom(chatRoomMap);
+        sendNotificationRequest(
+            messageTypeString: forwardBody['message_type'],
+            message: textEditingController.text);
+      } catch (e) {
+        emit(ErrorMessageState(e: e));
+      }
     }
   }
 
-  deleteMessage(MessageModel messageModel) {
+  deleteMessage(MessageModel messageModel) async {
     if (messageModel.messageType == MessageType.feed) {
-      feedRepository.deleteFeed(feedId: messageModel.feedId);
-      if (homeFeedBloc.state.feedIds.contains(messageModel.feedId)) {
-        homeFeedBloc.add(DeleteFeed(feedId: messageModel.feedId));
-      }
-      if (savedFeedBloc.state.feedIds.contains(messageModel.feedId)) {
-        savedFeedBloc.add(DeleteFeed(feedId: messageModel.feedId));
-      }
-      if (myFeedsBloc.state.feedIds.contains(messageModel.feedId)) {
-        myFeedsBloc.add(DeleteFeed(feedId: messageModel.feedId));
-      }
+      deleteFeedAndRemoveAll(messageModel.feedId);
+    }
+    if (messageModel.messageType != MessageType.feed &&
+        messageModel.messageType != MessageType.text &&
+        messageModel.messageType != MessageType.forward &&
+        messageModel.messageType != MessageType.loading) {
+      var body =
+      await deleteDataRequest(address: 'media/${messageModel.mediaId}');
     }
     reference
         .child(dataNode)
         .child(chatRoomModel.id)
-        .child(getDayNode(messageModel.createdAt))
         .child(messageModel.id)
         .child('message_type')
         .set('deleted');
@@ -783,6 +884,7 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
         .child('message_type')
         .set('deleted');
   }
+
 
   createMessageRoom(Map<String, dynamic> chatRoomMap) {
     if (messageRoomStatus == MessageRoomStatus.NotCreated) {
@@ -803,8 +905,7 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
           .set(chatRoomModel.id);
       messageRoomStatus = MessageRoomStatus.Active;
 
-      getLiveChat();
-      listenTypingUsers();
+      getMembers();
     }
   }
 
@@ -814,7 +915,9 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
     };
 
     map.addAll(
-        {'description': description.trim().isNotEmpty ? description : null});
+        {'description': description
+            .trim()
+            .isNotEmpty ? description : null});
 
     print('edit message room $map');
     print('edit message room $detailsNode  ${chatRoomModel.id}');
@@ -828,13 +931,46 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
   deleteMessageRoom() {
     Map<String, dynamic> map = {
       'status': 'deleted',
-      'delete_date': DateTime.now().millisecondsSinceEpoch,
+      'delete_date': ServerValue.timestamp,
     };
     reference
         .child(detailsNode)
         .child(chatRoomModel.id)
         .child('info')
         .update(map);
+  }
+
+  sendNotificationRequest(
+      {@required String messageTypeString, @required String message}) async {
+    print('sendNotificationRequest');
+
+    Map<String, dynamic> requestBody = {
+      'type': 'message_room',
+      'message_room_type': chatRoomModel.messageRoomType,
+      'message': messageTypeString == 'text' ? message : messageTypeString,
+      'sender_id': AppData().userId.toString(),
+      'message_room_id': chatRoomModel.id,
+      'user_ids': userContactModels.map((e) => e.id).toList(),
+    };
+    print(requestBody);
+    try {
+      var body = await postDataRequest(
+          myBody: requestBody, address: 'firebase/notification');
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> reloadStates() async {
+    emit(InfoDetails(chatRoomModel: chatRoomModel));
+    await Future.delayed(Duration(microseconds: 1));
+    emit(MembersState(userContactModels: userContactModels));
+    await Future.delayed(Duration(microseconds: 1));
+    emit(TextMessageState(
+        userRole: userRole,
+        messageRoomStatus: messageRoomStatus,
+        message: textEditingController.text,
+        messageRoomUserStatus: messageRoomUserStatus));
   }
 
   changeGroupIcon(BuildContext context) async {
@@ -848,7 +984,7 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
       if (chatRoomModel.imageId != null) {
         try {
           var body =
-              deleteDataRequest(address: ' media/${chatRoomModel.imageId}');
+          deleteDataRequest(address: ' media/${chatRoomModel.imageId}');
         } catch (e) {}
       }
       try {
@@ -909,7 +1045,7 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
     if (chatRoomModel.messageRoomType == 'group') {
       Map<String, dynamic> map = {
         'status': 'removed',
-        'removed_date': DateTime.now().millisecondsSinceEpoch,
+        'removed_date': ServerValue.timestamp,
       };
       reference
           .child(detailsNode)
@@ -920,7 +1056,7 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
     } else {
       Map<String, dynamic> map = {
         'status': 'removed',
-        'removed_date': DateTime.now().millisecondsSinceEpoch,
+        'removed_date': ServerValue.timestamp,
       };
       reference
           .child(detailsNode)
@@ -940,7 +1076,7 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
   addUserFromMessageRoom(String userId) {
     Map<String, dynamic> map = {
       'user_type': 'user',
-      'joining_date': DateTime.now().millisecondsSinceEpoch,
+      'joining_date': ServerValue.timestamp,
       'status': 'active'
     };
     reference
@@ -953,8 +1089,8 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
         .child('Users')
         .child(userId)
         .child(chatRoomModel.messageRoomType == 'group'
-            ? 'ChatRooms'
-            : 'ChannelRooms')
+        ? 'ChatRooms'
+        : 'ChannelRooms')
         .child(chatRoomModel.id)
         .set(chatRoomModel.id);
   }
@@ -968,39 +1104,6 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
         .remove();
   }
 
-  sendNotificationRequest(
-      {@required String messageTypeString, @required String message}) async {
-    print('sendNotificationRequest');
-
-    Map<String, dynamic> requestBody = {
-      'type': 'message_room',
-      'message_room_type': chatRoomModel.messageRoomType,
-      'message': messageTypeString == 'text' ? message : messageTypeString,
-      'sender_id': AppData().userId.toString(),
-      'message_room_id': chatRoomModel.id,
-      'user_ids': userContactModels.map((e) => e.id).toList(),
-    };
-    print(requestBody);
-    try {
-      var body = await postDataRequest(
-          myBody: requestBody, address: 'firebase/notification');
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  Future<void> reloadStates() async {
-    emit(InfoDetails(chatRoomModel: chatRoomModel));
-    await Future.delayed(Duration(microseconds: 1));
-    emit(MembersState(userContactModels: userContactModels));
-    await Future.delayed(Duration(microseconds: 1));
-    emit(TextMessageState(
-        userRole: userRole,
-        messageRoomStatus: messageRoomStatus,
-        message: textEditingController.text,
-        messageRoomUserStatus: messageRoomUserStatus));
-  }
-
   Future<void> messageRoomNameChanged(String value) async {
     messageRoomName = value;
     print('group name changed $value');
@@ -1010,5 +1113,34 @@ class MessageRoomCubit extends Cubit<MessageRoomState> {
   Future<void> descriptionChanged(String value) async {
     description = value;
     print('group name changed $value');
+  }
+
+
+
+  showAndHideEmoji() {
+    emojiShowing=!emojiShowing;
+
+    emit(TextMessageState(
+        message: textEditingController.text,
+        messageRoomUserStatus: messageRoomUserStatus,
+        messageRoomStatus: messageRoomStatus,
+        userRole: userRole));
+  }
+  onEmojiSelected(Emoji emoji) {
+    textEditingController
+      ..text += emoji.emoji
+      ..selection = TextSelection.fromPosition(
+          TextPosition(offset: textEditingController.text.length));
+  }
+
+  onBackspacePressed() {
+    textEditingController
+      ..text = textEditingController.text.characters.skipLast(1).toString()
+      ..selection = TextSelection.fromPosition(
+          TextPosition(offset: textEditingController.text.length));
+  }
+  selectUnselectMessage(MessageModel messageModel){
+    messageModels[messageModels.map((e) => e.id).toList().indexOf(messageModel.id)].isSelected=! messageModel.isSelected;
+    emit(LoadList(messageModels: messageModels));
   }
 }

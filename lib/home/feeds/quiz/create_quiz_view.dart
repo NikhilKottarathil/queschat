@@ -1,3 +1,4 @@
+import 'package:duration_picker/duration_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:queschat/authentication/form_submitting_status.dart';
@@ -14,8 +15,6 @@ import 'package:queschat/models/radio_model.dart';
 import 'package:queschat/uicomponents/appbars.dart';
 import 'package:queschat/uicomponents/custom_text_field.dart';
 import 'package:queschat/uicomponents/custom_ui_widgets.dart';
-
-import 'package:duration_picker/duration_picker.dart';
 
 class CreateQuizView extends StatelessWidget {
   List<RadioModel> radioData = new List<RadioModel>();

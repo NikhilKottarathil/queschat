@@ -123,7 +123,7 @@ class NewGroupCubit extends Cubit<NewGroupState> {
       Map<String, dynamic> memberMap = {};
       Map<String, dynamic> unSeenMessageCountMap = {};
       List<String> memberIds = [];
-      memberMap.addAll({AppData().userId: {'user_type':'owner','joining_date':DateTime.now().millisecondsSinceEpoch,'status':'active'}});
+      memberMap.addAll({AppData().userId: {'user_type':'owner','joining_date':ServerValue.timestamp,'status':'active'}});
       unSeenMessageCountMap.addAll({AppData().userId: 0});
       memberIds.add(AppData().userId);
       userContactModels.forEach((element) {
@@ -140,7 +140,7 @@ class NewGroupCubit extends Cubit<NewGroupState> {
       });
 
       Map<String, dynamic> infoMap = {
-        'created_time': DateTime.now().millisecondsSinceEpoch,
+        'created_time': ServerValue.timestamp,
         'is_single_chat': 'False',
         'created_by':AppData().userId,
         'message_room_type':isGroupOrChannel,
@@ -177,7 +177,7 @@ class NewGroupCubit extends Cubit<NewGroupState> {
             .child(element)
             .child(isGroupOrChannel == 'group' ? 'ChatRooms' : 'ChannelRooms')
             .child(chatRoomId)
-            .set(chatRoomId);
+            .set('owner');
       });
 
       emit(CreationSuccessful(
