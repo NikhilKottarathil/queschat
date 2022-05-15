@@ -14,7 +14,6 @@ import 'package:queschat/function/select_image.dart';
 import 'package:queschat/function/some_function.dart';
 import 'package:queschat/function/time_conversions.dart';
 import 'package:queschat/home/feeds/feed_actions.dart';
-import 'package:queschat/home/feeds/feeds_event.dart';
 import 'package:queschat/home/message/message_room/message_room_state.dart';
 import 'package:queschat/models/chat_room_model.dart';
 import 'package:queschat/models/message_model.dart';

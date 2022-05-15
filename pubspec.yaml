@@ -76,7 +76,7 @@ dependencies:
   just_audio: 0.9.11
   shimmer: ^2.0.0
   duration_picker: ^1.1.0+1
-  flutter_chat_ui: ^1.5.1
+#  flutter_chat_ui: ^1.5.1
   uuid: ^3.0.5
   open_file: ^3.2.1
   flutter_quill: ^4.0.0
