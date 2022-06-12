@@ -11,6 +11,7 @@ import 'package:queschat/authentication/verfiy_sign_up/verify_signup_view.dart';
 import 'package:queschat/components/custom_progress_indicator.dart';
 import 'package:queschat/constants/styles.dart';
 import 'package:queschat/function/show_snack_bar.dart';
+import 'package:queschat/router/app_router.dart';
 import 'package:queschat/uicomponents/custom_button.dart';
 import 'package:queschat/uicomponents/custom_text_field.dart';
 
@@ -20,30 +21,29 @@ class SignUpView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.grey.shade50,
+        elevation: 0,
+        automaticallyImplyLeading: true,
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.of(context).pop();
+          },
+          child: Icon(
+            Icons.arrow_back,
+            color: AppColors.IconColor,
+          ),
+        ),
+      ),
       body: BlocListener<SignUpBloc, SignUpState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           final formStatus = state.formStatus;
           if (formStatus is SubmissionFailed) {
             showSnackBar(context, formStatus.exception);
           } else if (formStatus is SubmissionSuccess) {
-            print('signup');
-            print(context.read<SignUpBloc>().generatedOTP);
-            AuthCredentials authCredentials = AuthCredentials(
-                userName: state.userName,
-                phoneNumber: state.phoneNumber,
-                password: state.password,
+            await setRepositoryAndBloc();
 
-                generatedOTP: context.read<SignUpBloc>().generatedOTP);
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => BlocProvider(
-                    create: (__) => VerifySignUpBloc(
-                        authRepo: context.read<SignUpBloc>().authRepo,
-                        authCredentials: authCredentials),
-                    child: VerifySignUpView(),
-                  ),
-                ));
+            Navigator.pushReplacementNamed(context, '/home');
           }
         },
         child: Form(
@@ -70,7 +70,9 @@ class SignUpView extends StatelessWidget {
                               fit: BoxFit.contain),
                         ),
 
-                        Spacer(),
+                        Spacer(
+                          flex: 1,
+                        ),
                         SizedBox(
                           height: 30,
                         ),
@@ -91,11 +93,10 @@ class SignUpView extends StatelessWidget {
                                 text: state.userName,
                                 onChange: (value) {
                                   context.read<SignUpBloc>().add(
-                                    SignUpUsernameChanged(
-                                        username: value),
-                                  );
+                                        SignUpUsernameChanged(username: value),
+                                      );
                                 },
-                                icon:  new Icon(Icons.person,
+                                icon: new Icon(Icons.person,
                                     color: AppColors.IconColor),
                                 textInputType: TextInputType.text);
                           },
@@ -111,6 +112,7 @@ class SignUpView extends StatelessWidget {
                                   return state.phoneNumberValidationText;
                                 },
                                 text: state.phoneNumber,
+                                enabled: false,
                                 onChange: (value) {
                                   context.read<SignUpBloc>().add(
                                         SignUpPhoneNumberChanged(
@@ -122,28 +124,28 @@ class SignUpView extends StatelessWidget {
                                 textInputType: TextInputType.number);
                           },
                         ),
-                        SizedBox(
-                          height: 18,
-                        ),
-                        BlocBuilder<SignUpBloc, SignUpState>(
-                          builder: (context, state) {
-                            return CustomTextField(
-                                hint: "Password",
-                                validator: (value) {
-                                  return state.passwordValidationText;
-                                },
-                                text: state.password,
-                                onChange: (value) {
-                                  context.read<SignUpBloc>().add(
-                                        SignUpPasswordChanged(
-                                            password: value),
-                                      );
-                                },
-                                icon: new Icon(Icons.lock,
-                                    color: AppColors.IconColor),
-                                textInputType: TextInputType.visiblePassword);
-                          },
-                        ),
+                        // SizedBox(
+                        //   height: 18,
+                        // ),
+                        // BlocBuilder<SignUpBloc, SignUpState>(
+                        //   builder: (context, state) {
+                        //     return CustomTextField(
+                        //         hint: "Password",
+                        //         validator: (value) {
+                        //           return state.passwordValidationText;
+                        //         },
+                        //         text: state.password,
+                        //         onChange: (value) {
+                        //           context.read<SignUpBloc>().add(
+                        //                 SignUpPasswordChanged(
+                        //                     password: value),
+                        //               );
+                        //         },
+                        //         icon: new Icon(Icons.lock,
+                        //             color: AppColors.IconColor),
+                        //         textInputType: TextInputType.visiblePassword);
+                        //   },
+                        // ),
                         SizedBox(
                           height: 10,
                         ),
@@ -156,7 +158,6 @@ class SignUpView extends StatelessWidget {
                                     text: "SIGN UP",
                                     action: () {
                                       if (_formKey.currentState.validate()) {
-
                                         context
                                             .read<SignUpBloc>()
                                             .add(SignUpSubmitted());
@@ -165,31 +166,33 @@ class SignUpView extends StatelessWidget {
                                   );
                           },
                         ),
-                        Spacer(),
-                        SizedBox(height: 70,),
-                        Align(
-                          alignment: Alignment.center,
-                          child: Column(
-                            children: [
-                              Text(
-                                "Already have an account?",
-                                style: TextStyles.bodyTextSecondary,
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(top: 4),
-                                child: InkWell(
-                                  child: Text("LOGIN",
-                                      style: TextStyles
-                                          .buttonPrimary),
-                                  onTap: () {
-
-                                    Navigator.pushNamed(context, '/otpLogin');
-                                    },
-                                ),
-                              )
-                            ],
-                          ),
-                        )
+                        Spacer(
+                          flex: 3,
+                        ),
+                        // SizedBox(height: 70,),
+                        // Align(
+                        //   alignment: Alignment.center,
+                        //   child: Column(
+                        //     children: [
+                        //       Text(
+                        //         "Already have an account?",
+                        //         style: TextStyles.bodyTextSecondary,
+                        //       ),
+                        //       Container(
+                        //         margin: EdgeInsets.only(top: 4),
+                        //         child: InkWell(
+                        //           child: Text("LOGIN",
+                        //               style: TextStyles
+                        //                   .buttonPrimary),
+                        //           onTap: () {
+                        //
+                        //             Navigator.pushNamed(context, '/otpLogin');
+                        //             },
+                        //         ),
+                        //       )
+                        //     ],
+                        //   ),
+                        // )
                       ],
                     ),
                   ),
@@ -201,5 +204,4 @@ class SignUpView extends StatelessWidget {
       ),
     );
   }
-
 }

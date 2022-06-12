@@ -314,23 +314,25 @@ class _RecordButtonState extends State<RecordButton> with SingleTickerProviderSt
         debugPrint("onLongPress");
         Vibrate.feedback(FeedbackType.success);
         if (await Permission.storage.isGranted) {
-          if (await Permission.manageExternalStorage.isGranted) {
+          // if (await Permission.manageExternalStorage.isGranted) {
             if (await Record().hasPermission()) {
               record = Record();
               Directory tempDir = await getTemporaryDirectory();
               String tempPath = tempDir.path;
 
-              Directory appDocDir = await getApplicationDocumentsDirectory();
-              String appDocPath = appDocDir.path;
+              // Directory appDocDir = await getApplicationDocumentsDirectory();
+              // String appDocPath = appDocDir.path;
               await record.start(
-                path: appDocPath +
+                path:tempPath+
                     "audio_${DateTime.now().millisecondsSinceEpoch}.m4a",
                 encoder: AudioEncoder.AAC,
                 bitRate: 128000,
                 samplingRate: 44100,
               );
-              startTime = DateTime.now();
+              startTime =DateTime.now();
+
               timer = Timer.periodic(const Duration(seconds: 1), (_) {
+                print('start time $startTime');
                 final minDur = DateTime.now().difference(startTime).inMinutes;
                 final secDur =
                     DateTime.now().difference(startTime).inSeconds % 60;
@@ -341,9 +343,9 @@ class _RecordButtonState extends State<RecordButton> with SingleTickerProviderSt
                 });
               });
             }
-          } else {
-            await [Permission.manageExternalStorage].request();
-          }
+          // } else {
+            // await [Permission.manageExternalStorage].request();
+          // }
         } else {
           await [Permission.storage].request();
         }

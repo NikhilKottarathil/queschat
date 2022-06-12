@@ -6,6 +6,11 @@ class InitialFormStatus extends FormSubmissionStatus {
   const InitialFormStatus();
 }
 
+class RegisterNewUser extends FormSubmissionStatus {
+  String phoneNumber;
+   RegisterNewUser(this.phoneNumber);
+}
+
 class FormSubmitting extends FormSubmissionStatus {}
 
 class SubmissionSuccess extends FormSubmissionStatus {

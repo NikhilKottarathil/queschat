@@ -108,7 +108,7 @@ class AppRouter {
       case '/signUp':
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (context) => SignUpBloc(authRepo: authRepository),
+            create: (context) => SignUpBloc(authRepo: authRepository,phoneNumber:  arguments['phoneNumber']),
             child: SignUpView(),
           ),
         );

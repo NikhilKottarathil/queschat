@@ -213,6 +213,7 @@ Future<void> displayMessage(RemoteMessage message) async {
               payload: data,
               roundedLargeIcon: true,
               // largeIcon: chatRoomModel.imageUrl,
+              largeIcon:data['icon_url']!=null? Urls().serverAddress+data['icon_url']:'assets/user_profile.png',
 
               notificationLayout: NotificationLayout.Default,
               category: NotificationCategory.Social),

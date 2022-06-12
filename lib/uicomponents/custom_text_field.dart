@@ -10,6 +10,7 @@ class CustomTextField extends StatefulWidget {
   var onChange;
   var text;
   int maxLength;
+  bool enabled;
 
 
   CustomTextField(
@@ -19,7 +20,7 @@ class CustomTextField extends StatefulWidget {
       this.validator,
       this.text,
         this.maxLength,
-      this.onChange,
+      this.onChange,this.enabled=true,
       this.textInputType})
       : super(key: key);
 
@@ -31,6 +32,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   TextEditingController controller = new TextEditingController();
 
   bool isVisible=false;
+  bool enabled=true;
   @override
   void initState() {
     // TODO: implement initState
@@ -38,6 +40,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
     if (widget.text != null) {
       controller.text = widget.text;
     }
+
   }
 
   @override
@@ -45,6 +48,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
     return new TextFormField(
       cursorColor: AppColors.SecondaryColor,
 
+      enabled: widget.enabled,
       controller: controller,
       keyboardType: widget.textInputType,
       style: TextStyles.bodyTextPrimary,

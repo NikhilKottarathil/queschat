@@ -22,6 +22,8 @@ class OTPChanged extends OTPLoginEvent {
 
   OTPChanged({this.otp});
 }
+class ChangeNumberPressed extends OTPLoginEvent {
+}
 
 class ResendOTPSubmitted extends OTPLoginEvent {}
 

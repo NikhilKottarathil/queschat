@@ -18,9 +18,12 @@ class _AudioBubbleState extends State<AudioBubble> {
   void initState() {
     super.initState();
     player.setUrl(widget.filepath).then((value) {
-      setState(() {
-        duration = value;
-      });
+
+      if(this.mounted) {
+        setState(() {
+          duration = value;
+        });
+      }
     });
   }
 

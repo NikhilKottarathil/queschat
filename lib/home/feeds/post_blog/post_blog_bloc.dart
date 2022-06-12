@@ -100,13 +100,6 @@ class PostBlogBloc extends Bloc<PostBlogEvent, PostBlogState> {
               if (!filePath.contains('http')) {
                 File file = File(filePath);
                 Map<String, String> requestBody = {};
-                // final appDocDir = await getApplicationDocumentsDirectory();
-
-                // var result = await FlutterImageCompress.compressAndGetFile(
-                //   file.absolute.path,
-                //   '${appDocDir.path}/${basename(file.path)}',
-                //   quality: 60,
-                // );
 
 
 
@@ -165,14 +158,6 @@ class PostBlogBloc extends Bloc<PostBlogEvent, PostBlogState> {
                   if (!filePath.contains('http')) {
                     File file = File(filePath);
                     Map<String, String> requestBody = {};
-                    // final appDocDir = await getApplicationDocumentsDirectory();
-
-                    // var result = await FlutterImageCompress.compressAndGetFile(
-                    //   file.absolute.path,
-                    //   '${appDocDir.path}/${basename(file.path)}',
-                    //   quality: 60,
-                    // );
-
 
 
                     var body = await postImageDataRequest(

@@ -152,20 +152,24 @@ class AuthRepository {
       };
       print(myBody);
       var body = await postDataRequest(address: 'getOtp', myBody: myBody);
-      if (body['token'] != null) {
-        SharedPreferences sharedPreferences =
-        await SharedPreferences.getInstance();
-        await sharedPreferences.setString('token', body['token'].toString());
-        await sharedPreferences.setString(
-            'firebase_token', body['firebase_token'].toString());
-        return AuthCredentials(
-            phoneNumber: phoneNumber,
-            generatedOTP: body['otp'].toString(),
-            firebaseToken: body['firebase_token'].toString(),
-            token: body['token'].toString());
+      if (body['otp'] != null) {
+
+        if(body['token']!=null) {
+          return AuthCredentials(
+              isUser: true,
+              phoneNumber: phoneNumber,
+              generatedOTP: body['otp'].toString(),
+              firebaseToken: body['firebase_token'].toString(),
+              token: body['token'].toString());
+        }else{
+          return AuthCredentials(
+              isUser: false,
+              phoneNumber: phoneNumber,
+              generatedOTP: body['otp'].toString(),);
+        }
       } else {
         if (body['message'] != null) {
-          throw Exception(body['message']);
+            throw Exception(body['message']);
         } else {
           throw AppExceptions().somethingWentWrong;
         }
@@ -548,7 +552,17 @@ class AuthRepository {
             phoneNumbers: [mobile]);
       } else {
         if (body['message'] != null) {
-          throw Exception(body['message']);
+          if(body['message']=='User Not Found'){
+            return UserContactModel(
+                profilePic: null,
+                userType: userType,
+                id: userId,
+                isUser: true,
+                name: 'Deleted User',
+                phoneNumbers: ['DeletedUser']);
+          }else {
+            throw Exception(body['message']);
+          }
         } else {
           throw Exception('Please retry');
         }

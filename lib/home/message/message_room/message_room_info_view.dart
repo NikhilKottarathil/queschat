@@ -161,19 +161,24 @@ class MessageRoomInfoView extends StatelessWidget {
                                   },
                                 ),
                               ),
-                              ListView.builder(
-                                shrinkWrap: true,
+                              Visibility(
+                                visible:context.read<MessageRoomCubit>().userRole ==
+                  'owner'||context.read<MessageRoomCubit>().userRole ==
+                  'admin',
+                                child: ListView.builder(
+                                  shrinkWrap: true,
 
-                                padding: EdgeInsets.only(top: 8, bottom: 10),
-                                itemCount: state.userContactModels.length,
+                                  padding: EdgeInsets.only(top: 8, bottom: 10),
+                                  itemCount: state.userContactModels.length,
 
-                                itemBuilder:
-                                    (BuildContext context, int index) {
-                                  return MessageRoomMemberContactView(
-                                      state.userContactModels[index],
-                                      context);
-                                },
-                                physics: NeverScrollableScrollPhysics(),
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return MessageRoomMemberContactView(
+                                        state.userContactModels[index],
+                                        context);
+                                  },
+                                  physics: NeverScrollableScrollPhysics(),
+                                ),
                               ),
                             ],
                           )
