@@ -70,8 +70,11 @@ Future<void> resetRepositoryAndBloc() async {
   await authRepository.initRepository();
   profileBloc = ProfileBloc(authRepo: authRepository);
 
-  allChatMessageRoomListBloc = MessageRoomListBloc(parentPage: 'allChat');
-  channelMessageRoomListBloc = MessageRoomListBloc(parentPage: 'channel');
+  // allChatMessageRoomListBloc = MessageRoomListBloc(parentPage: 'allChat');
+  // channelMessageRoomListBloc = MessageRoomListBloc(parentPage: 'channel');
+  await allChatMessageRoomListBloc.initMessageRoomList();
+  await channelMessageRoomListBloc.initMessageRoomList();
+
 }
 
 class AppRouter {

@@ -37,8 +37,14 @@ class MessageRoomSearchBloc
       MessageRoomSearchEvent event) async* {
     if (event is FetchInitialData) {
       yield state.copyWith(isLoading: true);
+      await  resetRepositoryAndBloc();
+      state.models.clear();
+      state.displayModels.clear();
+
       state.models.addAll(allChatMessageRoomListBloc.state.models);
       state.models.addAll(channelMessageRoomListBloc.state.models);
+      print('channel ${allChatMessageRoomListBloc.state.models.length}');
+      print('chat ${allChatMessageRoomListBloc.state.models.length}');
       List<String> existingChatUsers=[];
       allChatMessageRoomListBloc.state.models.forEach((element) {
         if(element.messageRoomType=='chat'){

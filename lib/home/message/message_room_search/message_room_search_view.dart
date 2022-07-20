@@ -8,6 +8,7 @@ import 'package:queschat/home/message/message_room_search/message_room_search_ev
 import 'package:queschat/home/message/message_room_search/message_room_search_state.dart';
 import 'package:queschat/main.dart';
 import 'package:queschat/models/chat_room_model.dart';
+import 'package:queschat/router/app_router.dart';
 
 import 'message_room_search_bloc.dart';
 
@@ -137,43 +138,61 @@ class _MessageRoomSearchViewState extends State<MessageRoomSearchView>
       shadowColor: Colors.transparent,
       title: BlocBuilder<MessageRoomSearchBloc, MessageRoomSearchState>(
           builder: (context, state) {
-        return TextField(
-          keyboardType: TextInputType.text,
-          style: TextStyles.subTitle2White,
-          maxLines: 1,
-          textAlign: TextAlign.start,
-          textAlignVertical: TextAlignVertical.center,
-          controller:
-              context.read<MessageRoomSearchBloc>().textEditingController,
-          decoration: new InputDecoration(
-            contentPadding: EdgeInsets.all(0),
-            filled: false,
-            alignLabelWithHint: true,
-            suffixIcon:
-                state.searchQuery != null && state.searchQuery.length != 0
-                    ? IconButton(
-                        icon: Icon(
-                          Icons.clear,
-                          color: AppColors.White,
-                        ),
-                        onPressed: () {
-                          context
-                              .read<MessageRoomSearchBloc>()
-                              .add(SearchQueryCleared());
-                        })
-                    : SizedBox(
-                        height: 0,
-                        width: 0,
-                      ),
-            hintText: 'Search...',
-            border: InputBorder.none,
-            disabledBorder: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            errorBorder: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            focusedErrorBorder: InputBorder.none,
-            hintStyle: TextStyles.subTitle2WhiteSecondary,
-          ),
+        return Row(
+          children: [
+            Expanded(
+              child: TextField(
+                keyboardType: TextInputType.text,
+                style: TextStyles.subTitle2White,
+                maxLines: 1,
+                textAlign: TextAlign.start,
+                textAlignVertical: TextAlignVertical.center,
+                controller:
+                    context.read<MessageRoomSearchBloc>().textEditingController,
+                decoration: new InputDecoration(
+                  contentPadding: EdgeInsets.all(0),
+                  filled: false,
+                  alignLabelWithHint: true,
+                  suffixIcon:
+                      state.searchQuery != null && state.searchQuery.length != 0
+                          ? IconButton(
+                              icon: Icon(
+                                Icons.clear,
+                                color: AppColors.White,
+                              ),
+                              onPressed: () {
+                                context
+                                    .read<MessageRoomSearchBloc>()
+                                    .add(SearchQueryCleared());
+                              })
+                          : SizedBox(
+                              height: 0,
+                              width: 0,
+                            ),
+                  hintText: 'Search...',
+                  border: InputBorder.none,
+                  disabledBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  focusedErrorBorder: InputBorder.none,
+                  hintStyle: TextStyles.subTitle2WhiteSecondary,
+                ),
+              ),
+            ),
+            IconButton(
+                constraints: BoxConstraints(),
+                padding: EdgeInsets.zero,
+                icon: Icon(
+                  Icons.refresh,
+                  color: AppColors.White,
+                ),
+                onPressed: ()async {
+                  context
+                      .read<MessageRoomSearchBloc>()
+                      .add(FetchInitialData());
+                })
+          ],
         );
       }),
     );

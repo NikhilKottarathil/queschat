@@ -599,9 +599,13 @@ class _MessageRoomViewState extends State<MessageRoomView>
                     boxShadow: appShadow,
                   ),
                   width: MediaQuery.of(context).size.width,
-                  height: 60,
-                  padding: EdgeInsets.only(right: 10),
+                  constraints: BoxConstraints(
+                    minHeight: 20.0,
+                    maxHeight: 150.0,
+                  ),
+                  padding: EdgeInsets.only(right: 10,bottom: 8),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       // IconButton(
                       //   iconSize: 40,
@@ -615,91 +619,48 @@ class _MessageRoomViewState extends State<MessageRoomView>
                       //   constraints: BoxConstraints(),
                       //   padding: EdgeInsets.only(left: 14, right: 10),
                       // ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12.0),
+                        child: IconButton(
+                          onPressed: () {
+                            context
+                                .read<MessageRoomCubit>()
+                                .showAndHideEmoji();
+                          },
+                          icon: Icon(
+                            Icons.emoji_emotions_outlined,
+                            color: AppColors.PrimaryColorLight,
+                          ),
+                          constraints: BoxConstraints(),
+                          padding: EdgeInsets.only(left: 8,right: 8),
+                        ),
+                      ),
                       Expanded(
-                        // child: GestureDetector(
-                        //   behavior: HitTestBehavior.opaque,
-                        //   onTap: () {
-                        //     FocusScope.of(context)
-                        //         .requestFocus(_textFieldFocusNode);
-                        //   },
-                        //   onLongPress: () {
-                        //     showMenu(
-                        //       context: context,
-                        //       // TODO: Position dynamically based on cursor or textfield
-                        //       position: RelativeRect.fromLTRB(0.0, 400.0, 300.0, 0.0),
-                        //       items: [
-                        //         PopupMenuItem(
-                        //           child: Text(
-                        //             "Paste",
-                        //           ),
-                        //           onTap: (){
-                        //             FlutterClipboard.paste().then((value) {
-                        //               context.read<MessageRoomCubit>().textEditingController.text=context.read<MessageRoomCubit>().textEditingController.text+value;
-                        //             });
-                        //           },
-                        //         ),
-                        //       ],
-                        //     );
-                        //   },
-                        //   child: IgnorePointer(
+
                         child: TextFormField(
                           focusNode: _textFieldFocusNode,
                           selectionControls: _textSelectionControls,
                           enableInteractiveSelection: true,
+
+
                           controller: context
                               .read<MessageRoomCubit>()
                               .textEditingController,
                           onChanged: _onTextChanged,
+
+                          maxLines: null,
+                          textInputAction: TextInputAction.newline,
                           style: TextStyles.subTitle2TextPrimary,
+                          showCursor: true,
+
                           decoration: InputDecoration(
                             hintText: "Write your message…",
                             hintStyle: TextStyles.subTitle2TextSecondary,
-                            prefixIconConstraints: BoxConstraints(),
-                            prefixIcon: IconButton(
-                              onPressed: () {
-                                context
-                                    .read<MessageRoomCubit>()
-                                    .showAndHideEmoji();
-                              },
-                              icon: Icon(
-                                Icons.emoji_emotions_outlined,
-                                color: AppColors.PrimaryColorLight,
-                              ),
-                              constraints: BoxConstraints(),
-                              // padding: EdgeInsets.all(0),
-                            ),
-                            suffixIcon: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    multipleMultiFormatFilePicker(
-                                        buildContext: buildContext,
-                                        roomName: context
-                                            .read<MessageRoomCubit>()
-                                            .chatRoomModel
-                                            .name);
-                                  },
-                                  icon: Icon(
-                                    Icons.attachment,
-                                    color: AppColors.PrimaryColorLight,
-                                  ),
-                                  constraints: BoxConstraints(),
-                                  padding: EdgeInsets.all(0),
-                                ),
-                                IconButton(
-                                  onPressed: () {
-                                    getMediaFromCamera(context);
-                                  },
-                                  icon: Icon(
-                                    Icons.camera_alt,
-                                    color: AppColors.PrimaryColorLight,
-                                  ),
-                                  constraints: BoxConstraints(),
-                                  padding: EdgeInsets.only(left: 18, right: 18),
-                                ),
-                              ],
-                            ),
+
+
+
+                            contentPadding: EdgeInsets.all(0),
+                            constraints: BoxConstraints(),
                             border: AppBorders.transparentBorder,
                             errorBorder: AppBorders.transparentBorder,
                             disabledBorder: AppBorders.transparentBorder,
@@ -708,45 +669,80 @@ class _MessageRoomViewState extends State<MessageRoomView>
                             focusedErrorBorder: AppBorders.transparentBorder,
                           ),
                         ),
-                        // ),
-                        // ),
+
                       ),
-                      Stack(
-                        children: [
-                          Visibility(
-                            visible: !isSendButtonVisible,
-                            maintainSize: true,
-                            maintainAnimation: true,
-                            maintainState: true,
-                            child: RecordButton(
-                              parentContext: context,
-                            ),
-                          ),
-                          Visibility(
-                            visible: isSendButtonVisible,
-                            child: InkWell(
-                              splashColor: Colors.transparent,
-                              onTap: () {
-                                context
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12.0),
+                        child: IconButton(
+                          onPressed: () {
+                            multipleMultiFormatFilePicker(
+                                buildContext: buildContext,
+                                roomName: context
                                     .read<MessageRoomCubit>()
-                                    .sendMessage(messageType: MessageType.text);
-                              },
-                              child: Container(
-                                child: const Icon(
-                                  Icons.send,
-                                  color: AppColors.White,
-                                ),
-                                height: 40,
-                                width: 40,
-                                clipBehavior: Clip.hardEdge,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.PrimaryColorLight,
+                                    .chatRoomModel
+                                    .name);
+                          },
+                          icon: Icon(
+                            Icons.attachment,
+                            color: AppColors.PrimaryColorLight,
+                          ),
+                          constraints: BoxConstraints(),
+                          padding: EdgeInsets.all(0),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12.0),
+                        child: IconButton(
+                          onPressed: () {
+                            getMediaFromCamera(context);
+                          },
+                          icon: Icon(
+                            Icons.camera_alt,
+                            color: AppColors.PrimaryColorLight,
+                          ),
+                          constraints: BoxConstraints(),
+                          padding: EdgeInsets.only(left: 18, right: 18),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4.0),
+                        child: Stack(
+                          children: [
+                            Visibility(
+                              visible: !isSendButtonVisible,
+                              maintainSize: true,
+                              maintainAnimation: true,
+                              maintainState: true,
+                              child: RecordButton(
+                                parentContext: context,
+                              ),
+                            ),
+                            Visibility(
+                              visible: isSendButtonVisible,
+                              child: InkWell(
+                                splashColor: Colors.transparent,
+                                onTap: () {
+                                  context
+                                      .read<MessageRoomCubit>()
+                                      .sendMessage(messageType: MessageType.text);
+                                },
+                                child: Container(
+                                  child: const Icon(
+                                    Icons.send,
+                                    color: AppColors.White,
+                                  ),
+                                  height: 40,
+                                  width: 40,
+                                  clipBehavior: Clip.hardEdge,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: AppColors.PrimaryColorLight,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),

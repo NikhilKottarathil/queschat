@@ -352,6 +352,9 @@ class AuthRepository {
 
   Future readContactsFromPhone() async {
     if (await Permission.contacts.isGranted) {
+      queschatUsers.clear();
+      nonQueschatUsers.clear();
+      queschatUsersMobileNumbers.clear();
       contactsOnPhone = await FlutterContacts.getContacts(withProperties: true);
 
 

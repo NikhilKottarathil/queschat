@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/src/provider.dart';
@@ -20,7 +21,7 @@ import 'package:queschat/home/message/message_room/message_appbar.dart';
 import 'package:queschat/home/message/message_room/message_room_cubit.dart';
 import 'package:queschat/models/message_model.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 class MessageAdapter extends StatefulWidget {
   MessageModel messageModel;
   BuildContext buildContext;
@@ -63,14 +64,18 @@ class _MessageAdapterState extends State<MessageAdapter>
         if (widget.messageModel.messageType != MessageType.deleted &&
                 widget.messageModel.messageType != MessageType.date ||
             widget.messageModel.messageType != MessageType.loading) {
-          context.read<MessageRoomCubit>().selectUnselectMessage(widget.messageModel);
+          context
+              .read<MessageRoomCubit>()
+              .selectUnselectMessage(widget.messageModel);
           messageSelectionAppBar(
               messageModel: widget.messageModel,
               buildContext: widget.buildContext);
         }
       },
       child: ColoredBox(
-        color: widget.messageModel.isSelected?Colors.grey.shade300:Colors.transparent,
+        color: widget.messageModel.isSelected
+            ? Colors.grey.shade300
+            : Colors.transparent,
         child: widget.messageModel.messageType == MessageType.date
             ? _displayDate()
             : widget.messageModel.messageType == MessageType.loading
@@ -301,9 +306,20 @@ class _MessageAdapterState extends State<MessageAdapter>
         ? Padding(
             padding:
                 const EdgeInsets.only(left: 6.0, right: 6, bottom: 2, top: 2),
-            child: Text(
-              widget.messageModel.message,
+            child: SelectableLinkify(
+              onOpen: (link) async {
+                if (await canLaunch(link.url)) {
+                  await launch(link.url);
+                } else {
+                  throw 'Could not launch $link';
+                }
+              },
+
+
+              text: widget.messageModel.message,
               style: TextStyles.bodyTextPrimary,
+              linkStyle: TextStyles.bodyTextPrimary
+                  .copyWith(color: AppColors.PrimaryColor),
             ),
           )
         : widget.messageModel.messageType == MessageType.image
